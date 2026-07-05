@@ -117,7 +117,9 @@ frappe.ui.form.on('VAT Declaration', {
 function get_values(frm) {
     // Total revenue
     get_total(frm, "viewVAT_200", 'total_revenue');
-    // get_total(frm, "viewVAT_205", 'non_taxable_revenue');
+    // Case 205 (memo) : prestations optees selon art. 22, deja incluses dans le 200.
+    // Fix fork : reactive l'auto-remplissage. NE PAS soustraire du 299 (voir update_taxable_revenue).
+    get_total(frm, "viewVAT_205", 'non_taxable_revenue');
     // Deductions
     get_total(frm, "viewVAT_220", 'tax_free_services');
     get_total(frm, "viewVAT_221", 'revenue_abroad');
@@ -195,7 +197,10 @@ function update_taxable_revenue(frm) {
         frm.doc.non_taxable_services + 
         frm.doc.losses +
         frm.doc.misc;
-    var taxable = frm.doc.total_revenue - frm.doc.non_taxable_revenue - deductions;
+    // Formulaire AFC : 299 = ch.200 - ch.289 (289 = 220+221+225+230+235+280).
+    // Le 205 (non_taxable_revenue = prestations optees art.22) est un MEMO inclus dans le 200 :
+    // il NE se soustrait PAS (bug upstream corrige ici).
+    var taxable = frm.doc.total_revenue - deductions;
     frm.set_value('total_deductions', deductions);
     frm.set_value('taxable_revenue', taxable);
 }

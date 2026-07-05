@@ -20,7 +20,9 @@ frappe.query_reports["Kontrolle MwSt"] = {
             "fieldname":"code",
             "label": __("Code"),
             "fieldtype": "Select",
-            "options": "200\n220\n221\n225\n230\n235\n302\n303\n312\n313\n322\n323\n332\n333\n342\n343\n382\n383\n400\n405",
+            // Fix fork : options remplies dynamiquement dans onload a partir des VAT query
+            // existantes (dropdown data-driven -> inclut 205 et tout code genere, exclut les obsoletes).
+            "options": "200",
             "default" : "200",
             "reqd": 1
         },
@@ -32,5 +34,19 @@ frappe.query_reports["Kontrolle MwSt"] = {
             "default" : frappe.defaults.get_default("Company"),
             "reqd": 1
         }
-    ]
+    ],
+    "onload": function(report) {
+        // Construit la liste des codes AFC a partir des VAT query "viewVAT_<code>" reellement definies.
+        frappe.db.get_list("VAT query", { fields: ["name"], limit: 0 }).then(function(rows) {
+            var codes = (rows || [])
+                .map(function(r) { return r.name.replace("viewVAT_", ""); })
+                .filter(function(c) { return /^[0-9]+$/.test(c); })
+                .sort(function(a, b) { return parseInt(a, 10) - parseInt(b, 10); });
+            if (codes.length) {
+                var f = report.get_filter("code");
+                f.df.options = codes.join("\n");
+                f.refresh();
+            }
+        });
+    }
 };

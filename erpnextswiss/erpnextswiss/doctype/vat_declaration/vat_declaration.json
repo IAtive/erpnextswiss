@@ -137,7 +137,7 @@
    "depends_on": "eval:doc.vat_type == 'effective'",
    "fieldname": "non_taxable_revenue",
    "fieldtype": "Float",
-   "label": "Non-taxable revenue (205)",
+   "label": "Opted supplies art. 22 (205)",
    "precision": "2"
   },
   {

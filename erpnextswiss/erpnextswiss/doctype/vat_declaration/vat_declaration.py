@@ -49,7 +49,7 @@ class VATDeclaration(Document):
             'z500': self.payable_tax,
             'z900': self.grants,
             'z910': self.donations,
-            'acquisition_rate': 7.7 if self.start_date < "2024-01-01" else 8.1,
+            'acquisition_rate': 7.7 if str(self.start_date) < "2024-01-01" else 8.1,  # fix v16 : start_date est un date, pas une str
             'rate1': self.rate_1,
             'rate1_2024': self.rate_1,
             'rate2': self.rate_2,

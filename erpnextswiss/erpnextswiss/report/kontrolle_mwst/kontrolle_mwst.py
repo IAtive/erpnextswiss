@@ -15,17 +15,21 @@ def execute(filters=None):
     if not filters.code:
         filters.code = "200"
 
-    # define columns
+    # define columns (journal TVA facon bexio : reference, compte, description, code, net, TVA, total)
     columns = [
-        {"label": _("Document"), "fieldname": "name", "fieldtype": "Dynamic Link", "options": "doctype", "width": 120},
-        {"label": _("Date"), "fieldname": "posting_date", "fieldtype": "Date", "width": 100},
-        {"label": _("Total"), "fieldname": "base_grand_total", "fieldtype": "Currency", "width": 100},
-        {"label": _("Taxes and Charges"), "fieldname": "taxes_and_charges", "fieldtype": "Data", "width": 150},
-        {"label": _("Tax Amount"), "fieldname": "total_taxes_and_charges", "fieldtype": "Currency", "width": 100},
-        {"label": _("Remarks"), "fieldname": "remarks", "fieldtype": "Data", "width": 150}
+        {"label": _("Date"), "fieldname": "posting_date", "fieldtype": "Date", "width": 90},
+        {"label": _("Reference"), "fieldname": "name", "fieldtype": "Dynamic Link", "options": "doctype", "width": 150},
+        {"label": _("Account"), "fieldname": "account", "fieldtype": "Link", "options": "Account", "width": 150},
+        {"label": _("Description"), "fieldname": "description", "fieldtype": "Data", "width": 220},
+        {"label": _("Tax code"), "fieldname": "tax_code", "fieldtype": "Data", "width": 200},
+        {"label": _("Currency"), "fieldname": "currency", "fieldtype": "Data", "width": 70},
+        {"label": _("Net amount"), "fieldname": "base_grand_total", "fieldtype": "Currency", "options": "currency", "width": 120},
+        {"label": _("VAT"), "fieldname": "tax_amount", "fieldtype": "Currency", "options": "currency", "width": 110},
+        {"label": _("Total"), "fieldname": "total_amount", "fieldtype": "Currency", "options": "currency", "width": 120},
     ]
 
     data = get_data(filters.from_date, filters.end_date, filters.code, filters.company)
+    # Le total est fourni par Frappe (add_total_row = 1 dans le report) -> pas de ligne manuelle.
     return columns, data
 
 def get_data(from_date, end_date, code, company="%"):
