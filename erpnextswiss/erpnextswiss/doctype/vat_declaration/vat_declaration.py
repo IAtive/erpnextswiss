@@ -46,7 +46,7 @@ class VATDeclaration(Document):
             'z410': self.missing_pretax,
             'z415': self.pretax_correction_mixed,
             'z420': self.pretax_correction_other,
-            'z500': self.payable_tax,
+            'z500': (self.payable_tax or 0) - (self.balance or 0),  # net signe (negatif = credit) pour eCH-0217
             'z900': self.grants,
             'z910': self.donations,
             'acquisition_rate': 7.7 if str(self.start_date) < "2024-01-01" else 8.1,  # fix v16 : start_date est un date, pas une str

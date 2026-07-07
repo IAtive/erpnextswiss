@@ -149,7 +149,16 @@ function get_values(frm) {
     if (frm.doc.vat_type == "effective") {
         get_tax(frm, "viewVAT_400", 'pretax_material');
         get_tax(frm, "viewVAT_405", 'pretax_investments');
+        // Fix fork : cases 410/415/420 non cablees a l'origine. Le 410 (degrevement ulterieur,
+        // art. 32) est indispensable depuis que la case est portee par la ligne (DUIP -> 410) :
+        // sans ce cablage, le 479 raterait le degrevement et le 500 serait surevalue.
+        get_tax(frm, "viewVAT_410", 'missing_pretax');
+        get_tax(frm, "viewVAT_415", 'pretax_correction_mixed');
+        get_tax(frm, "viewVAT_420", 'pretax_correction_other');
     }
+    // Section III : autres mouvements de fonds (subventions 900, dons 910) — Fix fork.
+    get_total(frm, "viewVAT_900", 'grants');
+    get_total(frm, "viewVAT_910", 'donations');
 }
 
 // force recalculate
@@ -256,8 +265,12 @@ function update_payable_tax(frm) {
         + frm.doc.form_1050
         + frm.doc.form_1055;
     frm.set_value('total_pretax_reductions', pretax);
-    var payable_tax = frm.doc.total_tax - pretax;
-    frm.set_value('payable_tax', payable_tax);
+    var net = frm.doc.total_tax - pretax;
+    // Fix fork : ventilation 500 (a payer) / 510 (en faveur) — montants POSITIFS et exclusifs,
+    // comme le formulaire officiel AFC. Le net signe est reconstitue pour le XML
+    // (payableTax = 500 - 510 ; negatif = credit, autorise par eCH-0217 amountType).
+    frm.set_value('payable_tax', net >= 0 ? net : 0);
+    frm.set_value('balance', net < 0 ? -net : 0);
 }
 
 function download_transfer_file(frm) {
