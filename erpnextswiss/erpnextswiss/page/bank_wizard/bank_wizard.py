@@ -156,7 +156,11 @@ def get_default_accounts(bank_account=None, company=None):
         company = frappe.get_value("Account", bank_account, "company")
     receivable_account = frappe.get_value('Company', company, 'default_receivable_account')
     payable_account = frappe.get_value('Company', company, 'default_payable_account')
-    expense_payable_account = frappe.get_value('Company', company, 'default_expense_claim_payable_account') or payable_account
+    # fix v16 : default_expense_claim_payable_account est un champ HR (app hrms) qui peut ne pas
+    # exister sur Company -> on le lit seulement s'il est present, sinon fallback sur le payable
+    expense_payable_account = payable_account
+    if frappe.get_meta('Company').has_field('default_expense_claim_payable_account'):
+        expense_payable_account = frappe.get_value('Company', company, 'default_expense_claim_payable_account') or payable_account
     auto_process_matches = frappe.get_value('ERPNextSwiss Settings', 'ERPNextSwiss Settings', 'auto_process_matches')
     return {
         'company': company,
