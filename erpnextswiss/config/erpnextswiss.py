@@ -128,12 +128,6 @@ def get_data():
             "icon": "octicon octicon-file-submodule",
             "items": [
                    {
-                       "type": "doctype",
-                       "name": "Contract",
-                       "label": _("Contract"),
-                       "description": _("Contract")                   
-                   },
-                   {
                         "type": "report",
                         "name": "Service Invoicing",
                         "label": _("Service Invoicing"),
