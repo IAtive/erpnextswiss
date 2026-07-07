@@ -6,12 +6,10 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "title",
   "company",
-  "cmp_abbr",
+  "title",
   "column_break_1",
   "vat_type",
-  "letter_head",
   "section_break_period",
   "start_date",
   "column_break_2",
@@ -32,39 +30,42 @@
   "normal_amount_2024",
   "reduced_amount_2024",
   "lodging_amount_2024",
-  "normal_amount",
-  "reduced_amount",
-  "lodging_amount",
+  "additional_amount_2024",
   "amount_1_2024",
   "amount_2_2024",
-  "amount_1",
-  "amount_2",
-  "additional_amount_2024",
-  "additional_amount",
   "column_break_3",
   "normal_rate_2024",
   "reduced_rate_2024",
   "lodging_rate_2024",
-  "normal_rate",
-  "reduced_rate",
-  "lodging_rate",
   "rate_1_2024",
   "rate_2_2024",
-  "rate_1",
-  "rate_2",
   "column_break_4",
   "normal_tax_2024",
   "reduced_tax_2024",
   "lodging_tax_2024",
+  "additional_tax_2024",
+  "tax_1_2024",
+  "tax_2_2024",
+  "section_old_rates",
+  "normal_amount",
+  "reduced_amount",
+  "lodging_amount",
+  "additional_amount",
+  "amount_1",
+  "amount_2",
+  "column_break_old_a",
+  "normal_rate",
+  "reduced_rate",
+  "lodging_rate",
+  "rate_1",
+  "rate_2",
+  "column_break_old_b",
   "normal_tax",
   "reduced_tax",
   "lodging_tax",
-  "tax_1_2024",
-  "tax_2_2024",
+  "additional_tax",
   "tax_1",
   "tax_2",
-  "additional_tax_2024",
-  "additional_tax",
   "section_summary",
   "total_tax",
   "pretax_material",
@@ -80,9 +81,18 @@
   "section_other_cashflows",
   "grants",
   "donations",
-  "amended_from"
+  "amended_from",
+  "cmp_abbr",
+  "letter_head"
  ],
  "fields": [
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Société",
+   "options": "Company",
+   "reqd": 1
+  },
   {
    "fieldname": "title",
    "fieldtype": "Data",
@@ -97,13 +107,13 @@
   {
    "fieldname": "vat_type",
    "fieldtype": "Select",
-   "label": "VAT type",
+   "label": "Méthode de décompte",
    "options": "effective\nflat"
   },
   {
    "fieldname": "section_break_period",
    "fieldtype": "Section Break",
-   "label": "Period"
+   "label": "Période de décompte"
   },
   {
    "fieldname": "start_date",
@@ -124,68 +134,68 @@
   {
    "fieldname": "section_revenue",
    "fieldtype": "Section Break",
-   "label": "Revenue"
+   "label": "I. Chiffre d'affaires"
   },
   {
    "columns": 10,
    "fieldname": "total_revenue",
    "fieldtype": "Float",
-   "label": "Total revenue (200)",
+   "label": "200 · Total des contre-prestations convenues ou reçues (art. 39)",
    "precision": "2"
   },
   {
    "depends_on": "eval:doc.vat_type == 'effective'",
    "fieldname": "non_taxable_revenue",
    "fieldtype": "Float",
-   "label": "Opted supplies art. 22 (205)",
+   "label": "205 · Contre-prestations optées (art. 22), incluses dans le ch. 200",
    "precision": "2"
   },
   {
    "fieldname": "section_deductions",
    "fieldtype": "Section Break",
-   "label": "Deductions"
+   "label": "Déductions (ch. 220 à 289)"
   },
   {
    "fieldname": "tax_free_services",
    "fieldtype": "Float",
-   "label": "Tax-free services (220)",
+   "label": "220 · Prestations exonérées (exportations, art. 23)",
    "precision": "2"
   },
   {
    "fieldname": "revenue_abroad",
    "fieldtype": "Float",
-   "label": "Revenue abroad (221)",
+   "label": "221 · Prestations fournies à l'étranger",
    "precision": "2"
   },
   {
    "fieldname": "transfers",
    "fieldtype": "Float",
-   "label": "Transfers (225)",
+   "label": "225 · Transferts (procédure de déclaration, art. 38)",
    "precision": "2"
   },
   {
    "fieldname": "non_taxable_services",
    "fieldtype": "Float",
-   "label": "Non-taxable services (230)",
+   "label": "230 · Prestations exclues du champ de l'impôt (art. 21)",
    "precision": "2"
   },
   {
    "fieldname": "losses",
    "fieldtype": "Float",
-   "label": "Losses (235)",
+   "label": "235 · Diminutions de la contre-prestation",
    "precision": "2"
   },
   {
    "fieldname": "misc",
    "fieldtype": "Float",
-   "label": "Miscellaneous (280)",
+   "label": "280 · Divers (p. ex. valeur du terrain)",
    "precision": "2"
   },
   {
    "default": "0.0",
    "fieldname": "total_deductions",
    "fieldtype": "Float",
-   "label": "Total deductions (289)",
+   "label": "289 · Total des déductions (ch. 220 à 280)",
    "precision": "2",
    "read_only": 1
   },
@@ -195,54 +205,54 @@
    "fieldname": "taxable_revenue",
    "fieldtype": "Float",
    "in_list_view": 1,
-   "label": "Taxable revenue (299)",
+   "label": "299 · Chiffre d'affaires imposable (200 − 289)",
    "precision": "2",
    "read_only": 1
   },
   {
    "fieldname": "section_tax_calculation",
    "fieldtype": "Section Break",
-   "label": "Tax calculation"
+   "label": "II. Calcul de l'impôt"
   },
   {
    "depends_on": "eval:doc.vat_type == 'effective'",
-   "fieldname": "normal_amount",
+   "fieldname": "normal_amount_2024",
    "fieldtype": "Float",
-   "label": "Normal (302)",
+   "label": "303 · Taux normal 8.1% — Prestations",
    "precision": "2"
   },
   {
    "depends_on": "eval:doc.vat_type == 'effective'",
-   "fieldname": "reduced_amount",
+   "fieldname": "reduced_amount_2024",
    "fieldtype": "Float",
-   "label": "Reduced (312)",
+   "label": "313 · Taux réduit 2.6% — Prestations",
    "precision": "2"
   },
   {
    "depends_on": "eval:doc.vat_type == 'effective'",
-   "fieldname": "lodging_amount",
+   "fieldname": "lodging_amount_2024",
    "fieldtype": "Float",
-   "label": "Lodging (342)",
+   "label": "343 · Hébergement 3.8% — Prestations",
+   "precision": "2"
+  },
+  {
+   "fieldname": "additional_amount_2024",
+   "fieldtype": "Float",
+   "label": "383 · Impôt sur les acquisitions — Prestations",
    "precision": "2"
   },
   {
    "depends_on": "eval:doc.vat_type == 'flat'",
-   "fieldname": "amount_1",
+   "fieldname": "amount_1_2024",
    "fieldtype": "Float",
-   "label": "Amount 1 (322)",
+   "label": "323 · TaDFN taux 1 — Prestations",
    "precision": "2"
   },
   {
    "depends_on": "eval:doc.vat_type == 'flat'",
-   "fieldname": "amount_2",
+   "fieldname": "amount_2_2024",
    "fieldtype": "Float",
-   "label": "Amount 2 (332)",
-   "precision": "2"
-  },
-  {
-   "fieldname": "additional_amount",
-   "fieldtype": "Float",
-   "label": "Additional (382)",
+   "label": "333 · TaDFN taux 2 — Prestations",
    "precision": "2"
   },
   {
@@ -250,47 +260,181 @@
    "fieldtype": "Column Break"
   },
   {
-   "default": "7.7",
+   "default": "8.1",
    "depends_on": "eval:doc.vat_type == 'effective'",
-   "fieldname": "normal_rate",
+   "fieldname": "normal_rate_2024",
    "fieldtype": "Percent",
-   "label": "Normal rate (%)"
+   "label": "Taux normal (%)"
   },
   {
-   "default": "2.5",
+   "default": "2.6",
    "depends_on": "eval:doc.vat_type == 'effective'",
-   "fieldname": "reduced_rate",
+   "fieldname": "reduced_rate_2024",
    "fieldtype": "Percent",
-   "label": "Reduced rate (%)"
+   "label": "Taux réduit (%)"
   },
   {
    "default": "3.8",
    "depends_on": "eval:doc.vat_type == 'effective'",
-   "fieldname": "lodging_rate",
+   "fieldname": "lodging_rate_2024",
    "fieldtype": "Percent",
-   "label": "Lodging rate (%)"
+   "label": "Taux hébergement (%)"
   },
   {
    "depends_on": "eval:doc.vat_type == 'flat'",
-   "fieldname": "rate_1",
+   "fieldname": "rate_1_2024",
    "fieldtype": "Percent",
-   "label": "Rate 1 (%)"
+   "label": "TaDFN taux 1 (%)"
   },
   {
    "depends_on": "eval:doc.vat_type == 'flat'",
-   "fieldname": "rate_2",
+   "fieldname": "rate_2_2024",
    "fieldtype": "Percent",
-   "label": "Rate 2 (%)"
+   "label": "TaDFN taux 2 (%)"
   },
   {
    "fieldname": "column_break_4",
    "fieldtype": "Column Break"
   },
   {
+   "fieldname": "normal_tax_2024",
+   "fieldtype": "Float",
+   "label": "300 · Impôt — taux normal 8.1%",
+   "precision": "2",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval:doc.vat_type == 'effective'",
+   "fieldname": "reduced_tax_2024",
+   "fieldtype": "Float",
+   "label": "310 · Impôt — taux réduit 2.6%",
+   "precision": "2",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval:doc.vat_type == 'effective'",
+   "fieldname": "lodging_tax_2024",
+   "fieldtype": "Float",
+   "label": "340 · Impôt — hébergement 3.8%",
+   "precision": "2",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval:doc.vat_type == 'effective'",
+   "fieldname": "additional_tax_2024",
+   "fieldtype": "Float",
+   "label": "380 · Impôt sur les acquisitions",
+   "precision": "2"
+  },
+  {
+   "depends_on": "eval:doc.vat_type == 'flat'",
+   "fieldname": "tax_1_2024",
+   "fieldtype": "Float",
+   "label": "320 · Impôt TaDFN 1",
+   "precision": "2",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval:doc.vat_type == 'flat'",
+   "fieldname": "tax_2_2024",
+   "fieldtype": "Float",
+   "label": "330 · Impôt TaDFN 2",
+   "precision": "2",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_old_rates",
+   "fieldtype": "Section Break",
+   "label": "Anciens taux (jusqu'au 31.12.2023)",
+   "collapsible": 1
+  },
+  {
+   "depends_on": "eval:doc.vat_type == 'effective'",
+   "fieldname": "normal_amount",
+   "fieldtype": "Float",
+   "label": "302 · Taux normal 7.7% (≤2023) — Prestations",
+   "precision": "2"
+  },
+  {
+   "depends_on": "eval:doc.vat_type == 'effective'",
+   "fieldname": "reduced_amount",
+   "fieldtype": "Float",
+   "label": "312 · Taux réduit 2.5% (≤2023) — Prestations",
+   "precision": "2"
+  },
+  {
+   "depends_on": "eval:doc.vat_type == 'effective'",
+   "fieldname": "lodging_amount",
+   "fieldtype": "Float",
+   "label": "342 · Hébergement 3.7% (≤2023) — Prestations",
+   "precision": "2"
+  },
+  {
+   "fieldname": "additional_amount",
+   "fieldtype": "Float",
+   "label": "382 · Impôt sur les acquisitions (≤2023) — Prestations",
+   "precision": "2"
+  },
+  {
+   "depends_on": "eval:doc.vat_type == 'flat'",
+   "fieldname": "amount_1",
+   "fieldtype": "Float",
+   "label": "322 · TaDFN taux 1 (≤2023) — Prestations",
+   "precision": "2"
+  },
+  {
+   "depends_on": "eval:doc.vat_type == 'flat'",
+   "fieldname": "amount_2",
+   "fieldtype": "Float",
+   "label": "332 · TaDFN taux 2 (≤2023) — Prestations",
+   "precision": "2"
+  },
+  {
+   "fieldname": "column_break_old_a",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "7.7",
+   "depends_on": "eval:doc.vat_type == 'effective'",
+   "fieldname": "normal_rate",
+   "fieldtype": "Percent",
+   "label": "Taux normal 2023 (%)"
+  },
+  {
+   "default": "2.5",
+   "depends_on": "eval:doc.vat_type == 'effective'",
+   "fieldname": "reduced_rate",
+   "fieldtype": "Percent",
+   "label": "Taux réduit 2023 (%)"
+  },
+  {
+   "default": "3.8",
+   "depends_on": "eval:doc.vat_type == 'effective'",
+   "fieldname": "lodging_rate",
+   "fieldtype": "Percent",
+   "label": "Taux hébergement 2023 (%)"
+  },
+  {
+   "depends_on": "eval:doc.vat_type == 'flat'",
+   "fieldname": "rate_1",
+   "fieldtype": "Percent",
+   "label": "TaDFN taux 1 2023 (%)"
+  },
+  {
+   "depends_on": "eval:doc.vat_type == 'flat'",
+   "fieldname": "rate_2",
+   "fieldtype": "Percent",
+   "label": "TaDFN taux 2 2023 (%)"
+  },
+  {
+   "fieldname": "column_break_old_b",
+   "fieldtype": "Column Break"
+  },
+  {
    "depends_on": "eval:doc.vat_type == 'effective'",
    "fieldname": "normal_tax",
    "fieldtype": "Float",
-   "label": "Normal tax (300)",
+   "label": "Impôt — taux normal 7.7% (≤2023)",
    "precision": "2",
    "read_only": 1
   },
@@ -298,7 +442,7 @@
    "depends_on": "eval:doc.vat_type == 'effective'",
    "fieldname": "reduced_tax",
    "fieldtype": "Float",
-   "label": "Reduced tax (310)",
+   "label": "Impôt — taux réduit 2.5% (≤2023)",
    "precision": "2",
    "read_only": 1
   },
@@ -306,15 +450,21 @@
    "depends_on": "eval:doc.vat_type == 'effective'",
    "fieldname": "lodging_tax",
    "fieldtype": "Float",
-   "label": "Lodging tax (340)",
+   "label": "Impôt — hébergement 3.7% (≤2023)",
    "precision": "2",
    "read_only": 1
+  },
+  {
+   "fieldname": "additional_tax",
+   "fieldtype": "Float",
+   "label": "Impôt sur les acquisitions (≤2023)",
+   "precision": "2"
   },
   {
    "depends_on": "eval:doc.vat_type == 'flat'",
    "fieldname": "tax_1",
    "fieldtype": "Float",
-   "label": "Tax 1 (320)",
+   "label": "Impôt TaDFN 1 (≤2023)",
    "precision": "2",
    "read_only": 1
   },
@@ -322,61 +472,55 @@
    "depends_on": "eval:doc.vat_type == 'flat'",
    "fieldname": "tax_2",
    "fieldtype": "Float",
-   "label": "Tax 2 (330)",
+   "label": "Impôt TaDFN 2 (≤2023)",
    "precision": "2",
    "read_only": 1
   },
   {
-   "fieldname": "additional_tax",
-   "fieldtype": "Float",
-   "label": "Additional tax (380)",
-   "precision": "2"
-  },
-  {
    "fieldname": "section_summary",
    "fieldtype": "Section Break",
-   "label": "Summary"
+   "label": "Impôt préalable et décompte"
   },
   {
    "bold": 1,
    "fieldname": "total_tax",
    "fieldtype": "Float",
-   "label": "Total tax (399)",
+   "label": "399 · Total de l'impôt dû (ch. 302 à 383)",
    "precision": "2"
   },
   {
    "depends_on": "eval:doc.vat_type == 'effective'",
    "fieldname": "pretax_material",
    "fieldtype": "Float",
-   "label": "Pretax material and services (400)",
+   "label": "400 · Impôt préalable sur matériel et prestations de services",
    "precision": "2"
   },
   {
    "depends_on": "eval:doc.vat_type == 'effective'",
    "fieldname": "pretax_investments",
    "fieldtype": "Float",
-   "label": "Pretax investments (405)",
+   "label": "405 · Impôt préalable sur investissements et autres charges",
    "precision": "2"
   },
   {
    "depends_on": "eval:doc.vat_type == 'effective'",
    "fieldname": "missing_pretax",
    "fieldtype": "Float",
-   "label": "Missing pretax (410)",
+   "label": "410 · Dégrèvement ultérieur de l'impôt préalable (art. 32)",
    "precision": "2"
   },
   {
    "depends_on": "eval:doc.vat_type == 'effective'",
    "fieldname": "pretax_correction_mixed",
    "fieldtype": "Float",
-   "label": "Pretax correction mixed (415)",
+   "label": "415 · Corrections : double affectation (art. 30), prestations à soi-même (art. 31)",
    "precision": "2"
   },
   {
    "depends_on": "eval:doc.vat_type == 'effective'",
    "fieldname": "pretax_correction_other",
    "fieldtype": "Float",
-   "label": "Pretax correction other (420)",
+   "label": "420 · Réductions : subventions, taxes touristiques (art. 33 al. 2)",
    "precision": "2"
   },
   {
@@ -384,7 +528,7 @@
    "depends_on": "eval:doc.vat_type == 'flat'",
    "fieldname": "form_1050",
    "fieldtype": "Float",
-   "label": "Form 1050 (470)",
+   "label": "470 · Formulaire 1050",
    "precision": "2"
   },
   {
@@ -392,13 +536,13 @@
    "depends_on": "eval:doc.vat_type == 'flat'",
    "fieldname": "form_1055",
    "fieldtype": "Float",
-   "label": "Form 1055 (471)",
+   "label": "471 · Formulaire 1055",
    "precision": "2"
   },
   {
    "fieldname": "total_pretax_reductions",
    "fieldtype": "Float",
-   "label": "Total pretax reductions (479)",
+   "label": "479 · Total de l'impôt préalable (ch. 400 à 420)",
    "precision": "2",
    "read_only": 1
   },
@@ -406,31 +550,31 @@
    "bold": 1,
    "fieldname": "payable_tax",
    "fieldtype": "Float",
-   "label": "Payable tax (500)",
+   "label": "500 · Montant à payer à l'AFC",
    "precision": "2",
    "read_only": 1
   },
   {
    "fieldname": "balance",
    "fieldtype": "Float",
-   "label": "Balance (510)",
+   "label": "510 · Solde en faveur de l'assujetti",
    "precision": "2"
   },
   {
    "fieldname": "section_other_cashflows",
    "fieldtype": "Section Break",
-   "label": "Other cashflows"
+   "label": "III. Autres mouvements de fonds (art. 18 al. 2)"
   },
   {
    "fieldname": "grants",
    "fieldtype": "Float",
-   "label": "Grants (900)",
+   "label": "900 · Subventions, taxes touristiques (art. 18 al. 2 let. a-c)",
    "precision": "2"
   },
   {
    "fieldname": "donations",
    "fieldtype": "Float",
-   "label": "Donations (910)",
+   "label": "910 · Dons, dividendes, dédommagements (let. d-l)",
    "precision": "2"
   },
   {
@@ -441,13 +585,6 @@
    "options": "VAT Declaration",
    "print_hide": 1,
    "read_only": 1
-  },
-  {
-   "fieldname": "company",
-   "fieldtype": "Link",
-   "label": "Company",
-   "options": "Company",
-   "reqd": 1
   },
   {
    "fetch_from": "company.abbr",
@@ -464,126 +601,6 @@
    "hidden": 1,
    "label": "Letter Head",
    "options": "Letter Head"
-  },
-  {
-   "depends_on": "eval:doc.vat_type == 'effective'",
-   "fieldname": "normal_amount_2024",
-   "fieldtype": "Float",
-   "label": "Normal (303)",
-   "precision": "2"
-  },
-  {
-   "depends_on": "eval:doc.vat_type == 'effective'",
-   "fieldname": "reduced_amount_2024",
-   "fieldtype": "Float",
-   "label": "Reduced (313)",
-   "precision": "2"
-  },
-  {
-   "depends_on": "eval:doc.vat_type == 'effective'",
-   "fieldname": "lodging_amount_2024",
-   "fieldtype": "Float",
-   "label": "Lodging (343)",
-   "precision": "2"
-  },
-  {
-   "depends_on": "eval:doc.vat_type == 'flat'",
-   "fieldname": "amount_1_2024",
-   "fieldtype": "Float",
-   "label": "Amount 1 (323)",
-   "precision": "2"
-  },
-  {
-   "depends_on": "eval:doc.vat_type == 'flat'",
-   "fieldname": "amount_2_2024",
-   "fieldtype": "Float",
-   "label": "Amount 2 (333)",
-   "precision": "2"
-  },
-  {
-   "default": "8.1",
-   "depends_on": "eval:doc.vat_type == 'effective'",
-   "fieldname": "normal_rate_2024",
-   "fieldtype": "Percent",
-   "label": "Normal rate - 2024 (%)"
-  },
-  {
-   "default": "2.6",
-   "depends_on": "eval:doc.vat_type == 'effective'",
-   "fieldname": "reduced_rate_2024",
-   "fieldtype": "Percent",
-   "label": "Reduced rate - 2024 (%)"
-  },
-  {
-   "default": "3.8",
-   "depends_on": "eval:doc.vat_type == 'effective'",
-   "fieldname": "lodging_rate_2024",
-   "fieldtype": "Percent",
-   "label": "Lodging rate - 2024 (%)"
-  },
-  {
-   "depends_on": "eval:doc.vat_type == 'flat'",
-   "fieldname": "rate_1_2024",
-   "fieldtype": "Percent",
-   "label": "Rate 1 - 2024 (%)"
-  },
-  {
-   "depends_on": "eval:doc.vat_type == 'flat'",
-   "fieldname": "rate_2_2024",
-   "fieldtype": "Percent",
-   "label": "Rate 2 - 2024 (%)"
-  },
-  {
-   "fieldname": "normal_tax_2024",
-   "fieldtype": "Float",
-   "label": "Normal tax (300)",
-   "precision": "2",
-   "read_only": 1
-  },
-  {
-   "depends_on": "eval:doc.vat_type == 'effective'",
-   "fieldname": "reduced_tax_2024",
-   "fieldtype": "Float",
-   "label": "Reduced tax (310)",
-   "precision": "2",
-   "read_only": 1
-  },
-  {
-   "depends_on": "eval:doc.vat_type == 'effective'",
-   "fieldname": "lodging_tax_2024",
-   "fieldtype": "Float",
-   "label": "Lodging tax (340)",
-   "precision": "2",
-   "read_only": 1
-  },
-  {
-   "depends_on": "eval:doc.vat_type == 'effective'",
-   "fieldname": "additional_tax_2024",
-   "fieldtype": "Float",
-   "label": "Additional tax (380)",
-   "precision": "2"
-  },
-  {
-   "depends_on": "eval:doc.vat_type == 'flat'",
-   "fieldname": "tax_1_2024",
-   "fieldtype": "Float",
-   "label": "Tax 1 (320)",
-   "precision": "2",
-   "read_only": 1
-  },
-  {
-   "depends_on": "eval:doc.vat_type == 'flat'",
-   "fieldname": "tax_2_2024",
-   "fieldtype": "Float",
-   "label": "Tax 2 (330)",
-   "precision": "2",
-   "read_only": 1
-  },
-  {
-   "fieldname": "additional_amount_2024",
-   "fieldtype": "Float",
-   "label": "Additional (383)",
-   "precision": "2"
   }
  ],
  "is_submittable": 1,
