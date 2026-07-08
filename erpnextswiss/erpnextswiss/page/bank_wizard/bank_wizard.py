@@ -13,6 +13,19 @@ from frappe.utils.data import get_url_to_form
 from erpnext.setup.utils import get_exchange_rate
 import datetime
 
+# Fallback inspire de bexio : rapproche une facture ouverte du tiers deja identifie (par nom)
+# dont le montant est dans la TOLERANCE CHF 5 OU 2% (la plus favorable) — gere escompte, frais,
+# arrondi. Ne retourne un match que s'il est UNIQUE (evite les faux positifs).
+def _match_within_tolerance(candidates, party, amount, party_key):
+    amount = abs(float(amount))
+    tol = max(5.0, round(amount * 0.02, 2))
+    hits = [c for c in candidates
+            if c.get(party_key) == party and abs(float(c['outstanding_amount']) - amount) <= tol]
+    if len(hits) == 1:
+        return hits[0]['name'], float(hits[0]['outstanding_amount'])
+    return None, 0.0
+
+
 # this function tries to match the amount to an open sales invoice
 #
 # returns the sales invoice reference (name string) or None
@@ -517,6 +530,7 @@ def read_camt_transactions(transaction_entries, account, settings, debug=False, 
                     invoice_matches = []
                     expense_matches = None
                     matched_amount = 0.0
+                    amount_tolerance_used = False   # True si match par montant tolerance (fallback)
                     if credit_debit == "DBIT":
                         # match by payment instruction id
                         possible_pinvs = []
@@ -601,6 +615,14 @@ def read_camt_transactions(transaction_entries, account, settings, debug=False, 
                                     party_match = pinv['supplier']
                                     # add total matched amount
                                     matched_amount += float(pinv['outstanding_amount'])
+                            # Fallback (bexio) : fournisseur identifie mais pas de match par reference
+                            # -> facture ouverte dont le montant est dans la tolerance CHF 5 / 2%.
+                            if not invoice_matches and party_match:
+                                m_name, m_out = _match_within_tolerance(possible_pinvs, party_match, amount, 'supplier')
+                                if m_name:
+                                    invoice_matches = [m_name]
+                                    matched_amount = m_out
+                                    amount_tolerance_used = True
                         # employees
                         match_employees = frappe.get_all("Employee",
                             filters={'employee_name': party_name, 'status': 'active'},
@@ -653,6 +675,15 @@ def read_camt_transactions(transaction_entries, account, settings, debug=False, 
                                     # add total matched amount
                                     matched_amount += float(sinv['outstanding_amount'])
 
+                            # Fallback (bexio) : pas de match par reference mais client identifie par nom
+                            # -> propose sa facture ouverte dont le montant est dans la tolerance CHF 5 / 2%.
+                            if not invoice_matches and party_match:
+                                m_name, m_out = _match_within_tolerance(possible_sinvs, party_match, amount, 'customer')
+                                if m_name:
+                                    invoice_matches = [m_name]
+                                    matched_amount = m_out
+                                    amount_tolerance_used = True
+
                     # reset invoice matches in case there are no matches
                     try:
                         if len(invoice_matches) == 0:
@@ -676,7 +707,8 @@ def read_camt_transactions(transaction_entries, account, settings, debug=False, 
                         'invoice_matches': invoice_matches,
                         'matched_amount': round(matched_amount, 2),
                         'employee_match': employee_match,
-                        'expense_matches': expense_matches
+                        'expense_matches': expense_matches,
+                        'amount_tolerance': amount_tolerance_used
                     }
                     txns.append(new_txn)
         else:

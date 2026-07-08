@@ -1,44 +1,72 @@
-<div style="margin: 5px; margin-top: 0px; border-top: 1px solid white; ">
-  <!-- load the zip extension -->
+<style>
+  .bwp { margin: 18px 0; }
+  .bwp-card { border: 1px solid var(--border-color); border-radius: 12px; padding: 26px;
+      background: var(--card-bg); }
+  .bwp-head { display: flex; align-items: center; gap: 14px; }
+  .bwp-icon { width: 46px; height: 46px; flex: none; border-radius: 10px;
+      background: var(--bg-blue); color: var(--text-on-blue);
+      display: flex; align-items: center; justify-content: center; }
+  .bwp-title { font-size: 17px; font-weight: 600; color: var(--text-color); margin: 0; }
+  .bwp-sub { color: var(--text-muted); font-size: 13px; margin: 2px 0 0 0; }
+  .bwp-drop { margin-top: 22px; border: 2px dashed var(--border-color); border-radius: 10px;
+      padding: 24px; text-align: center; background: var(--subtle-accent); transition: border-color .15s; }
+  .bwp-drop:hover { border-color: var(--primary); }
+  .bwp-drop b { color: var(--text-color); }
+  .bwp-drop input[type=file] { display: inline-block; margin-top: 12px; }
+  .bwp-hint { color: var(--text-muted); font-size: 12px; margin-top: 12px; }
+  .bwp-row { margin-top: 18px; }
+  .bwp-row select { max-width: 320px; }
+  .bwp-actions { margin-top: 22px; text-align: right; }
+  .bwp-actions .btn-parse-file { padding: 7px 24px; font-weight: 600; }
+</style>
+
+<div class="bwp">
   <script src="/assets/erpnextswiss/js/jszip.min.js"></script>
-  
-  <p class="text-muted">{%= __("Import payment entries from bank account file") %}</p>
 
-  <div class="section-body">
-    <div class="row"> 
-      <div class="form-column col-sm-6">
-        <p>{{ __("File") }} <input type="file" id="input_file" /></p>
-        <p>
-            <select id="bank_account" disabled style="visibility: hidden;">
-            </select>
-            <input id="intermediate_account" class="hidden" />
-            <input id="company" class="hidden" />
-            <input id="receivable_account" class="hidden" />
-            <input id="payable_account" class="hidden" />
-            <input id="expense_payable_account" class="hidden" />
-            <input id="default_customer" class="hidden" />
-            <input id="default_supplier" class="hidden" />
-            <input id="auto_process_matches" class="hidden" />
-      </p>
+  <div class="bwp-card">
+    <div class="bwp-head">
+      <div class="bwp-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M4 21V10M20 21V10M12 3 3 8h18zM8 21v-6M12 21v-6M16 21v-6"></path></svg>
       </div>
-
-      <div class="form-column col-sm-6" style="text-align: right; ">	  	
-        <br><button type="submit" id="btn-parse-file" class="btn btn-sm btn-primary btn-parse-file">{{ __("Parse") }}</button>  
-        <i id="waitingScreen" class="fa fa-spinner fa-spin hidden"></i>
+      <div>
+        <p class="bwp-title">{{ __("Import a bank statement") }}</p>
+        <p class="bwp-sub">{{ __("Match incoming and outgoing payments to your invoices") }}</p>
       </div>
     </div>
-      
-    <div class="row">
-        <div class="col-sm-12">
-        <div id="table_placeholder"></div>	    
+
+    <div class="bwp-drop">
+      <div><b>{{ __("Choose a bank statement file") }}</b></div>
+      <input type="file" id="input_file" />
+      <div class="bwp-hint">{{ __("Accepted formats: camt.053 / camt.054 (ISO 20022), MT940, or a ZIP archive") }}</div>
     </div>
+
+    <input id="intermediate_account" class="hidden" />
+    <input id="company" class="hidden" />
+    <input id="receivable_account" class="hidden" />
+    <input id="payable_account" class="hidden" />
+    <input id="expense_payable_account" class="hidden" />
+    <input id="default_customer" class="hidden" />
+    <input id="default_supplier" class="hidden" />
+    <input id="auto_process_matches" class="hidden" />
+
+    <div class="bwp-row">
+      <select id="bank_account" class="form-control" disabled style="visibility: hidden;"></select>
+    </div>
+
+    <div class="bwp-actions">
+      <i id="waitingScreen" class="fa fa-spinner fa-spin hidden"></i>
+      <button type="submit" id="btn-parse-file" class="btn btn-primary btn-parse-file">{{ __("Parse") }}</button>
     </div>
   </div>
-  
+
+  <div class="row" style="margin-top: 18px;">
+    <div class="col-sm-12">
+      <div id="table_placeholder"></div>
+    </div>
+  </div>
 </div>
 
 <div id="waitingScreen" class="overlay">
-  <!-- Overlay content -->
   <div class="overlay-content">
     <p><i class="fa fa-spinner fa-spin" style="font-size:80px"></i></p>
     <p>{{ __("Please wait, parsing data...") }}</p>
