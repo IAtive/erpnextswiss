@@ -11,6 +11,7 @@ import ast
 from frappe.utils import cint, flt
 from frappe.utils.data import get_url_to_form
 from erpnext.setup.utils import get_exchange_rate
+from erpnext.accounts.party import get_party_account
 import datetime
 
 # Fallback inspire de bexio : rapproche une facture ouverte du tiers deja identifie (par nom)
@@ -943,9 +944,29 @@ def make_payment_entry(amount, date, reference_no, paid_from=None, paid_to=None,
         })
     if party_type == "Employee":
         payment_entry.paid_to = get_payable_account(company, employee=True)['account'] or paid_to         # note: at creation, this is ignored
+    # Rapprochement d'une (ou plusieurs) facture(s) sur un tiers Customer/Supplier : on pose le compte
+    # de tiers NORMAL (creance 1100 / dette 2000, ou le compte specifique du tiers) ET on ajoute les
+    # references AVANT l'insert. Sans ca, l'option "Book Advance Payments in Separate Party Account"
+    # bascule le paiement non alloue sur le compte d'ACOMPTE (2030/1130) au moment de l'insert, puis
+    # l'ajout de la reference apres coup produit le mismatch "facture sur 1100 / paiement sur 2030".
+    # En mettant les references des l'insert, ERPNext resout le bon compte et ne le reecrit pas.
+    # Robuste que la separation soit activee ou non (get_party_account rend deja 1100/2000 sans elle).
+    # Un encaissement/decaissement SANS reference (vrai acompte via bouton Customer/Supplier) n'est pas
+    # touche -> l'acompte reste correctement sur 2030/1130.
+    prebooked_references = False
+    if references and party and party_type in ("Customer", "Supplier"):
+        normal_party_account = get_party_account(party_type, party, company)
+        if normal_party_account:
+            if payment_entry.payment_type == "Receive":
+                payment_entry.paid_from = normal_party_account
+            elif payment_entry.payment_type == "Pay":
+                payment_entry.paid_to = normal_party_account
+        for reference in references:
+            append_reference(payment_entry, reference, reference_type)
+        prebooked_references = True
     new_entry = payment_entry.insert()
-    # add references after insert (otherwise they are overwritten)
-    if references:
+    # add references after insert (advances / employee : party account not concerned by the mismatch)
+    if references and not prebooked_references:
         for reference in references:
             create_reference(new_entry.name, reference, reference_type)
     # pattern matching
@@ -981,6 +1002,26 @@ def make_payment_entry(amount, date, reference_no, paid_from=None, paid_to=None,
         matched_entry.submit()
         frappe.db.commit()
     return {'link': get_url_to_form("Payment Entry", new_entry.name), 'payment_entry': new_entry.name}
+
+# appends a reference row to the Payment Entry doc BEFORE insert (so ERPNext resolves the normal
+# party account instead of the advance account). Same allocation logic as create_reference.
+def append_reference(payment_entry_doc, invoice_reference, invoice_type="Sales Invoice"):
+    if "Invoice" in invoice_type:
+        total_amount = frappe.get_value(invoice_type, invoice_reference, "base_grand_total")
+        outstanding_amount = frappe.get_value(invoice_type, invoice_reference, "outstanding_amount")
+    else:
+        total_amount = frappe.get_value(invoice_type, invoice_reference, "total_claimed_amount")
+        outstanding_amount = total_amount
+    paid_amount = payment_entry_doc.paid_amount
+    allocated_amount = outstanding_amount if paid_amount > outstanding_amount else paid_amount
+    payment_entry_doc.append("references", {
+        "reference_doctype": invoice_type,
+        "reference_name": invoice_reference,
+        "total_amount": total_amount,
+        "outstanding_amount": outstanding_amount,
+        "allocated_amount": allocated_amount,
+    })
+
 
 # creates the reference record in a payment entry
 def create_reference(payment_entry, invoice_reference, invoice_type="Sales Invoice"):

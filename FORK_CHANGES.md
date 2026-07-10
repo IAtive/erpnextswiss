@@ -81,6 +81,9 @@ Ajout du schéma officiel **`eCH-0217-2-0-0.xsd`** + ses dépendances (eCH-0058,
 
 ## 5. Bank Wizard (`page/bank_wizard`) — matching & design
 
+> 📖 **Guide utilisateur des boutons de rapprochement** (quand chaque bouton s'affiche, quand l'utiliser,
+> effet produit) : voir **`page/bank_wizard/README.md`**.
+
 ### 5.1 Matching par tolérance + par nom de tiers (inspiré bexio)
 `bank_wizard.py` :
 - helper **`_match_within_tolerance()`** : rapproche une facture ouverte du tiers dont le montant est
@@ -105,6 +108,26 @@ Ajout du schéma officiel **`eCH-0217-2-0-0.xsd`** + ses dépendances (eCH-0058,
 > (chaîne entre **apostrophes simples**). **Jamais d'apostrophe ASCII `'`** dans ces fichiers (casse le
 > bundle : `SyntaxError`) → guillemets doubles + `'` (U+2019) ou entités HTML. `bench build --app erpnextswiss`
 > après modification.
+
+### 5.3 Compte de tiers au rapprochement de facture (compatibilité « Book Advance in Separate Party Account »)
+`bank_wizard.py` (`make_payment_entry`) :
+- **Problème** : le Wizard créait le Payment Entry **sans référence**, puis ajoutait la facture **après**
+  l'insert. Avec l'option ERPNext **« Book Advance Payments in Separate Party Account »** activée, un
+  paiement non alloué est logé sur le **compte d'acompte** (2030 encaissement / 1130 décaissement). La
+  facture (sur **1100** / **2000**) ajoutée ensuite provoquait le blocage
+  *« Sales Invoice … is associated with 1100 …, but Party Account is 2030 »*.
+- **Correctif** : quand il y a des **références de facture** sur un tiers `Customer`/`Supplier`, on pose le
+  **compte de tiers normal** via `get_party_account(...)` (**jamais** le compte d'acompte) **et** on ajoute
+  les références **AVANT l'insert** (nouvelle fonction **`append_reference()`**, même allocation que
+  `create_reference`). ERPNext résout alors le bon compte à l'insert et ne le réécrit pas.
+- **Vrai acompte préservé** : un encaissement/décaissement **sans référence** (bouton *Customer/Supplier*)
+  n'est **pas** touché → reste sur **2030/1130**. Comportement **robuste que la séparation soit activée ou non**
+  (sans elle, `get_party_account` rend déjà 1100/2000).
+- Import ajouté : `from erpnext.accounts.party import get_party_account`.
+
+> Côté `swiss_compliance_setup` : le setup épingle `default_receivable_account = 1100` /
+> `default_payable_account = 2000` (sinon 2030, typé `Receivable`, est choisi par défaut pour les
+> **factures** — bug distinct, corrigé séparément). Voir `ch_accounting_setup.md` §11.
 
 ---
 
@@ -145,7 +168,7 @@ erpnextswiss/doctype/vat_declaration/vat_declaration.js        # 205, câblage 4
 erpnextswiss/doctype/vat_declaration/vat_declaration.json      # nomenclature FR + réorg sections + Société 1er
 erpnextswiss/report/kontrolle_mwst/kontrolle_mwst.js           # dropdown data-driven
 erpnextswiss/report/kontrolle_mwst/kontrolle_mwst.py           # colonnes enrichies + total
-erpnextswiss/page/bank_wizard/bank_wizard.py                   # hrms fix, tolérance CHF 5/2%, nom de tiers
+erpnextswiss/page/bank_wizard/bank_wizard.py                   # hrms fix, tolérance CHF 5/2%, nom de tiers, compte de tiers au rapprochement (§5.3)
 erpnextswiss/page/bank_wizard/bank_wizard.html                 # page d'accueil pro, theme-aware
 erpnextswiss/page/bank_wizard/transaction_table.html           # tableau + badges, theme-aware
 erpnextswiss/public/xsd/                                       # eCH-0217 v2 + dépendances
