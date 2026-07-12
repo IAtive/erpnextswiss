@@ -60,7 +60,7 @@ In case you update from the sources and observe an error, make sure to update de
     * ZUGFeRD: fully electronic invoices.
     * ZUGFeRD Wizard: read and interpret both ZUGFeRD and QR-invoices to purchase invoices
 * Taxes
-    * Import monthly average exchange rates, daily exchange rates (ESTV)
+    * Import monthly average exchange rates, daily exchange rates (ESTV) — scheduled, with config & logs (see [docs/swiss_exchange_rates.md](docs/swiss_exchange_rates.md))
     * VAT declaration (with ESTV data transfer easyTax/ePortal)
     * Zefix integration
 * Human resources

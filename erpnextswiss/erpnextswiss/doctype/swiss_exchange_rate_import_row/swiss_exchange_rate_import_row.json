@@ -1,0 +1,60 @@
+{
+ "actions": [],
+ "creation": "2026-07-12 10:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "from_currency",
+  "to_currency",
+  "exchange_rate",
+  "value_date",
+  "action"
+ ],
+ "fields": [
+  {
+   "fieldname": "from_currency",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "From Currency"
+  },
+  {
+   "fieldname": "to_currency",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "To Currency"
+  },
+  {
+   "fieldname": "exchange_rate",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Exchange Rate",
+   "precision": "9"
+  },
+  {
+   "fieldname": "value_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Value Date"
+  },
+  {
+   "fieldname": "action",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Action",
+   "options": "Inserted\nSkipped"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2026-07-12 10:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "ERPNextSwiss",
+ "name": "Swiss Exchange Rate Import Row",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

@@ -102,6 +102,8 @@ email_append_to = ["EDI File"]
 # before_install = "erpnextswiss.install.before_install"
 after_install = "erpnextswiss.setup.install.after_install"
 
+after_migrate = "erpnextswiss.erpnextswiss.doctype.swiss_exchange_rate_settings.swiss_exchange_rate_settings.ensure_defaults"
+
 # Desk Notifications
 # ------------------
 # See frappe.core.notifications.get_notification_config
@@ -161,7 +163,8 @@ doc_events = {
 scheduler_events = {
     "daily": [
         "erpnextswiss.erpnextswiss.doctype.inspection_equipment.inspection_equipment.check_calibration_status",
-        "erpnextswiss.erpnextswiss.ebics.background_sync"
+        "erpnextswiss.erpnextswiss.ebics.background_sync",
+        "erpnextswiss.erpnextswiss.doctype.swiss_exchange_rate_settings.swiss_exchange_rate_settings.scheduled_fetch"
     ],
     "hourly": [
         "erpnextswiss.erpnextswiss.edi.process_incoming"
