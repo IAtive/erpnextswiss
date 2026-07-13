@@ -402,6 +402,38 @@ def read_camt_transactions(transaction_entries, account, settings, debug=False, 
                             # fallback to amount from entry level
                             amount = entry_amount
                             currency = entry_currency
+                # --- exchange rate + original (instructed) amount, when the bank converted (ISO <AmtDtls>)
+                # Ex. paiement EUR depuis un compte CHF : <InstdAmt Ccy="EUR"> + <CcyXchg><XchgRate>.
+                # Sert a poser le bon montant en devise + le taux reel sur le Payment Entry (gain/perte de change).
+                xchg_rate = None
+                instructed_amount = None
+                instructed_currency = None
+                try:
+                    amt_dtls = transaction_soup.txdtls.amtdtls
+                    if amt_dtls:
+                        instd = amt_dtls.find("instdamt")
+                        if instd and instd.amt:
+                            instructed_amount = float(instd.amt.get_text())
+                            instructed_currency = instd.amt.get("ccy")
+                    # Le parser HTML de BeautifulSoup "hisse" souvent <XchgRate> hors de <AmtDtls>/<TxDtls>
+                    # -> on le cherche dans le transaction_soup, puis au niveau entry_soup en repli.
+                    xchg = transaction_soup.find("xchgrate") or entry_soup.find("xchgrate")
+                    if xchg:
+                        xchg_rate = float(xchg.get_text())
+                except:
+                    pass
+                # FX : la transaction est en DEVISE (ex. TxAmt EUR 5400) mais le compte booke en CHF.
+                # On GARDE `amount` en DEVISE -> le MATCHING compare bien 5400 EUR a la facture en EUR.
+                # On retient A PART le montant BOOKE en CHF (entry_amount, ex. 4988.93) dans booked_amount,
+                # pour poser le bon CHF cote banque dans le Payment Entry (le taux se derive: CHF booke / devise).
+                booked_amount = None
+                booked_currency = None
+                if currency and entry_currency and currency != entry_currency:
+                    if not instructed_amount:
+                        instructed_amount = float(amount)
+                        instructed_currency = currency
+                    booked_amount = entry_amount
+                    booked_currency = entry_currency
                 try:
                     # --- find party IBAN
                     if credit_debit == "DBIT":
@@ -709,7 +741,12 @@ def read_camt_transactions(transaction_entries, account, settings, debug=False, 
                         'matched_amount': round(matched_amount, 2),
                         'employee_match': employee_match,
                         'expense_matches': expense_matches,
-                        'amount_tolerance': amount_tolerance_used
+                        'amount_tolerance': amount_tolerance_used,
+                        'xchg_rate': xchg_rate,
+                        'instructed_amount': instructed_amount,
+                        'instructed_currency': instructed_currency,
+                        'booked_amount': booked_amount,
+                        'booked_currency': booked_currency
                     }
                     txns.append(new_txn)
         else:
@@ -857,7 +894,8 @@ def read_camt_transactions(transaction_entries, account, settings, debug=False, 
 @frappe.whitelist()
 def make_payment_entry(amount, date, reference_no, paid_from=None, paid_to=None, type="Receive",
     party=None, party_type=None, references=None, remarks=None, auto_submit=False, exchange_rate=1,
-    party_iban=None, company=None, pattern=None):
+    party_iban=None, company=None, pattern=None, instructed_amount=None, xchg_rate=None,
+    booked_amount=None):
     # assert list
     if references:
         references = ast.literal_eval(references)
@@ -870,15 +908,67 @@ def make_payment_entry(amount, date, reference_no, paid_from=None, paid_to=None,
             company = frappe.get_value("Account", paid_from, "company")
         elif paid_to:
             company = frappe.get_value("Account", paid_to, "company")
-    # prepare to verify exchange rates
+    # ---- taux de change & montants multi-devises -----------------------------------------------
+    # Le cote TIERS (client/fournisseur) peut etre en devise (ex. creancier EUR 2001) ; le cote BANQUE
+    # est en general en CHF. `amount` = montant de la transaction (souvent EN DEVISE, ex. EUR 5400 ; sert
+    # au MATCHING contre la facture en devise). `booked_amount` = montant reellement BOOKE en CHF (ex.
+    # 4988.93, du camt). Pour qu'ERPNext calcule le gain/perte de change : cote tiers = montant EN DEVISE
+    # + taux reel, cote banque = CHF booke au taux 1. Taux = <XchgRate> du camt (valide) sinon derive
+    # (CHF booke / montant devise).
     company_currency = frappe.get_value("Company", company, "default_currency")
-    if type == "Receive":
-        account_currency = frappe.get_value("Account", paid_to, "account_currency")
-    else:
-        account_currency = frappe.get_value("Account", paid_from, "account_currency")
-    if account_currency != company_currency and exchange_rate == 1:
-        # re-evaluate exchange rate
-        exchange_rate = get_exchange_rate(from_currency=account_currency, to_currency=company_currency, transaction_date=date)
+    # Resoudre le VRAI compte tiers (souvent en devise) AVANT la detection de devise. Le bank wizard
+    # envoie le compte par defaut generique (2000/1100, en CHF) ; get_party_account rend le compte
+    # specifique au tiers (ex. creancier EUR 2001). Sans cette resolution en amont, party_currency est
+    # lue sur le compte CHF -> le bloc multi-devises plus bas ne se declenche pas et le taux reste a 1
+    # (bug: paiement d'une facture EUR booke a plat en CHF, sans reprise du taux reel du camt).
+    resolved_party_account = None
+    if references and party and party_type in ("Customer", "Supplier"):
+        resolved_party_account = get_party_account(party_type, party, company)
+        if resolved_party_account:
+            if type == "Receive":
+                paid_from = resolved_party_account
+            else:
+                paid_to = resolved_party_account
+    party_account = paid_from if type == "Receive" else paid_to      # cote tiers (client/fournisseur)
+    bank_side = paid_to if type == "Receive" else paid_from            # cote banque/caisse
+    party_currency = (frappe.get_value("Account", party_account, "account_currency")
+                      if party_account else company_currency) or company_currency
+    bank_currency = (frappe.get_value("Account", bank_side, "account_currency")
+                     if bank_side else company_currency) or company_currency
+    # defauts mono-devise : meme montant des deux cotes, un seul taux
+    paid_amt = received_amt = float(amount)
+    src_rate = tgt_rate = exchange_rate
+    if party_currency != company_currency and exchange_rate == 1:
+        if party_currency != bank_currency:
+            # la banque a CONVERTI : montant devise + taux reel cote tiers, CHF au taux 1 cote banque
+            foreign_amount = None
+            if instructed_amount:
+                foreign_amount = abs(float(instructed_amount))
+            elif references:
+                ref_dt = "Purchase Invoice" if type == "Pay" else "Sales Invoice"
+                try:
+                    foreign_amount = sum(flt(frappe.get_value(ref_dt, r, "outstanding_amount")) for r in references)
+                except Exception:
+                    foreign_amount = None
+            # CHF reellement debite/credite : le booked_amount du camt, sinon `amount` (cas manuel ou l'appel
+            # passe deja le CHF). C'est ce montant qui va cote BANQUE ; le montant en DEVISE va cote TIERS.
+            chf_amount = abs(float(booked_amount)) if booked_amount else abs(float(amount))
+            if foreign_amount and abs(foreign_amount) > 0.005:
+                real_rate = round(chf_amount / abs(foreign_amount), 6)            # derive (fiable) : CHF / devise
+                if xchg_rate and abs(abs(foreign_amount) * float(xchg_rate) - chf_amount) <= max(0.05, chf_amount * 0.02):
+                    real_rate = float(xchg_rate)                                  # XchgRate du camt (valide)
+                if type == "Receive":
+                    paid_amt, src_rate = foreign_amount, real_rate                # paid_from = tiers (devise)
+                    received_amt, tgt_rate = chf_amount, 1                         # paid_to = banque (CHF)
+                else:
+                    paid_amt, src_rate = chf_amount, 1                            # paid_from = banque (CHF)
+                    received_amt, tgt_rate = foreign_amount, real_rate            # paid_to = tiers (devise)
+            else:
+                # pas de montant en devise -> ancien fallback taux du jour
+                src_rate = tgt_rate = get_exchange_rate(from_currency=party_currency, to_currency=company_currency, transaction_date=date)
+        else:
+            # tiers et banque dans la MEME devise etrangere (ex. banque EUR + creancier EUR) : un seul taux
+            src_rate = tgt_rate = get_exchange_rate(from_currency=party_currency, to_currency=company_currency, transaction_date=date)
     if type == "Receive":
         # receive
         payment_entry = frappe.get_doc({
@@ -887,8 +977,8 @@ def make_payment_entry(amount, date, reference_no, paid_from=None, paid_to=None,
             'party_type': party_type,
             'party': party,
             'paid_to': paid_to,
-            'paid_amount': float(amount),
-            'received_amount': float(amount),
+            'paid_amount': paid_amt,
+            'received_amount': received_amt,
             'reference_no': reference_no,
             'reference_date': date,
             'posting_date': date,
@@ -896,8 +986,8 @@ def make_payment_entry(amount, date, reference_no, paid_from=None, paid_to=None,
             'camt_amount': float(amount),
             'bank_account_no': party_iban,
             'company': company,
-            'source_exchange_rate': exchange_rate,
-            'target_exchange_rate': exchange_rate
+            'source_exchange_rate': src_rate,
+            'target_exchange_rate': tgt_rate
         })
     elif type == "Pay":
         # pay
@@ -907,8 +997,8 @@ def make_payment_entry(amount, date, reference_no, paid_from=None, paid_to=None,
             'party_type': party_type,
             'party': party,
             'paid_from': paid_from,
-            'paid_amount': float(amount),
-            'received_amount': float(amount),
+            'paid_amount': paid_amt,
+            'received_amount': received_amt,
             'reference_no': reference_no,
             'reference_date': date,
             'posting_date': date,
@@ -916,8 +1006,8 @@ def make_payment_entry(amount, date, reference_no, paid_from=None, paid_to=None,
             'camt_amount': float(amount),
             'bank_account_no': party_iban,
             'company': company,
-            'source_exchange_rate': exchange_rate,
-            'target_exchange_rate': exchange_rate
+            'source_exchange_rate': src_rate,
+            'target_exchange_rate': tgt_rate
         })
         if party_type == "Employee":
             reference_type = "Expense Claim"
@@ -930,8 +1020,8 @@ def make_payment_entry(amount, date, reference_no, paid_from=None, paid_to=None,
             'payment_type': 'Internal Transfer',
             'paid_from': paid_from,
             'paid_to': paid_to,
-            'paid_amount': float(amount),
-            'received_amount': float(amount),
+            'paid_amount': paid_amt,
+            'received_amount': received_amt,
             'reference_no': reference_no,
             'reference_date': date,
             'posting_date': date,
@@ -939,8 +1029,8 @@ def make_payment_entry(amount, date, reference_no, paid_from=None, paid_to=None,
             'camt_amount': float(amount),
             'bank_account_no': party_iban,
             'company': company,
-            'source_exchange_rate': exchange_rate,
-            'target_exchange_rate': exchange_rate
+            'source_exchange_rate': src_rate,
+            'target_exchange_rate': tgt_rate
         })
     if party_type == "Employee":
         payment_entry.paid_to = get_payable_account(company, employee=True)['account'] or paid_to         # note: at creation, this is ignored
@@ -955,12 +1045,14 @@ def make_payment_entry(amount, date, reference_no, paid_from=None, paid_to=None,
     # touche -> l'acompte reste correctement sur 2030/1130.
     prebooked_references = False
     if references and party and party_type in ("Customer", "Supplier"):
-        normal_party_account = get_party_account(party_type, party, company)
-        if normal_party_account:
+        # compte tiers deja resolu en tete (resolved_party_account) : on l'affecte au doc pour que la
+        # reference s'attache au bon compte des l'insert (evite le mismatch 1100/2030 quand la separation
+        # des acomptes est active).
+        if resolved_party_account:
             if payment_entry.payment_type == "Receive":
-                payment_entry.paid_from = normal_party_account
+                payment_entry.paid_from = resolved_party_account
             elif payment_entry.payment_type == "Pay":
-                payment_entry.paid_to = normal_party_account
+                payment_entry.paid_to = resolved_party_account
         for reference in references:
             append_reference(payment_entry, reference, reference_type)
         prebooked_references = True
@@ -1012,8 +1104,13 @@ def append_reference(payment_entry_doc, invoice_reference, invoice_type="Sales I
     else:
         total_amount = frappe.get_value(invoice_type, invoice_reference, "total_claimed_amount")
         outstanding_amount = total_amount
-    paid_amount = payment_entry_doc.paid_amount
-    allocated_amount = outstanding_amount if paid_amount > outstanding_amount else paid_amount
+    # montant du paiement dans la DEVISE DU TIERS (pour plafonner l'allocation) : cote tiers = paid_from
+    # pour un Receive (creance), paid_to pour un Pay (dette). En mono-devise, les deux sont egaux.
+    if payment_entry_doc.payment_type == "Pay":
+        party_amount = payment_entry_doc.received_amount
+    else:
+        party_amount = payment_entry_doc.paid_amount
+    allocated_amount = outstanding_amount if party_amount > outstanding_amount else party_amount
     payment_entry_doc.append("references", {
         "reference_doctype": invoice_type,
         "reference_name": invoice_reference,

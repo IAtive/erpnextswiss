@@ -20,7 +20,8 @@ app_include_js = [
     "/assets/erpnextswiss/js/swiss_common.js",
     "/assets/erpnextswiss/js/iban.js",
     "/assets/erpnextswiss/js/email.js",
-    "assets/js/erpnextswiss_templates.min.js"
+    # NB: "erpnextswiss_templates.min.js" retiré — bundle legacy non genere par Frappe v16 (404).
+    # Rien ne l'utilise cote client (aucun frappe.templates[...]) ; la table est rendue server-side.
 ]
 
 # include js, css files in header of web template

@@ -21,6 +21,7 @@ L'upstream ciblait v13-15. Correctifs ponctuels pour tourner en v16 :
 | `page/bank_wizard/bank_wizard.py` (`get_default_accounts`) | lecture de `default_expense_claim_payable_account` **gardée** par `frappe.get_meta("Company").has_field(...)` | ce champ vient de l'app **hrms** ; erpnextswiss **ne dépend pas** de hrms → crash SQL (colonne inconnue) si hrms absent. Fallback sur le compte fournisseur. |
 | `pyproject.toml` | retrait de la dépendance `frappe` | conflit d'install en v16 |
 | `zugferd/zugferd.py` | fix import `factur-x` | API de la lib changée |
+| `hooks.py` (`app_include_js`) | retrait de `erpnextswiss_templates.min.js` | bundle legacy **non généré** par le build v16 → **404** à chaque page desk. Rien ne l'utilise (aucun `frappe.templates[...]` client ; la table du Bank Wizard est rendue **server-side**). |
 
 ---
 
@@ -129,6 +130,43 @@ Ajout du schéma officiel **`eCH-0217-2-0-0.xsd`** + ses dépendances (eCH-0058,
 > `default_payable_account = 2000` (sinon 2030, typé `Receivable`, est choisi par défaut pour les
 > **factures** — bug distinct, corrigé séparément). Voir `ch_accounting_setup.md` §11.
 
+### 5.4 Taux de change au rapprochement d'une facture en devise (gain/perte de change)
+`bank_wizard.py` (`read_camt053` + `make_payment_entry`) + `bank_wizard.js` :
+- **Problème** : pour une facture en **devise** (ex. créancier EUR 2001) payée depuis une **banque CHF**,
+  le Wizard passait le **montant CHF débité** comme montant EUR, au **taux 1** : `received_amount = amount`,
+  `source/target_exchange_rate = exchange_rate (1)`. La logique de taux regardait en plus le **mauvais
+  compte** (côté banque `paid_from` au lieu du côté tiers). Résultat : **facture mal soldée** (le CHF pris
+  pour de l'EUR → allocation partielle) **et gain/perte de change absent ou faux**.
+- **Correctif — 3 couches** :
+  1. **`read_camt053`** : extrait, par transaction, `xchg_rate` (`<CcyXchg>/<XchgRate>`), `instructed_amount`
+     (`<AmtDtls>/<InstdAmt>`, montant d'origine en devise) et **`booked_amount`** = le montant **réellement
+     BOOKÉ en CHF** (`<Ntry><Amt>`, ex. 4988.93) quand la transaction est dans une **devise ≠ celle du compte**.
+     ⚠️ **`amount` reste EN DEVISE** (le `<TxAmt>`, ex. EUR 5400) — indispensable pour que le **MATCHING**
+     compare bien 5400 EUR à la facture en EUR ; le CHF réel voyage à part dans `booked_amount`.
+     ⚠️ Le parser HTML de BeautifulSoup **hisse `<XchgRate>` hors de `<TxDtls>`** → cherché dans
+     `transaction_soup` puis **en repli au niveau `entry_soup`** (sinon toujours `None`).
+  2. **`bank_wizard.js`** : passe `xchg_rate`, `instructed_amount` **et `booked_amount`** à `make_payment_entry`.
+  3. **`make_payment_entry`** : identifie le **côté TIERS** (créance pour Receive, dette pour Pay) ; s'il est
+     en devise et différent de la banque, pose le **montant EN DEVISE** (`InstdAmt` du camt, sinon l'ouvert
+     de la facture) côté tiers, et le **CHF réellement débité** (`booked_amount`, sinon `amount`) côté banque
+     au taux 1. Taux tiers = `XchgRate` du camt s'il concorde avec les montants, sinon **dérivé** = CHF booké
+     ÷ montant devise (= 4988.93/5400 = **0.923876**, fiable même sans `XchgRate`).
+  4. **`append_reference`** : l'allocation est plafonnée par le montant **dans la devise du tiers**
+     (`received_amount` pour Pay, `paid_amount` pour Receive), plus par le CHF débité.
+  5. **Ordre — résolution du compte tiers AVANT la détection de devise** (correctif clé) : le JS envoie le
+     **compte par défaut générique** (`2000`/`1100`, en **CHF**) dans `paid_from`/`paid_to`. La détection de
+     devise doit donc appeler `get_party_account(...)` **en tête** de `make_payment_entry` pour obtenir le
+     **compte spécifique du tiers** (ex. créancier EUR `2001`) **avant** de lire `party_currency`. Sinon la
+     devise du tiers est lue sur le compte CHF générique → `party_currency == company_currency` → le bloc
+     multi-devises **ne se déclenche jamais** → `paid_amount`/`target_exchange_rate` restent à plat
+     (ex. `5400` CHF / taux `1` au lieu de `4988.93` CHF / `0.923876`). Le compte résolu est réutilisé plus
+     bas pour l'`append_reference` (une seule résolution).
+- **Résultat** : facture **soldée** dans sa devise, dette/créance soldée en CHF, **gain/perte de change sur
+  6999** calculé contre le taux facture. Fallback fiable **même si la banque ne fournit pas `XchgRate`**.
+- Robuste en mono-devise (comportement inchangé). Prérequis : les tiers en devise doivent avoir leur compte
+  de tiers **en devise** rattaché (Customer/Supplier → *Accounts* : 1101/2001) pour que `get_party_account`
+  (§5.3) renvoie le bon compte.
+
 ---
 
 ## 6. Retrait du doctype `Contract` (collision avec ERPNext natif)
@@ -168,7 +206,7 @@ erpnextswiss/doctype/vat_declaration/vat_declaration.js        # 205, câblage 4
 erpnextswiss/doctype/vat_declaration/vat_declaration.json      # nomenclature FR + réorg sections + Société 1er
 erpnextswiss/report/kontrolle_mwst/kontrolle_mwst.js           # dropdown data-driven
 erpnextswiss/report/kontrolle_mwst/kontrolle_mwst.py           # colonnes enrichies + total
-erpnextswiss/page/bank_wizard/bank_wizard.py                   # hrms fix, tolérance CHF 5/2%, nom de tiers, compte de tiers au rapprochement (§5.3)
+erpnextswiss/page/bank_wizard/bank_wizard.py                   # hrms fix, tolérance CHF 5/2%, nom de tiers, compte de tiers (§5.3), taux de change camt (§5.4)
 erpnextswiss/page/bank_wizard/bank_wizard.html                 # page d'accueil pro, theme-aware
 erpnextswiss/page/bank_wizard/transaction_table.html           # tableau + badges, theme-aware
 erpnextswiss/public/xsd/                                       # eCH-0217 v2 + dépendances
