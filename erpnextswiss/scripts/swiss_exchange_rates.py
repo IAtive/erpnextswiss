@@ -199,6 +199,32 @@ def read_daily_rates(currencies=["EUR"]):
     return fetch_and_store(rate_type="Daily", currencies=currencies, trigger="Manual")
 
 
+@frappe.whitelist()
+def year_end_rates(date, currencies):
+    """Cours AFC de CLÔTURE (cours du jour à une date donnée) pour la réévaluation de change.
+
+    LECTURE SEULE : ne crée AUCUN « Currency Exchange » — indispensable pour ne PAS polluer les cours
+    des transactions (qui restent au cours moyen mensuel). Le cours de clôture n'existe donc que dans
+    le formulaire de réévaluation (champ new_exchange_rate), jamais en base.
+
+    Si `date` n'est pas un jour de publication (week-end / férié), recule jusqu'au dernier jour ouvré
+    (max 6 jours). Retourne {devise: cours_vers_CHF}."""
+    from frappe.utils import getdate, add_days
+    if isinstance(currencies, str):
+        currencies = frappe.parse_json(currencies)
+    d = getdate(date)
+    for _ in range(7):
+        url = "{0}?d={1}".format(ENDPOINTS["Daily"], d.strftime("%Y%m%d"))
+        try:
+            _period, pairs = _parse_estv_xml(url, currencies)
+        except Exception:
+            pairs = []
+        if pairs:
+            return {code: rate for code, rate in pairs}
+        d = getdate(add_days(d, -1))   # jour non publié → dernier jour ouvré
+    return {}
+
+
 """
 Import du taux inverse (CHF -> devise), basé sur le dernier cours devise -> CHF en base.
 Conservé pour usage manuel ; fetch_and_store gère déjà l'inverse via create_inverted.

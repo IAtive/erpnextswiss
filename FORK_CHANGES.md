@@ -196,6 +196,25 @@ Ces éléments **s'appuient** sur le fork mais vivent dans l'app métier :
 
 ---
 
+## 8. Cours de clôture AFC pour la réévaluation de change (change latent)
+
+**Problème** : la réévaluation de fin d'année (doctype natif *Exchange Rate Revaluation*) doit valoriser
+les postes en devise au **cours de clôture** (cours du jour au 31.12), **différent** du cours moyen mensuel
+utilisé pour les transactions. Or **stocker** ce cours de clôture dans *Currency Exchange* le ferait
+utiliser à tort par les factures datées du 31.12 (incohérence méthode « cours moyen mensuel »).
+
+**Solution — bouton non invasif sur *Exchange Rate Revaluation*** :
+- `scripts/swiss_exchange_rates.py` → **`year_end_rates(date, currencies)`** (`@frappe.whitelist`) :
+  **lecture seule**, lit le cours du jour BAZG (`xmldaily?d=YYYYMMDD`) via `_parse_estv_xml`, **sans écrire
+  aucun Currency Exchange**. Repli sur le **dernier jour ouvré** si la date n'est pas publiée (max 6 j).
+- `public/js/exchange_rate_revaluation.js` (hook **`doctype_js`**) : bouton **« Appliquer cours de clôture
+  AFC »** qui remplit `new_exchange_rate` sur chaque ligne (par devise) via `frappe.model.set_value` →
+  **déclenche le recalcul natif** d'ERPNext (gain/perte). Additif : le contrôleur core n'est pas touché.
+- **Cohérence préservée** : le cours de clôture ne vit que dans le formulaire de réévaluation, jamais en
+  base → les transactions de décembre restent au cours moyen mensuel. Cf. `ch_accounting_setup.md` §11.
+
+---
+
 ## Récapitulatif des fichiers du fork modifiés
 
 ```
@@ -212,6 +231,9 @@ erpnextswiss/page/bank_wizard/transaction_table.html           # tableau + badge
 erpnextswiss/public/xsd/                                       # eCH-0217 v2 + dépendances
 erpnextswiss/workspace/erpnextswiss/erpnextswiss.json          # retrait lien Contract
 erpnextswiss/config/erpnextswiss.py                            # retrait item Contract
+erpnextswiss/hooks.py                                          # doctype_js Exchange Rate Revaluation (§8) ; retrait templates.min.js (§1)
+erpnextswiss/scripts/swiss_exchange_rates.py                   # year_end_rates() lecture seule — cours de clôture AFC (§8)
+erpnextswiss/public/js/exchange_rate_revaluation.js            # bouton « Appliquer cours de clôture AFC » (§8)
 (supprimés) erpnextswiss/doctype/contract{,_period,_service}/  # collision Contract natif
 ```
 
