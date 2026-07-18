@@ -320,6 +320,63 @@ def set_company_defaults(company):
         frappe.db.set_value("Company", company, updates)
 
 
+# Comptes techniques de l'inventaire PERPÉTUEL. SRBNB + EIIV = « reçu / engagé, PAS encore facturé »
+# → passifs de régularisation (CO art. 958b, comptabilité d'exercice), rangés dans la famille 230.
+# (num, nom, account_type ERPNext)
+PERPETUAL_ACCOUNTS = [
+    ("2301", "Marchandises reçues, non facturées", "Stock Received But Not Billed"),
+    ("2302", "Frais accessoires inclus dans la valorisation", "Expenses Included In Valuation"),
+]
+
+
+def setup_perpetual_inventory(company):
+    """Méthode d'inventaire PERPÉTUEL — le stock est le cœur de métier (négoce / revendeur).
+    Le stock est valorisé EN TEMPS RÉEL : chaque réception l'entre (Dr 1200), chaque livraison en
+    sort le coût (Dr 4200 COGS / Cr 1200). **Impact TVA : AUCUN** (la TVA reste sur les factures ;
+    les mouvements de stock n'en portent pas). Voir doc §15 #10 + §20 (négoce/perpétuel).
+
+    Pose :
+      - 2 comptes techniques en **passif de régularisation** (famille 230, CO 958b) :
+          **2301 SRBNB** « Marchandises reçues, non facturées » — tampon réception ↔ facture,
+          **2302 EIIV** « Frais accessoires inclus dans la valorisation » — tampon landed cost ↔ facture ;
+      - **active « Enable Perpetual Inventory »** + câble les comptes de stock de la société
+          (1200 stock, 4208 ajustement, 2301 SRBNB).
+    `account_type` posé sur 1200 (Stock) / 4208 (Stock Adjustment) pour qu'ERPNext les reconnaisse ;
+    EIIV (2302) est trouvé par son `account_type` seul (pas de champ Company)."""
+    print("→ Inventaire perpétuel (négoce)…")
+    ref2300 = _acc(company, "2300")  # Passifs de régularisation → parent commun de 2301/2302
+    parent = frappe.db.get_value("Account", ref2300, "parent_account") if ref2300 else None
+    for num, name, atype in PERPETUAL_ACCOUNTS:
+        if _acc_silent(company, num):
+            continue
+        if not parent:
+            print(f"  ⚠️ parent (2300) introuvable — {num} non créé")
+            continue
+        doc = frappe.get_doc({"doctype": "Account", "company": company, "account_number": num,
+                              "account_name": name, "account_type": atype, "parent_account": parent})
+        doc.flags.ignore_permissions = True
+        doc.insert(ignore_if_duplicate=True)
+        print(f"  ✓ {num} « {name} » créé ({atype})")
+    # Comptes de stock reconnus par ERPNext via leur account_type
+    stock = _acc(company, "1200")                                    # Stock In Hand
+    adjust = _acc_silent(company, "4208") or _acc_silent(company, "4800")  # Stock Adjustment
+    if stock:
+        frappe.db.set_value("Account", stock, "account_type", "Stock")
+    if adjust:
+        frappe.db.set_value("Account", adjust, "account_type", "Stock Adjustment")
+    # Activation + câblage société
+    srbnb = _acc_silent(company, "2301")
+    updates = {"enable_perpetual_inventory": 1}
+    if stock:
+        updates["default_inventory_account"] = stock
+    if adjust:
+        updates["stock_adjustment_account"] = adjust
+    if srbnb:
+        updates["stock_received_but_not_billed"] = srbnb
+    frappe.db.set_value("Company", company, updates)
+    print("  ✓ perpétuel activé (stock 1200, ajustement 4208/4800, SRBNB 2301, EIIV 2302)")
+
+
 def set_erpnextswiss_settings(company):
     """Configure ERPNextSwiss Settings : compte intermediaire (compte d'attente) = 1099.
     Utilise par le Bank Wizard pour parquer les lignes bancaires non identifiees.
@@ -577,6 +634,7 @@ def setup_company(company):
     create_items(company)
     tag_account_boxes(company)
     set_company_defaults(company)
+    setup_perpetual_inventory(company)
     set_erpnextswiss_settings(company)
     set_accounting_settings()
     setup_currency_accounts(company)

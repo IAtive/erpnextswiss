@@ -91,16 +91,20 @@ def collect(company, start_date, end_date):
 
     # ===================== Contrôle 2 : lignes taxables NON classées =====================
     C2 = "2 · Lignes non classées"
+    # afc_box porté par la LIGNE de taxe (tabSales Taxes and Charges), pas par le Template header.
     unclassified = frappe.db.sql("""
         SELECT si.name AS inv, si.customer AS tiers, sii.item_code AS item,
                sii.base_net_amount AS ht, sii.item_tax_rate AS itr
         FROM `tabSales Invoice Item` sii
         JOIN `tabSales Invoice` si ON si.name = sii.parent
         LEFT JOIN `tabItem Tax Template` itt ON itt.name = sii.item_tax_template
-        LEFT JOIN `tabSales Taxes and Charges Template` stct ON stct.name = si.taxes_and_charges
         WHERE si.docstatus = 1 AND si.company = %(c)s
           AND si.posting_date BETWEEN %(s)s AND %(e)s
-          AND COALESCE(itt.afc_box, stct.afc_box) IS NULL
+          AND COALESCE(itt.afc_box, (
+                SELECT stc.afc_box FROM `tabSales Taxes and Charges` stc
+                WHERE stc.parent = si.name AND stc.afc_box IS NOT NULL AND stc.afc_box != ''
+                LIMIT 1
+              )) IS NULL
     """, {"c": company, "s": start_date, "e": end_date}, as_dict=True)
     taxable = []
     for r in unclassified:
@@ -139,12 +143,19 @@ def collect(company, start_date, end_date):
 
     # ===================== Contrôle 3 : sanité de la configuration =====================
     C3 = "3 · Configuration"
-    for dt, child, ratef in [("Sales Taxes and Charges Template", "Sales Taxes and Charges", "rate"),
-                             ("Item Tax Template", "Item Tax Template Detail", "tax_rate")]:
+    # afc_box est sur le PARENT pour Item Tax Template, mais sur la LIGNE (enfant) pour les taxes de vente.
+    for dt, child, ratef, box_on in [
+            ("Sales Taxes and Charges Template", "Sales Taxes and Charges", "rate", "child"),
+            ("Item Tax Template", "Item Tax Template Detail", "tax_rate", "parent")]:
+        if box_on == "parent":
+            box_cond = "(p.afc_box IS NULL OR p.afc_box = '')"
+        else:  # aucune ligne enfant ne porte d'afc_box → template non mappé
+            box_cond = (f"NOT EXISTS (SELECT 1 FROM `tab{child}` tb "
+                        "WHERE tb.parent = p.name AND tb.afc_box IS NOT NULL AND tb.afc_box != '')")
         bad = frappe.db.sql(f"""
             SELECT p.name, MAX(t.`{ratef}`) AS rate
             FROM `tab{dt}` p JOIN `tab{child}` t ON t.parent = p.name
-            WHERE p.company = %s AND p.disabled = 0 AND (p.afc_box IS NULL OR p.afc_box = '')
+            WHERE p.company = %s AND p.disabled = 0 AND {box_cond}
             GROUP BY p.name HAVING MAX(t.`{ratef}`) > 0
         """, company, as_dict=True)
         for b in bad:
@@ -175,13 +186,20 @@ def collect(company, start_date, end_date):
     boxes_t = tuple(box_rate.keys()) or ("",)
     lines = frappe.db.sql("""
         SELECT si.name AS inv, sii.item_code AS item, sii.item_tax_rate AS itr,
-               COALESCE(itt.afc_box, stct.afc_box) AS box
+               COALESCE(itt.afc_box, (
+                 SELECT stc.afc_box FROM `tabSales Taxes and Charges` stc
+                 WHERE stc.parent = si.name AND stc.afc_box IS NOT NULL AND stc.afc_box != ''
+                 LIMIT 1
+               )) AS box
         FROM `tabSales Invoice Item` sii
         JOIN `tabSales Invoice` si ON si.name = sii.parent
         LEFT JOIN `tabItem Tax Template` itt ON itt.name = sii.item_tax_template
-        LEFT JOIN `tabSales Taxes and Charges Template` stct ON stct.name = si.taxes_and_charges
         WHERE si.docstatus = 1 AND si.company = %(c)s AND si.posting_date BETWEEN %(s)s AND %(e)s
-          AND COALESCE(itt.afc_box, stct.afc_box) IN %(boxes)s
+          AND COALESCE(itt.afc_box, (
+                SELECT stc.afc_box FROM `tabSales Taxes and Charges` stc
+                WHERE stc.parent = si.name AND stc.afc_box IS NOT NULL AND stc.afc_box != ''
+                LIMIT 1
+              )) IN %(boxes)s
     """, {"c": company, "s": start_date, "e": end_date, "boxes": boxes_t}, as_dict=True)
     mism = []
     for r in lines:

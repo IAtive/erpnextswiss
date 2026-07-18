@@ -37,6 +37,8 @@
 18. [Paramétrage manuel requis (après le setup)](#18-paramétrage-manuel-requis-après-le-setup)
 19. [Gestion des salaires (paie externe → comptabilisation ERPNext)](#19-gestion-des-salaires-paie-externe--comptabilisation-erpnext)
 20. [Gestion de la clôture (bouclement)](#20-gestion-de-la-clôture-bouclement)
+21. [Gestion des stocks — inventaire perpétuel (négoce)](#21-gestion-des-stocks--inventaire-perpétuel-négoce)
+20. [Gestion de la clôture (bouclement)](#20-gestion-de-la-clôture-bouclement)
 
 ---
 
@@ -591,7 +593,7 @@ touchent la **présentation**, la **traçabilité** ou le **mécanisme**.
 | 7   | **Règlement TVA vers 2201 — manuel**                                | pas de décompte natif → l'écriture de solde périodique (2200/1170/1171 → **2201**) puis le paiement AFC sont un **Journal Entry manuel**                                                                                                                                                                                                                                          | le **schéma** (comptes soldés, périodicité) avant la 1re clôture TVA réelle                                                                                                                                                                                                                             |
 | 8   | **Méthode de décompte : effective, contre-prestations _convenues_** | méthode **effective** (pas taux de la dette fiscale nette / forfaitaire) **et** TVA due à la **facturation** (_convenues_), pas à l'encaissement (_reçues_) → **pas de TVA sur les acomptes**                                                                                                                                                                                     | la **méthode TVA réelle** : effective/forfaitaire **et** convenu/reçu                                                                                                                                                                                                                                   |
 | 9   | **TVA import en mode douane classique** _(aligné bexio)_            | report de l'impôt à l'import (art. 63 LTVA) **non** activé → TVA import déductible en **case 400** (compte **1170**), via un code douane **100%** (**DOUAM/DOUACE**, exactement comme bexio), porté sur la **facture du transitaire** (fournisseur normal, contrepartie 2000)                                                                                                     | si la société a l'**autorisation de report** (sinon rien à faire — c'est le mode standard)                                                                                                                                                                                                              |
-| 10  | **Inventaire perpétuel**                                            | désactivé si la société ne fait **pas** de stock (le plan bexio n'a pas de comptes stock/SRBNB)                                                                                                                                                                                                                                                                                   | la société fait-elle de la **gestion de stock** ? Si oui → configurer les comptes stock                                                                                                                                                                                                                 |
+| 10  | **Méthode d'inventaire : PERPÉTUEL** (stock = cœur de métier)        | on retient l'**inventaire perpétuel** : le stock est valorisé **en temps réel** (réception → Dr 1200 ; livraison → Dr 4200 COGS / Cr 1200), **COGS et marge connus par vente**. Deux **comptes techniques** ajoutés (**2301 SRBNB**, **2302 EIIV**) en **passif de régularisation** (famille 230, CO 958b). **Impact TVA : aucun.** Flux à **2 documents** (réception + facture / livraison + facture). | **confirmer avec la fiduciaire** : la **méthode retenue (perpétuel)**, l'**emplacement des 2 comptes** (230 régularisation = norme-correct ; alternative près des créanciers 2005), et le **changement opérationnel** (réceptions + bons de livraison saisis en continu). Détail, écritures et impact : **cf. détail #10 + §21**. |
 | 11  | **Bouclement du résultat de l'exercice** _(aligné bexio)_           | à la clôture, le résultat du compte de résultat est viré sur **2979 « Bénéfice/perte de l'exercice »** (comme la fonction _Comptabilisation des résultats_ de bexio) via un **Period Closing Voucher** ; l'**affectation** (2979 → 2970 reporté / réserves / dividende) est **séparée** (post-AG)                                                                                 | la **périodicité** de bouclement et le schéma d'**affectation** du résultat                                                                                                                                                                                                                             |
 | 12  | **Multi-devises : CHF + EUR (achat & vente)**                       | comptes créance/dette **en EUR** (**1101** / **2001**) créés hors chart (car `account_currency` est ignoré sur un chart `verified`) ; **pas de banque EUR par défaut** (paiement/encaissement EUR via le compte CHF — 1021 à ajouter seulement si compte bancaire EUR réel, voir §11) ; la **TVA reste en CHF** (taux facture) ; l'**écart de change** au règlement → **6999**, en mode **réalisé à l'encaissement** (conversion CHF) — alternative : soldes en devise + **réévaluation périodique** (voir §11)   | **quelles devises** le client utilise réellement (EUR seul ? + USD ?), **quels sens** (vente/achat), et **réalisé à l'encaissement ou réévaluation périodique** ?                                                                                                                                       |
 | 13  | **Acomptes : compte de tiers séparé (2030/1130) — ON ou OFF**       | option _Book Advance Payments in Separate Party Account_ **activée par défaut** → acomptes isolés **en continu** sur **2030/1130**. Alternative : **désactiver** → acomptes en **solde du tiers** (1100/2000) + **reclassement à la clôture** des acomptes matériels. **Conforme CO 959a dans les deux cas** ; détails, écritures de reclassement et arbitrage complet au **§11** | le **volume réel d'acomptes** (reçus de clients / versés à des fournisseurs) : flux **régulier** → garder la **séparation** (bilan propre en continu) ; **rares** → **désactiver** (plus simple, zéro friction Bank Wizard, reclassement ponctuel au bouclement)                                        |
@@ -623,29 +625,6 @@ on solde manuellement 2200 (TVA due) et 1170/1171 (préalable) vers **2201** (de
 paie l'AFC depuis 2201 (§10). → **Valider le schéma exact et la périodicité** avec le fiduciaire avant
 la première clôture réelle.
 
-**10. Inventaire perpétuel & comptes de stock** — Gérer du stock **n'impose pas** l'inventaire
-perpétuel : ERPNext suit les **quantités** dans tous les cas ; le **perpétuel** (écritures de stock en
-temps réel dans le grand livre) est un **choix de gestion**, pas une obligation. La **norme suisse (CO)
-autorise le périodique** — le standard PME — où le stock est valorisé **à la clôture** via **1200 +
-4800** (variation de stocks), **sans compte technique supplémentaire**. C'est le mode **recommandé** et
-retenu par défaut (on a d'ailleurs **désactivé** le perpétuel pour éviter d'exiger des comptes hors
-plan KMU).
-
-Si le client choisit le **perpétuel** (négoce important, marges suivies au mouvement), il faut **2
-comptes en plus** — les autres existent déjà (**1200** stock, **4200** COGS, **4800** ajustement) :
-
-- **SRBNB « Marchandises reçues, non facturées »** (passif transitoire : bien reçu, facture en
-  attente) → famille **2300 Passifs de régularisation** (sous-compte, ex. `2301`) — **emplacement
-  norme-correct** (CO art. 958b, comptabilité d'exercice) ; ou `2005` près des créanciers (préférence
-  fiduciaire).
-- **Expenses Included In Valuation** (frais accessoires — transport/douane — capitalisés dans le stock,
-  **solde nul**) → compte **technique de passage**, ex. `4009` — **aucune recommandation normative**
-  (pur mécanisme ERP).
-
-Réglage : **Company → « Enable Perpetual Inventory »** + renseigner ces comptes dans les défauts Stock
-(et éventuellement par entrepôt). → **À décider avec le client/fiduciaire**, sachant que le
-**périodique reste la voie la plus conforme et la plus simple** pour une PME suisse.
-
 **8. Méthode effective + contre-prestations _convenues_** — Le paramétrage suppose la méthode
 **effective** (impôt dû − impôt préalable, par opposition au taux de la dette fiscale nette /
 forfaitaire) **et** le décompte selon les contre-prestations **convenues** (TVA due dès la
@@ -653,6 +632,24 @@ forfaitaire) **et** le décompte selon les contre-prestations **convenues** (TVA
 de TVA** — celle-ci naît à l'émission de la facture. → **Confirmer avec le fiduciaire la méthode
 réelle de la société sur les deux axes** (effective/forfaitaire ET convenu/reçu). Si la société est
 au _reçu_, le traitement des acomptes changera (TVA à l'encaissement).
+
+**10. Inventaire PERPÉTUEL & comptes de stock** — La gestion du stock étant le **cœur de métier**
+(négoce / revendeur), on retient l'**inventaire perpétuel** : le stock est valorisé **en temps réel**
+(chaque réception l'entre, chaque livraison en sort le coût), et la **marge est connue par vente**. Le
+setup **active** « Enable Perpetual Inventory » et pose **2 comptes techniques** — les autres existent
+déjà (**1200** stock, **4200** COGS, **4208** ajustement) :
+
+- **2301 SRBNB « Marchandises reçues, non facturées »** — tampon **réception ↔ facture** (`account_type`
+  *Stock Received But Not Billed*, champ Company `stock_received_but_not_billed`).
+- **2302 EIIV « Frais accessoires inclus dans la valorisation »** — tampon **landed cost ↔ facture** du
+  transporteur (`account_type` *Expenses Included In Valuation*, **trouvé par account_type**, pas de
+  champ Company).
+
+**Emplacement normatif** : les deux sont des « **reçu / engagé, pas encore facturé** » → des **passifs
+de régularisation** (**famille 230**, CO art. 958b) ; ils **tendent vers zéro** (`2301 + 2302 = 0` ⇒ tout
+ce qui est reçu a été facturé). Alternative acceptée : près des créanciers (`2005`), à l'appréciation du
+fiduciaire. **Impact TVA : aucun** (la TVA reste sur les factures ; les mouvements de stock n'en portent
+pas). Le **détail du fonctionnement, des flux et des écritures** est au **§21**.
 
 **11. Bouclement du résultat _(aligné bexio)_** — À la clôture, ERPNext vire le solde du compte de
 résultat (classes 3 à 8) sur les **capitaux propres** via un **Period Closing Voucher**. Compte cible :
@@ -1140,6 +1137,99 @@ rattaché à `Company.unrealized_exchange_gain_loss_account` — sans lui, l'out
 9. **Contre-passation** : à l'ouverture de l'exercice suivant, ouvre la Journal Entry de réévaluation → **Reverse Journal Entry** → date `01.01` → Submit. On repart de la valeur d'origine ; le vrai écart se figera au **paiement** (réalisé → **6999**), sans double comptage.
 
 **Rappels :** cours de clôture ≠ cours moyen mensuel · **jamais** de case AFC sur 6998 · **ne pas** stocker le cours de clôture dans _Currency Exchange_ (sinon il polluerait les transactions du 31.12) — tout est expliqué en **§11**.
+
+---
+
+## 21. Gestion des stocks — inventaire PERPÉTUEL (négoce)
+
+> **Cadre.** La gestion du stock est le **cœur de métier** (achat-revente de marchandises). On retient
+> donc l'**inventaire perpétuel** : la comptabilité de stock suit la logistique **en temps réel**. Le
+> setup (`setup_perpetual_inventory`) l'**active par défaut** et crée les comptes techniques.
+> **Impact TVA : aucun** (§21.5).
+
+### 21.1 Le principe
+
+- **Périodique** (non retenu) : le stock au bilan n'est juste qu'**à la clôture** ; la marge est globale.
+- **Perpétuel** (retenu) : **chaque mouvement physique** touche la compta → stock au bilan **toujours
+  juste**, **COGS et marge connus par vente**, clôture **automatique** (plus d'écriture de variation
+  manuelle). ERPNext ne génère ces écritures que pour les **articles de stock** (`is_stock_item = 1`).
+
+### 21.2 Les comptes (posés par le setup)
+
+| Compte | Rôle | Paramétrage |
+|---|---|---|
+| **1200** Stocks de marchandises | valeur du stock (bilan) | `account_type = Stock` · Company `default_inventory_account` |
+| **4200** Achats de marchandises | **COGS** (coût des ventes) | `default_expense_account` (déjà en place) |
+| **4208** Variations de stocks | ajustement de stock | `account_type = Stock Adjustment` · Company `stock_adjustment_account` |
+| **2301** SRBNB « Marchandises reçues, non facturées » | tampon **réception ↔ facture** | `account_type = Stock Received But Not Billed` · Company `stock_received_but_not_billed` |
+| **2302** EIIV « Frais accessoires inclus dans la valorisation » | tampon **landed cost ↔ facture** | `account_type = Expenses Included In Valuation` (**trouvé par account_type**, pas de champ Company) |
+
+**2301 et 2302** sont des **passifs de régularisation** (famille **230**, CO art. 958b) — « reçu / engagé,
+pas encore facturé ». Ils **tendent vers zéro** : `2301 + 2302 = 0` ⇔ tout ce qui est reçu/engagé a été
+facturé (contrôle de réconciliation simple). *Alternative fiduciaire :* près des créanciers (`2005`).
+
+### 21.3 Flux ACHAT (2 documents)
+
+Marchandise **1000** net + 81 TVA :
+```
+1) Purchase Receipt (réception)      Dr 1200 Stock            1000
+                                        Cr 2301 SRBNB               1000     ← au net, SANS TVA
+2) Purchase Invoice (liée)           Dr 2301 SRBNB            1000
+                                     Dr 1170 Impôt préalable    81
+                                        Cr 2000 Dette fournisseur    1081
+```
+*(Écriture de réception **validée en réel** : Dr 1200 / Cr 2301.)* Le SRBNB (2301) revient à **zéro** dès
+la facture saisie.
+
+### 21.4 Flux VENTE (2 documents)
+
+Vente **2000** + 162 TVA, coût du stock vendu **1200** :
+```
+1) Delivery Note (bon de livraison)  Dr 4200 COGS             1200
+                                        Cr 1200 Stock              1200     ← sortie au coût, SANS TVA
+2) Sales Invoice (liée)              Dr 1100 Client           2162
+                                        Cr 3200 Ventes             2000
+                                        Cr 2200 TVA due             162
+```
+
+### 21.5 Frais accessoires (landed cost) → EIIV
+
+Transport / douane à **capitaliser dans le stock** (le vrai coût = prix + fret + douane) :
+```
+Landed Cost Voucher (sur la réception)  Dr 1200 Stock          80
+                                           Cr 2302 EIIV              80
+Facture du transporteur                 Dr 2302 EIIV           80
+                                        Dr 1170 Impôt préalable  …      ← TVA du transport, normale
+                                           Cr 2000 Transporteur        …
+```
+Le stock est valorisé **prix + frais** ; l'EIIV (2302) revient à **zéro**. *(Droits de douane = coût du
+stock, **pas** de la TVA ; **TVA à l'import** = impôt préalable normal, case 400.)*
+
+### 21.6 Impact TVA : **aucun**
+
+La TVA vit sur les **factures** (achat / vente). Les **mouvements de stock** (réception, livraison, COGS,
+landed cost) **ne portent aucune TVA**. Le **décompte TVA est identique** au mode périodique. Les comptes
+1200 / 2301 / 2302 / 4200 ne sont **pas** des comptes de TVA → pas d'`afc_box`, **aucun effet** sur le
+décompte ni sur les contrôles de plausibilité.
+
+### 21.7 Articles de stock vs services
+
+Le perpétuel **n'agit que sur `is_stock_item = 1`**. Les **services / prestations / frais** (`is_stock_item
+= 0`) se facturent **directement** (facture d'achat / vente, sans réception ni livraison, sans COGS). On
+peut **mélanger** stock et services sur la **même facture** — ERPNext traite ligne par ligne. *(Laisser
+`Enable Provisional Accounting for Non-Stock Items` **désactivé**.)*
+
+### 21.8 Le changement opérationnel (à valider fiduciaire / client)
+
+- **Flux achat** : réception (**Purchase Receipt**) **puis** facture — 2 documents.
+- **Flux vente** : bon de livraison (**Delivery Note**) **puis** facture — 2 documents.
+- **Discipline** : tout mouvement physique = un document, **en continu** (sinon le stock GL diverge du réel).
+- **Ordre** : réceptionner **avant** de vendre (sinon stock négatif).
+- **Entrepôts** deviennent des **entités comptables** ; **articles** en `is_stock_item = 1`, valorisation
+  **FIFO** (négoce).
+- **Raccourci** : une facture avec la case **« Update Stock »** fait réception+facture (ou livraison+facture)
+  **en un seul document** — pratique si réception = facturation le même jour ; mais le **flux 2-documents**
+  reste requis pour les **frais accessoires** (Landed Cost) et les livraisons décalées.
 
 ---
 
