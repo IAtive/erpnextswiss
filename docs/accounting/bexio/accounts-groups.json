@@ -1,0 +1,2700 @@
+{
+  "is_onboarded": true,
+  "is_resettable": false,
+  "accounts": [
+    {
+      "id": "b2e53502-e369-4c0f-a4e7-93198cfbe947",
+      "number": "1020",
+      "name": "Banque UBS CHF",
+      "account_classification": "Asset",
+      "accounts_group_id": "8a487927-9765-476d-86d3-77a9bd427086",
+      "is_active": true,
+      "is_connected": true,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "74fcd723-f1e1-4422-88bb-2263aa4197a0",
+      "number": "1029",
+      "name": "Bank",
+      "account_classification": "Asset",
+      "accounts_group_id": "8a487927-9765-476d-86d3-77a9bd427086",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": true,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "b6746bd1-9ce2-4edb-9af7-400b07151738",
+      "number": "1090",
+      "name": "Comptes de transfert",
+      "account_classification": "Asset",
+      "accounts_group_id": "4523b618-0c59-4d7b-9b59-0430cf7e816c",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "056764f8-a644-4304-83a5-594a887d6051",
+      "number": "1091",
+      "name": "Compte d'attente pour salaires",
+      "account_classification": "Asset",
+      "accounts_group_id": "4523b618-0c59-4d7b-9b59-0430cf7e816c",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "3c02e04d-eaa4-4f0a-b71b-0d3f59e93f61",
+      "number": "1099",
+      "name": "Compte d'attente pour des montants à clarifier",
+      "account_classification": "Asset",
+      "accounts_group_id": "4523b618-0c59-4d7b-9b59-0430cf7e816c",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "b5382071-5404-4b4f-9287-eae5039e494e",
+      "number": "1100",
+      "name": "Créances suisses",
+      "account_classification": "Asset",
+      "accounts_group_id": "2d027e31-2107-4990-b8a5-692b4691c08a",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": true,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "8fb882d6-8f0d-40f6-ab43-2187cf8867fc",
+      "number": "1109",
+      "name": "Corrections de la valeur des créances",
+      "account_classification": "Asset",
+      "accounts_group_id": "2d027e31-2107-4990-b8a5-692b4691c08a",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "054c4bc4-6f21-49ff-b173-2e5133921319",
+      "number": "1130",
+      "name": "Paiements anticipés aux fournisseurs",
+      "account_classification": "Asset",
+      "accounts_group_id": "2d027e31-2107-4990-b8a5-692b4691c08a",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "eea4f5c8-9b18-4a86-b871-7aa05a4351ab",
+      "number": "1140",
+      "name": "Prêts",
+      "account_classification": "Asset",
+      "accounts_group_id": "7da3ef69-67b3-4d68-a281-3e352daab1e6",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "01f99ef7-ac63-40e7-8f28-97de928d51b0",
+      "number": "1170",
+      "name": "Impôt préalable: TVA s/matériel, marchandises, prestations et énergie",
+      "account_classification": "Asset",
+      "accounts_group_id": "89a3832c-55db-4c80-953c-50d6b505c48c",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": true,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "8a1f10e3-da7a-4849-aa5c-fb0955e0b021",
+      "number": "1171",
+      "name": "Impôt préalable: TVA s/investissements et autres charges d'exploitation",
+      "account_classification": "Asset",
+      "accounts_group_id": "89a3832c-55db-4c80-953c-50d6b505c48c",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": true,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "8520b4d4-27d2-4812-bde1-7b0a7ae97e32",
+      "number": "1172",
+      "name": "Réconciliation de l'impôt préalable lors de changement de méthode",
+      "account_classification": "Asset",
+      "accounts_group_id": "89a3832c-55db-4c80-953c-50d6b505c48c",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": true,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "a145aeef-3301-445d-b7ac-c0c2a8612e6d",
+      "number": "1173",
+      "name": "Réduction de l'impôt préalable",
+      "account_classification": "Asset",
+      "accounts_group_id": "89a3832c-55db-4c80-953c-50d6b505c48c",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": true,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "974e10e0-9b6f-4d14-9500-856185461117",
+      "number": "1174",
+      "name": "Correction de l'impôt préalable",
+      "account_classification": "Asset",
+      "accounts_group_id": "89a3832c-55db-4c80-953c-50d6b505c48c",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": true,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "b8fb9ad2-6fbe-41f2-80b7-92085148f5de",
+      "number": "1175",
+      "name": "Décompte TVA",
+      "account_classification": "Asset",
+      "accounts_group_id": "89a3832c-55db-4c80-953c-50d6b505c48c",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "cb1cbf29-07bc-42f3-a824-1034a95b7985",
+      "number": "1176",
+      "name": "Impôt anticipé à récupérer",
+      "account_classification": "Asset",
+      "accounts_group_id": "89a3832c-55db-4c80-953c-50d6b505c48c",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "5ec19255-8e5a-4a03-8836-e706ccd6c8bb",
+      "number": "1183",
+      "name": "Compte courant Assurance-accidents",
+      "account_classification": "Asset",
+      "accounts_group_id": "c4357089-04dd-4156-afe9-f5e333f8a388",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "99c0ab9f-24ee-4f80-9861-6cef720d9e6d",
+      "number": "1184",
+      "name": "Compte courant Assurance maladie",
+      "account_classification": "Asset",
+      "accounts_group_id": "c4357089-04dd-4156-afe9-f5e333f8a388",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "578e06c6-0081-4229-8d30-90ae8d5d0df8",
+      "number": "1188",
+      "name": "Compte courant Impôt à la source",
+      "account_classification": "Asset",
+      "accounts_group_id": "c4357089-04dd-4156-afe9-f5e333f8a388",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "ff1799b2-2e3e-4d7d-abb9-29f039abf50d",
+      "number": "1200",
+      "name": "Stocks de marchandises commerciales",
+      "account_classification": "Asset",
+      "accounts_group_id": "b6f3c4e9-99c9-4833-8c04-ba7bb99fa1aa",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "7280f7df-c2d4-481c-8fb0-230014ca7682",
+      "number": "1280",
+      "name": "Travaux en cours",
+      "account_classification": "Asset",
+      "accounts_group_id": "b6f3c4e9-99c9-4833-8c04-ba7bb99fa1aa",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "07ac464b-1e59-411a-b430-3f267637f1ab",
+      "number": "1300",
+      "name": "Charges payées d'avance",
+      "account_classification": "Asset",
+      "accounts_group_id": "989f3ea5-2e2b-4dfb-b5ed-69f29ad316d6",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "1a254bdf-0467-4ab9-b3a0-de65a349ca4d",
+      "number": "1500",
+      "name": "Machines et appareils",
+      "account_classification": "Asset",
+      "accounts_group_id": "9028738f-4e0e-49a9-84ee-6dd1182259a5",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": {
+        "id": "85beb2d7-28ff-48e1-a53c-3577d7482524"
+      }
+    },
+    {
+      "id": "69984b27-aeb9-4a59-a98b-60335f9b58e5",
+      "number": "1510",
+      "name": "Mobilier et installations",
+      "account_classification": "Asset",
+      "accounts_group_id": "9028738f-4e0e-49a9-84ee-6dd1182259a5",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": {
+        "id": "85beb2d7-28ff-48e1-a53c-3577d7482524"
+      }
+    },
+    {
+      "id": "83bd5f3b-fdfa-46bf-acdb-f8a3d0261834",
+      "number": "1520",
+      "name": "Machines de bureau",
+      "account_classification": "Asset",
+      "accounts_group_id": "9028738f-4e0e-49a9-84ee-6dd1182259a5",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": {
+        "id": "85beb2d7-28ff-48e1-a53c-3577d7482524"
+      }
+    },
+    {
+      "id": "5066fed2-24e7-4129-9568-f14dc24a3790",
+      "number": "1530",
+      "name": "Véhicules",
+      "account_classification": "Asset",
+      "accounts_group_id": "9028738f-4e0e-49a9-84ee-6dd1182259a5",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": {
+        "id": "85beb2d7-28ff-48e1-a53c-3577d7482524"
+      }
+    },
+    {
+      "id": "40b0b69d-616b-435d-989a-2db025dce007",
+      "number": "2000",
+      "name": "Dettes résultant d'achats de matières et de marchandises",
+      "account_classification": "Liability",
+      "accounts_group_id": "f4125f6f-8ddc-4a04-97f2-2e257a560760",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": true,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "e9ce317d-fee2-4f1f-b4f7-539009059f66",
+      "number": "2030",
+      "name": "Acomptes reçus de tiers",
+      "account_classification": "Liability",
+      "accounts_group_id": "f4125f6f-8ddc-4a04-97f2-2e257a560760",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": true,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "6900a61f-4e1d-4108-9480-2035ad0c17c1",
+      "number": "2100",
+      "name": "Compte courant A",
+      "account_classification": "Liability",
+      "accounts_group_id": "fd6e8f99-d347-4317-94fe-8178991f4d8a",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "ccbff69c-773a-42cf-b663-9c82fba754c6",
+      "number": "2190",
+      "name": "Carte de crédit",
+      "account_classification": "Liability",
+      "accounts_group_id": "fd6e8f99-d347-4317-94fe-8178991f4d8a",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "95d9a7e9-4083-424e-a3db-4f2860f737a1",
+      "number": "2200",
+      "name": "TVA due",
+      "account_classification": "Liability",
+      "accounts_group_id": "fbebc246-a0d7-4993-9b85-91792f746b0e",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": true,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "5723ad3c-a348-4548-aaba-ab24e69e8bdb",
+      "number": "2201",
+      "name": "Décompte TVA",
+      "account_classification": "Liability",
+      "accounts_group_id": "fbebc246-a0d7-4993-9b85-91792f746b0e",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": true,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "113e6f10-32ad-40d0-872e-fc2170297215",
+      "number": "2202",
+      "name": "Réconciliation du chiffre d'affaires suite à un changement de méthode",
+      "account_classification": "Liability",
+      "accounts_group_id": "fbebc246-a0d7-4993-9b85-91792f746b0e",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": true,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "b5e960c0-e15e-4c45-971d-fe3200783978",
+      "number": "2203",
+      "name": "Impôt sur les acquisitions",
+      "account_classification": "Liability",
+      "accounts_group_id": "fbebc246-a0d7-4993-9b85-91792f746b0e",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": true,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "33290c25-5a42-4ac4-bc8a-45a6c4d698d1",
+      "number": "2270",
+      "name": "Compte courant Institutions de prévoyance professionnelle",
+      "account_classification": "Liability",
+      "accounts_group_id": "fb73272f-9582-4c3f-8d68-448603412bca",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "cbc2c6d5-e5f6-4e79-a4bf-fe8b64c7fb19",
+      "number": "2271",
+      "name": "Compte courant AVS, AI, APG, AC",
+      "account_classification": "Liability",
+      "accounts_group_id": "fb73272f-9582-4c3f-8d68-448603412bca",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "51b33d44-a7a9-416c-8e28-8b80fb0c786f",
+      "number": "2272",
+      "name": "Compte courant Caisse d'allocations familiales (CAF)",
+      "account_classification": "Liability",
+      "accounts_group_id": "fb73272f-9582-4c3f-8d68-448603412bca",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "62ae88e0-cc7f-4c7e-80b2-6e02894efabc",
+      "number": "2273",
+      "name": "Compte courant Assurance-accidents",
+      "account_classification": "Liability",
+      "accounts_group_id": "fb73272f-9582-4c3f-8d68-448603412bca",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "a7437adf-039d-43d5-98be-d071ca5b4799",
+      "number": "2274",
+      "name": "Compte courant Assurance maladie (indemnité journalière maladie)",
+      "account_classification": "Liability",
+      "accounts_group_id": "fb73272f-9582-4c3f-8d68-448603412bca",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "af875ad1-4b8c-408d-81db-b1d67041ba3e",
+      "number": "2279",
+      "name": "Compte courant Impôt à la source",
+      "account_classification": "Liability",
+      "accounts_group_id": "fb73272f-9582-4c3f-8d68-448603412bca",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "5081e863-b92c-4fab-b0c6-ebfb8dfe7bca",
+      "number": "2300",
+      "name": "Passifs de régularisation (passifs transitoires)",
+      "account_classification": "Liability",
+      "accounts_group_id": "5094ac93-9c4b-4a70-b857-d317d816e027",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "4891bfb8-342f-4dba-956b-18492aaa79f2",
+      "number": "2400",
+      "name": "Emprunts A",
+      "account_classification": "Liability",
+      "accounts_group_id": "412c0483-55c5-48d6-a7e9-8d6bea31bfaf",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "0df7c26d-4db4-40aa-9159-19d867d705c1",
+      "number": "2560",
+      "name": "Autres dettes envers l'actionnaire",
+      "account_classification": "Liability",
+      "accounts_group_id": "ce17ddfb-23be-4f1f-9fd6-6ec706c7b0e4",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "7df88082-590a-46a0-baec-d0bc93bc4a86",
+      "number": "2800",
+      "name": "Capital",
+      "account_classification": "Liability",
+      "accounts_group_id": "dfc3a7a0-abb6-4dc8-a77c-2b7867a33661",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "6445d47e-8e50-44dc-8f35-41f8acf2d288",
+      "number": "2950",
+      "name": "Réserve légale issue du bénéfice",
+      "account_classification": "Liability",
+      "accounts_group_id": "33fb69cf-8bbd-41eb-a392-5f2daee9a684",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "021a7a0e-1398-4c59-a59d-4906814a00a4",
+      "number": "2970",
+      "name": "Bénéfice ou perte reporté",
+      "account_classification": "Liability",
+      "accounts_group_id": "33fb69cf-8bbd-41eb-a392-5f2daee9a684",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "1d0ffc74-6557-4bde-8737-140f2f9218c7",
+      "number": "2979",
+      "name": "Bénéfice ou perte de l'exercice",
+      "account_classification": "Liability",
+      "accounts_group_id": "33fb69cf-8bbd-41eb-a392-5f2daee9a684",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "a9f6c07d-515d-4d43-a5da-d9edff0651b9",
+      "number": "3000",
+      "name": "Ventes de produits fabriqués",
+      "account_classification": "Income",
+      "accounts_group_id": "aa9d444d-8858-4167-94cf-a122f16893fc",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": {
+        "id": "cfa86c4a-feae-4f2e-ae6d-eafad087ac3e"
+      }
+    },
+    {
+      "id": "e464d4ed-5ea6-4b2d-8b96-1e73205f090b",
+      "number": "3200",
+      "name": "Ventes de marchandises",
+      "account_classification": "Income",
+      "accounts_group_id": "aeadfa7f-1e58-4988-bfbb-c86172d6f6ff",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": true,
+      "standard_tax_rate": {
+        "id": "cfa86c4a-feae-4f2e-ae6d-eafad087ac3e"
+      }
+    },
+    {
+      "id": "f0bec5e5-06f2-475a-a1dd-d92e39e4748a",
+      "number": "3400",
+      "name": "Ventes brutes de prestations",
+      "account_classification": "Income",
+      "accounts_group_id": "b698098c-8823-4bde-bc87-cd2ae85a4e71",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": {
+        "id": "cfa86c4a-feae-4f2e-ae6d-eafad087ac3e"
+      }
+    },
+    {
+      "id": "f5ec2025-7465-49a2-b02f-3ff71513eda7",
+      "number": "3600",
+      "name": "Produits annexes résultant de livraisons et de prestations de services",
+      "account_classification": "Income",
+      "accounts_group_id": "73c4ee03-037c-4b7f-9ca5-1da2d256dc3b",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": {
+        "id": "cfa86c4a-feae-4f2e-ae6d-eafad087ac3e"
+      }
+    },
+    {
+      "id": "1f4cb14a-0a96-4698-8d96-ada4da5f882c",
+      "number": "3680",
+      "name": "Autres produits",
+      "account_classification": "Income",
+      "accounts_group_id": "b9c0b88a-9551-4a5f-8330-0b4b974f6369",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": {
+        "id": "cfa86c4a-feae-4f2e-ae6d-eafad087ac3e"
+      }
+    },
+    {
+      "id": "ac3230f8-ecac-4f15-acff-fc784d6bdac4",
+      "number": "3800",
+      "name": "Escomptes",
+      "account_classification": "Income",
+      "accounts_group_id": "e4237f13-27dc-4355-9505-43c393e77675",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": true,
+      "standard_tax_rate": {
+        "id": "cfa86c4a-feae-4f2e-ae6d-eafad087ac3e"
+      }
+    },
+    {
+      "id": "b584974a-d011-4254-b284-01fded938ad5",
+      "number": "3801",
+      "name": "Rabais et réductions de prix",
+      "account_classification": "Income",
+      "accounts_group_id": "e4237f13-27dc-4355-9505-43c393e77675",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": {
+        "id": "cfa86c4a-feae-4f2e-ae6d-eafad087ac3e"
+      }
+    },
+    {
+      "id": "e7b9153f-0fb0-475b-9de3-638e659d3bc7",
+      "number": "3802",
+      "name": "Ristournes",
+      "account_classification": "Income",
+      "accounts_group_id": "e4237f13-27dc-4355-9505-43c393e77675",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": {
+        "id": "cfa86c4a-feae-4f2e-ae6d-eafad087ac3e"
+      }
+    },
+    {
+      "id": "cb6713e3-65e8-4a80-9f2c-3864b921dd03",
+      "number": "3803",
+      "name": "Commissions de tiers",
+      "account_classification": "Income",
+      "accounts_group_id": "e4237f13-27dc-4355-9505-43c393e77675",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": {
+        "id": "68439804-b9d7-4e53-b90e-546063e801eb"
+      }
+    },
+    {
+      "id": "df6fdf6d-861f-445e-a306-3fd63db92186",
+      "number": "3804",
+      "name": "Frais d'encaissement",
+      "account_classification": "Income",
+      "accounts_group_id": "e4237f13-27dc-4355-9505-43c393e77675",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "eccb1849-b333-46a3-ba7f-b72dfd1dd80e",
+      "number": "3805",
+      "name": "Pertes sur clients, variation du ducroire",
+      "account_classification": "Income",
+      "accounts_group_id": "e4237f13-27dc-4355-9505-43c393e77675",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "c3484c2c-e4b4-4695-a742-41e162efa3c4",
+      "number": "3806",
+      "name": "Différences de change",
+      "account_classification": "Income",
+      "accounts_group_id": "e4237f13-27dc-4355-9505-43c393e77675",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "f9494593-4257-48c8-ab56-b62bd64578b9",
+      "number": "3940",
+      "name": "Variation de la valeur des prestations non facturées",
+      "account_classification": "Income",
+      "accounts_group_id": "f984b401-9b94-46ec-93b1-c2ed7428b0aa",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "9c8475f0-6e58-48d9-9ef6-9b9952716e05",
+      "number": "4000",
+      "name": "Charges de matériel produit",
+      "account_classification": "Expense",
+      "accounts_group_id": "a66cdb7c-1258-4c38-9358-1283b77a6378",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": {
+        "id": "68439804-b9d7-4e53-b90e-546063e801eb"
+      }
+    },
+    {
+      "id": "3b62fa7c-9fd3-4b73-9b25-79f2d06ff538",
+      "number": "4200",
+      "name": "Achats de marchandises",
+      "account_classification": "Expense",
+      "accounts_group_id": "f17ef978-4b97-4073-9134-797247ee3f3e",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": true,
+      "standard_tax_rate": {
+        "id": "68439804-b9d7-4e53-b90e-546063e801eb"
+      }
+    },
+    {
+      "id": "6c02ef26-23de-4da5-8fe9-33586a5b398f",
+      "number": "4208",
+      "name": "Variations de stocks",
+      "account_classification": "Expense",
+      "accounts_group_id": "f17ef978-4b97-4073-9134-797247ee3f3e",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "f189946d-a741-4b78-b76f-650064cd5e30",
+      "number": "4270",
+      "name": "Frets à l'achat",
+      "account_classification": "Expense",
+      "accounts_group_id": "9e8111ff-cc0e-414b-8ba7-c62e3e7184df",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": {
+        "id": "68439804-b9d7-4e53-b90e-546063e801eb"
+      }
+    },
+    {
+      "id": "a7276d24-829a-4681-a07d-f262c3ceeeb3",
+      "number": "4400",
+      "name": "Charges pour prestations de services",
+      "account_classification": "Expense",
+      "accounts_group_id": "7fc3c657-e8b1-4c32-846f-fdc6052387fc",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": {
+        "id": "68439804-b9d7-4e53-b90e-546063e801eb"
+      }
+    },
+    {
+      "id": "62ce07c2-ee4c-49b8-b22d-44231cee2228",
+      "number": "4620",
+      "name": "Autres charges de marchandises",
+      "account_classification": "Expense",
+      "accounts_group_id": "950560d7-3075-4f1c-8ddb-b419aa2e691c",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": {
+        "id": "68439804-b9d7-4e53-b90e-546063e801eb"
+      }
+    },
+    {
+      "id": "15c791cb-c9e9-40e9-94c9-ed96c31e3fba",
+      "number": "4640",
+      "name": "Autres charges pour prestations de tiers",
+      "account_classification": "Expense",
+      "accounts_group_id": "3dce0617-a9f8-4b9e-846b-133b32c2a394",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": {
+        "id": "68439804-b9d7-4e53-b90e-546063e801eb"
+      }
+    },
+    {
+      "id": "51d482af-9d52-44e9-96f7-42c76c2b0b31",
+      "number": "4650",
+      "name": "Charges d'emballage",
+      "account_classification": "Expense",
+      "accounts_group_id": "a8771fd5-82f7-4207-8d14-b4f408b34594",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": {
+        "id": "68439804-b9d7-4e53-b90e-546063e801eb"
+      }
+    },
+    {
+      "id": "7b34eb5c-8f74-4bce-87c4-b0fd461874ed",
+      "number": "4660",
+      "name": "Variation des provisions pour garantie",
+      "account_classification": "Expense",
+      "accounts_group_id": "b6281e2a-60e4-44fe-8c69-5966812d4b19",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "97be7f89-a0e1-4c12-9f3d-b2f31760d638",
+      "number": "4700",
+      "name": "Frets à l'achat",
+      "account_classification": "Expense",
+      "accounts_group_id": "5079a9c3-f378-4059-bbf4-00aff61862b6",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "2f8b1efa-492f-4d74-b67a-a0096c2a3dc1",
+      "number": "4800",
+      "name": "Variation des stocks de marchandises",
+      "account_classification": "Expense",
+      "accounts_group_id": "eaf3fdef-0d06-4bfe-8606-7cbd6dc5e34d",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "ee9baf5a-a4c2-4b51-bc28-2f8f25fad9de",
+      "number": "4900",
+      "name": "Escomptes",
+      "account_classification": "Expense",
+      "accounts_group_id": "1e9c9da1-1f46-43e3-a6e4-539bec331bdc",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": true,
+      "standard_tax_rate": {
+        "id": "68439804-b9d7-4e53-b90e-546063e801eb"
+      }
+    },
+    {
+      "id": "562da636-6bea-49bc-8ea1-edd42486cf11",
+      "number": "4901",
+      "name": "Rabais et réductions de prix",
+      "account_classification": "Expense",
+      "accounts_group_id": "1e9c9da1-1f46-43e3-a6e4-539bec331bdc",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": {
+        "id": "68439804-b9d7-4e53-b90e-546063e801eb"
+      }
+    },
+    {
+      "id": "ff62df03-2fb4-4e5d-a0b2-723c4b90e728",
+      "number": "4906",
+      "name": "Différences de change",
+      "account_classification": "Expense",
+      "accounts_group_id": "1e9c9da1-1f46-43e3-a6e4-539bec331bdc",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "721347bc-3a8a-4c0a-9dbc-9ff2418a79c7",
+      "number": "5000",
+      "name": "Salaires",
+      "account_classification": "Expense",
+      "accounts_group_id": "8db54708-9a53-468b-a461-9ab59c32a66c",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "4acd9aad-42a5-42f4-91a3-d81ff6392b3e",
+      "number": "5001",
+      "name": "Indemnités",
+      "account_classification": "Expense",
+      "accounts_group_id": "8db54708-9a53-468b-a461-9ab59c32a66c",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "15cc37c1-39c9-4d48-9cf9-eae8c1a251fa",
+      "number": "5002",
+      "name": "Participations au bénéfice",
+      "account_classification": "Expense",
+      "accounts_group_id": "8db54708-9a53-468b-a461-9ab59c32a66c",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "d1b06a3c-884a-4846-97d9-916525c1b211",
+      "number": "5003",
+      "name": "Commissions",
+      "account_classification": "Expense",
+      "accounts_group_id": "8db54708-9a53-468b-a461-9ab59c32a66c",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "e9cabe6e-d2b1-4137-8854-5f92e3ec7114",
+      "number": "5005",
+      "name": "Prestations des assurances sociales",
+      "account_classification": "Expense",
+      "accounts_group_id": "8db54708-9a53-468b-a461-9ab59c32a66c",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "c03cec32-820f-4911-8904-efbb071fdae0",
+      "number": "5008",
+      "name": "Autres charges de personnel",
+      "account_classification": "Expense",
+      "accounts_group_id": "8db54708-9a53-468b-a461-9ab59c32a66c",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": {
+        "id": "85beb2d7-28ff-48e1-a53c-3577d7482524"
+      }
+    },
+    {
+      "id": "f3ceec18-ae67-4d9a-b090-3ca2c0b75d8f",
+      "number": "5700",
+      "name": "AVS, AI, APG, AC",
+      "account_classification": "Expense",
+      "accounts_group_id": "9d64a01e-a2c0-4dd4-b6d5-261c0c1a6059",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "b626427a-36ca-45ec-ae22-daac3a93d1e2",
+      "number": "5710",
+      "name": "Caisse d'allocations familiales (CAF)",
+      "account_classification": "Expense",
+      "accounts_group_id": "9d64a01e-a2c0-4dd4-b6d5-261c0c1a6059",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "fa10c3d2-fbee-4900-9b71-0f5ea9fcbf92",
+      "number": "5720",
+      "name": "Prévoyance professionnelle",
+      "account_classification": "Expense",
+      "accounts_group_id": "9d64a01e-a2c0-4dd4-b6d5-261c0c1a6059",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "6b781765-a217-4998-a020-2065b8891dc4",
+      "number": "5730",
+      "name": "Assurance-accidents",
+      "account_classification": "Expense",
+      "accounts_group_id": "9d64a01e-a2c0-4dd4-b6d5-261c0c1a6059",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "ebe0b1fb-4a1e-45c4-9556-73026f90a2ad",
+      "number": "5740",
+      "name": "Assurance maladie (indemnité journalière maladie)",
+      "account_classification": "Expense",
+      "accounts_group_id": "9d64a01e-a2c0-4dd4-b6d5-261c0c1a6059",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "953c781a-e20c-4e5d-98bd-f77e8db37c91",
+      "number": "5790",
+      "name": "Impôts à la source",
+      "account_classification": "Expense",
+      "accounts_group_id": "9d64a01e-a2c0-4dd4-b6d5-261c0c1a6059",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "d8b8fad3-9e58-43b7-9c60-e39e3f74a083",
+      "number": "5810",
+      "name": "Formation obligatoire",
+      "account_classification": "Expense",
+      "accounts_group_id": "af12b100-4d9a-4b60-9e0c-0f2cb1f52586",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": {
+        "id": "85beb2d7-28ff-48e1-a53c-3577d7482524"
+      }
+    },
+    {
+      "id": "7a14a3de-ffcb-4196-a01c-1cd1a3e34221",
+      "number": "5820",
+      "name": "Dépenses effectifs",
+      "account_classification": "Expense",
+      "accounts_group_id": "09351c62-779a-4218-9cd1-d935133a9d20",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": {
+        "id": "85beb2d7-28ff-48e1-a53c-3577d7482524"
+      }
+    },
+    {
+      "id": "b6ba0f9d-ac43-4106-a55b-2f9c1ce493f9",
+      "number": "5832",
+      "name": "Dépenses, voyage, voiture, nuitée",
+      "account_classification": "Expense",
+      "accounts_group_id": "d79ec3db-511b-49d4-98ef-1c217dd40c2d",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "45bb1f18-b396-4cbe-904d-f354511d806e",
+      "number": "5880",
+      "name": "Manifestations en faveur du personnel",
+      "account_classification": "Expense",
+      "accounts_group_id": "3998dea6-94a8-4653-a5f9-04f0e263464c",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": {
+        "id": "85beb2d7-28ff-48e1-a53c-3577d7482524"
+      }
+    },
+    {
+      "id": "feec0ea0-b79a-41c3-8104-39ba64ae4369",
+      "number": "5890",
+      "name": "Parts privées sur charges de personnel",
+      "account_classification": "Expense",
+      "accounts_group_id": "19f8b2e3-88bb-46f2-bab6-559613fc1e15",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "9b49d63e-fafe-4f75-867f-84e3297c699f",
+      "number": "5891",
+      "name": "Compensation en nature",
+      "account_classification": "Expense",
+      "accounts_group_id": "19f8b2e3-88bb-46f2-bab6-559613fc1e15",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "f3223107-03d0-45ce-9d8d-58c71d163d1e",
+      "number": "6000",
+      "name": "Loyer",
+      "account_classification": "Expense",
+      "accounts_group_id": "c0f76eda-5972-4cda-bbd3-f3f94e00ed92",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "7bc84c48-afad-4439-83b8-bad4eee7dee8",
+      "number": "6030",
+      "name": "Charges accessoires",
+      "account_classification": "Expense",
+      "accounts_group_id": "c0f76eda-5972-4cda-bbd3-f3f94e00ed92",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": {
+        "id": "85beb2d7-28ff-48e1-a53c-3577d7482524"
+      }
+    },
+    {
+      "id": "d90c34a8-4a84-47c0-ad13-a43038f94871",
+      "number": "6040",
+      "name": "Nettoyage",
+      "account_classification": "Expense",
+      "accounts_group_id": "c0f76eda-5972-4cda-bbd3-f3f94e00ed92",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": {
+        "id": "85beb2d7-28ff-48e1-a53c-3577d7482524"
+      }
+    },
+    {
+      "id": "d9de14c7-b405-498f-b00a-e9fb275efb07",
+      "number": "6100",
+      "name": "ERR machines et appareils de production",
+      "account_classification": "Expense",
+      "accounts_group_id": "642e6dcb-f27f-4a7c-8a48-30ac88bfc07e",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": {
+        "id": "85beb2d7-28ff-48e1-a53c-3577d7482524"
+      }
+    },
+    {
+      "id": "2e6b7b16-503b-446a-9ab3-734588f3faab",
+      "number": "6200",
+      "name": "Réparation",
+      "account_classification": "Expense",
+      "accounts_group_id": "05a4d5ef-a9de-4c7b-810d-4af307f60c21",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": {
+        "id": "85beb2d7-28ff-48e1-a53c-3577d7482524"
+      }
+    },
+    {
+      "id": "12d0cbe0-2f84-4303-89a4-c7b0e520442a",
+      "number": "6210",
+      "name": "Essence",
+      "account_classification": "Expense",
+      "accounts_group_id": "05a4d5ef-a9de-4c7b-810d-4af307f60c21",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": {
+        "id": "85beb2d7-28ff-48e1-a53c-3577d7482524"
+      }
+    },
+    {
+      "id": "3b7bc2ad-6d1f-4177-9f05-c7d3a9cdc1c5",
+      "number": "6220",
+      "name": "Assurance responsabilité civile",
+      "account_classification": "Expense",
+      "accounts_group_id": "05a4d5ef-a9de-4c7b-810d-4af307f60c21",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "260e71ad-12c3-4dd9-9c0c-7ff90b3eaf01",
+      "number": "6260",
+      "name": "Véhicules en leasing",
+      "account_classification": "Expense",
+      "accounts_group_id": "05a4d5ef-a9de-4c7b-810d-4af307f60c21",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": {
+        "id": "85beb2d7-28ff-48e1-a53c-3577d7482524"
+      }
+    },
+    {
+      "id": "25948050-d6b0-490b-b347-a4d13ee7b0fe",
+      "number": "6270",
+      "name": "Parts privées sur charges de véhicules",
+      "account_classification": "Expense",
+      "accounts_group_id": "05a4d5ef-a9de-4c7b-810d-4af307f60c21",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": {
+        "id": "cfa86c4a-feae-4f2e-ae6d-eafad087ac3e"
+      }
+    },
+    {
+      "id": "781fcd7f-68ee-49e7-9b3f-872ebb6805d4",
+      "number": "6300",
+      "name": "Assurance pour dommage naturels",
+      "account_classification": "Expense",
+      "accounts_group_id": "af22eb5d-57d9-4cd9-95e6-3316f2def767",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "7303e800-6983-4649-bdd4-0e6ffd238d92",
+      "number": "6360",
+      "name": "Droits et taxes",
+      "account_classification": "Expense",
+      "accounts_group_id": "265fa911-f5ed-44b5-8476-ad4debe8fe3b",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "f073e832-019a-46e2-9633-01a194f83992",
+      "number": "6400",
+      "name": "Charges d'énergie",
+      "account_classification": "Expense",
+      "accounts_group_id": "8e447bde-f86a-4190-b199-b05ac97e4f22",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": {
+        "id": "85beb2d7-28ff-48e1-a53c-3577d7482524"
+      }
+    },
+    {
+      "id": "aa6f6929-894d-4b89-b3df-26446a915d75",
+      "number": "6500",
+      "name": "Matériel de bureau",
+      "account_classification": "Expense",
+      "accounts_group_id": "f17c254a-f153-4962-8642-1fd9cd4c11c7",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": {
+        "id": "85beb2d7-28ff-48e1-a53c-3577d7482524"
+      }
+    },
+    {
+      "id": "554962c0-32f9-41f6-92d2-272ee1012d2f",
+      "number": "6510",
+      "name": "Frais de communication",
+      "account_classification": "Expense",
+      "accounts_group_id": "f17c254a-f153-4962-8642-1fd9cd4c11c7",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": {
+        "id": "85beb2d7-28ff-48e1-a53c-3577d7482524"
+      }
+    },
+    {
+      "id": "7b535037-5a46-4a39-84da-8bc569da8c09",
+      "number": "6512",
+      "name": "Internet",
+      "account_classification": "Expense",
+      "accounts_group_id": "f17c254a-f153-4962-8642-1fd9cd4c11c7",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": {
+        "id": "85beb2d7-28ff-48e1-a53c-3577d7482524"
+      }
+    },
+    {
+      "id": "3a02c34c-fae2-4c55-b1f1-b01cd7f7717e",
+      "number": "6513",
+      "name": "Frais de port",
+      "account_classification": "Expense",
+      "accounts_group_id": "f17c254a-f153-4962-8642-1fd9cd4c11c7",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": {
+        "id": "85beb2d7-28ff-48e1-a53c-3577d7482524"
+      }
+    },
+    {
+      "id": "9cc0bb16-01f2-481e-a5a1-25a34cb8a85a",
+      "number": "6530",
+      "name": "Honoraires pour la tenue de la comptabilité",
+      "account_classification": "Expense",
+      "accounts_group_id": "f17c254a-f153-4962-8642-1fd9cd4c11c7",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": {
+        "id": "85beb2d7-28ff-48e1-a53c-3577d7482524"
+      }
+    },
+    {
+      "id": "35812cf2-02e1-427c-8ea2-396e1f76dc36",
+      "number": "6559",
+      "name": "Autres frais d'administration",
+      "account_classification": "Expense",
+      "accounts_group_id": "f17c254a-f153-4962-8642-1fd9cd4c11c7",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": {
+        "id": "85beb2d7-28ff-48e1-a53c-3577d7482524"
+      }
+    },
+    {
+      "id": "fadf0b3f-738e-4cbe-955c-b77843bbd68a",
+      "number": "6570",
+      "name": "Frais informatiques",
+      "account_classification": "Expense",
+      "accounts_group_id": "3a729a82-9025-489a-a7db-a2fb65746977",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": {
+        "id": "85beb2d7-28ff-48e1-a53c-3577d7482524"
+      }
+    },
+    {
+      "id": "a76ca056-0595-45eb-a11b-486c0b7a2fdb",
+      "number": "6600",
+      "name": "Publicité dans les journaux",
+      "account_classification": "Expense",
+      "accounts_group_id": "6714adac-3eaa-4abd-bc6b-426fb689fadb",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": {
+        "id": "85beb2d7-28ff-48e1-a53c-3577d7482524"
+      }
+    },
+    {
+      "id": "71595fa5-72af-4a6b-95cd-ed1ab876fdd3",
+      "number": "6640",
+      "name": "Frais de déplacement",
+      "account_classification": "Expense",
+      "accounts_group_id": "8c4bdce8-4e3f-4718-a9d5-c82bab031080",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": {
+        "id": "85beb2d7-28ff-48e1-a53c-3577d7482524"
+      }
+    },
+    {
+      "id": "9747d316-b27f-4919-aa54-bdc76de31930",
+      "number": "6641",
+      "name": "Service à la clientèle",
+      "account_classification": "Expense",
+      "accounts_group_id": "8c4bdce8-4e3f-4718-a9d5-c82bab031080",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": {
+        "id": "85beb2d7-28ff-48e1-a53c-3577d7482524"
+      }
+    },
+    {
+      "id": "b759c3b5-6554-474b-bd1d-7b2b474636a0",
+      "number": "6800",
+      "name": "Ajustement de la valeur de titres des actifs immobilisés",
+      "account_classification": "Expense",
+      "accounts_group_id": "79407a86-2a50-4841-b75a-6442df9c1ddb",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "07f0d0fe-fef6-43a8-80af-b38bd473b3ce",
+      "number": "6900",
+      "name": "Intérêts débiteurs sur crédit bancaire",
+      "account_classification": "Expense",
+      "accounts_group_id": "688d0ab6-41a7-4288-9ff4-31e393d2c44e",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "47e7431a-5a40-4720-8987-47fda965dc19",
+      "number": "6940",
+      "name": "Frais bancaires",
+      "account_classification": "Expense",
+      "accounts_group_id": "688d0ab6-41a7-4288-9ff4-31e393d2c44e",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "c505c824-05ce-4319-920a-f5f9f65e4403",
+      "number": "6945",
+      "name": "Différence d'arrondi",
+      "account_classification": "Expense",
+      "accounts_group_id": "688d0ab6-41a7-4288-9ff4-31e393d2c44e",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": true,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "653e83cb-2803-4cb8-8d5f-66b1022fb33f",
+      "number": "6949",
+      "name": "Pertes de change",
+      "account_classification": "Expense",
+      "accounts_group_id": "688d0ab6-41a7-4288-9ff4-31e393d2c44e",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": true,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "15eb5882-351b-4bd7-ad27-9c7e8b89840c",
+      "number": "6950",
+      "name": "Produits financiers sur avoirs en banque",
+      "account_classification": "Income",
+      "accounts_group_id": "a3b8e7af-5188-4de9-9f45-e50226b775e3",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "ad4b33e2-8be2-46c1-b6f8-9eceb79d697f",
+      "number": "6999",
+      "name": "Gains de change",
+      "account_classification": "Income",
+      "accounts_group_id": "a3b8e7af-5188-4de9-9f45-e50226b775e3",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": true,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "dd6d1053-af71-477f-959e-845eeef6284f",
+      "number": "8000",
+      "name": "Charges hors exploitation",
+      "account_classification": "Expense",
+      "accounts_group_id": "68630501-9d07-412a-be69-dae52910676e",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "074fb0f3-4972-43ca-bd63-3a858d4b7732",
+      "number": "8100",
+      "name": "Produits hors exploitation",
+      "account_classification": "Income",
+      "accounts_group_id": "68630501-9d07-412a-be69-dae52910676e",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "36f15a1c-3e11-42d0-81d3-eb7ffe967880",
+      "number": "8505",
+      "name": "Pertes exceptionnelles sure débiteurs",
+      "account_classification": "Expense",
+      "accounts_group_id": "93861b1b-5cd3-49d3-86be-14480e71521d",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "c27d0c6f-f3c0-49c6-8eb5-8ed4f5d7310d",
+      "number": "8514",
+      "name": "Bénéfices exceptionnels sur aliénations d'actifs immobilisés",
+      "account_classification": "Income",
+      "accounts_group_id": "93861b1b-5cd3-49d3-86be-14480e71521d",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "211a95e8-44e8-4135-8386-c8a5801f0ada",
+      "number": "8900",
+      "name": "Impôts sur le bénéfice/Impôts cantonaux et communaux",
+      "account_classification": "Expense",
+      "accounts_group_id": "fb533267-4ff6-4965-96b4-a714ded3828e",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": false,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "4bec7a96-fe23-4def-9c9b-b1b4ddce13b0",
+      "number": "9000",
+      "name": "Compte de résultat",
+      "account_classification": "Complete",
+      "accounts_group_id": "0774f160-9a91-4093-bf83-5b16ad9a2d3d",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": true,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "18c6d35e-a542-4f63-939c-20f8c8b5c127",
+      "number": "9100",
+      "name": "Bilan d'ouverture",
+      "account_classification": "Complete",
+      "accounts_group_id": "0774f160-9a91-4093-bf83-5b16ad9a2d3d",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": true,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "37d8a3eb-dabe-4b1c-b899-01f4cc36ed0a",
+      "number": "9101",
+      "name": "Bilan de clôture",
+      "account_classification": "Complete",
+      "accounts_group_id": "0774f160-9a91-4093-bf83-5b16ad9a2d3d",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": true,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "7e46cd21-02e9-466a-8c52-1e468c1bc6da",
+      "number": "9200",
+      "name": "Bénéfice ou perte de l'exercice",
+      "account_classification": "Complete",
+      "accounts_group_id": "0774f160-9a91-4093-bf83-5b16ad9a2d3d",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": true,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "a32b4809-9bab-46a3-9967-e0227f42b6ec",
+      "number": "9900",
+      "name": "Corrections",
+      "account_classification": "Complete",
+      "accounts_group_id": "0774f160-9a91-4093-bf83-5b16ad9a2d3d",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": true,
+      "standard_tax_rate": null
+    },
+    {
+      "id": "f734be10-991c-4918-9473-2d46a9fb92c0",
+      "number": "9901",
+      "name": "Transfert de soldes",
+      "account_classification": "Complete",
+      "accounts_group_id": "0774f160-9a91-4093-bf83-5b16ad9a2d3d",
+      "is_active": true,
+      "is_connected": false,
+      "is_system_account": true,
+      "standard_tax_rate": null
+    }
+  ],
+  "groups": [
+    {
+      "id": "257eae39-e7ca-4d1a-8782-01b503e061b8",
+      "number": "1",
+      "name": "Actifs",
+      "is_system_accounts_group": true,
+      "parent_accounts_group_id": null,
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": false,
+        "is_parent_changeable": false
+      }
+    },
+    {
+      "id": "c16d6c75-a905-4bfc-8857-2a9e57204e3c",
+      "number": "10",
+      "name": "Actifs circulants",
+      "is_system_accounts_group": true,
+      "parent_accounts_group_id": "257eae39-e7ca-4d1a-8782-01b503e061b8",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": false,
+        "is_parent_changeable": false
+      }
+    },
+    {
+      "id": "8a487927-9765-476d-86d3-77a9bd427086",
+      "number": "100",
+      "name": "Trésorerie",
+      "is_system_accounts_group": true,
+      "parent_accounts_group_id": "c16d6c75-a905-4bfc-8857-2a9e57204e3c",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": false,
+        "is_parent_changeable": false
+      }
+    },
+    {
+      "id": "4523b618-0c59-4d7b-9b59-0430cf7e816c",
+      "number": "109",
+      "name": "Comptes d'attente",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "c16d6c75-a905-4bfc-8857-2a9e57204e3c",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "2d027e31-2107-4990-b8a5-692b4691c08a",
+      "number": "110",
+      "name": "Créances résultant de la vente de biens et de prestations de services",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "c16d6c75-a905-4bfc-8857-2a9e57204e3c",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "7da3ef69-67b3-4d68-a281-3e352daab1e6",
+      "number": "114",
+      "name": "Autres créances à court terme",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "c16d6c75-a905-4bfc-8857-2a9e57204e3c",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "89a3832c-55db-4c80-953c-50d6b505c48c",
+      "number": "117",
+      "name": "Créances à court terme envers des institutions publiques",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "c16d6c75-a905-4bfc-8857-2a9e57204e3c",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "c4357089-04dd-4156-afe9-f5e333f8a388",
+      "number": "118",
+      "name": "Créances de sécurité sociale",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "c16d6c75-a905-4bfc-8857-2a9e57204e3c",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "b6f3c4e9-99c9-4833-8c04-ba7bb99fa1aa",
+      "number": "120",
+      "name": "Stocks et prestations de services non facturées",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "c16d6c75-a905-4bfc-8857-2a9e57204e3c",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "989f3ea5-2e2b-4dfb-b5ed-69f29ad316d6",
+      "number": "130",
+      "name": "Actifs de régularisation (actifs transitoires)",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "c16d6c75-a905-4bfc-8857-2a9e57204e3c",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "96f874d9-ecdc-4eec-b47b-5d7d3f4e52c3",
+      "number": "14",
+      "name": "Actifs immobilisés",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "257eae39-e7ca-4d1a-8782-01b503e061b8",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "9028738f-4e0e-49a9-84ee-6dd1182259a5",
+      "number": "150",
+      "name": "Immobilisations corporelles meubles",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "96f874d9-ecdc-4eec-b47b-5d7d3f4e52c3",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "41277c3a-7b3d-4ecc-8191-1a5118d4cae8",
+      "number": "2",
+      "name": "Passifs",
+      "is_system_accounts_group": true,
+      "parent_accounts_group_id": null,
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": false,
+        "is_parent_changeable": false
+      }
+    },
+    {
+      "id": "34695510-979d-452e-8869-debcafc24d0c",
+      "number": "20",
+      "name": "Capitaux étrangers à court terme",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "41277c3a-7b3d-4ecc-8191-1a5118d4cae8",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "f4125f6f-8ddc-4a04-97f2-2e257a560760",
+      "number": "200",
+      "name": "Dettes résultant de l'achat de biens et de prestations de services",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "34695510-979d-452e-8869-debcafc24d0c",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "fd6e8f99-d347-4317-94fe-8178991f4d8a",
+      "number": "210",
+      "name": "Dettes à court terme portant intérêt",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "34695510-979d-452e-8869-debcafc24d0c",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "fbebc246-a0d7-4993-9b85-91792f746b0e",
+      "number": "220",
+      "name": "Autres dettes à court terme",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "34695510-979d-452e-8869-debcafc24d0c",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "fb73272f-9582-4c3f-8d68-448603412bca",
+      "number": "227",
+      "name": "Dettes de sécurité sociale",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "34695510-979d-452e-8869-debcafc24d0c",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "5094ac93-9c4b-4a70-b857-d317d816e027",
+      "number": "230",
+      "name": "Passifs de régularisation (passifs transitoires)",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "34695510-979d-452e-8869-debcafc24d0c",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "9e55a149-05e5-411b-bd2d-00f6cc5bce63",
+      "number": "24",
+      "name": "Capitaux étrangers à long terme",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "41277c3a-7b3d-4ecc-8191-1a5118d4cae8",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "412c0483-55c5-48d6-a7e9-8d6bea31bfaf",
+      "number": "240",
+      "name": "Dettes à long terme portant intérêt",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "9e55a149-05e5-411b-bd2d-00f6cc5bce63",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "ce17ddfb-23be-4f1f-9fd6-6ec706c7b0e4",
+      "number": "256",
+      "name": "Dettes envers des participations",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "9e55a149-05e5-411b-bd2d-00f6cc5bce63",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "3d25daf9-888d-4c6e-8410-5268854c0320",
+      "number": "28",
+      "name": "Capitaux propres",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "41277c3a-7b3d-4ecc-8191-1a5118d4cae8",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "dfc3a7a0-abb6-4dc8-a77c-2b7867a33661",
+      "number": "280",
+      "name": "Capital",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "3d25daf9-888d-4c6e-8410-5268854c0320",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "33fb69cf-8bbd-41eb-a392-5f2daee9a684",
+      "number": "290",
+      "name": "Réserves et bénéfice reporté ou perte reportée",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "3d25daf9-888d-4c6e-8410-5268854c0320",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "5a5c5524-e1d9-41a7-afef-7f37f1570374",
+      "number": "3",
+      "name": "Produits nets des ventes de biens et de prestations de services",
+      "is_system_accounts_group": true,
+      "parent_accounts_group_id": null,
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": false,
+        "is_parent_changeable": false
+      }
+    },
+    {
+      "id": "b249f884-8c7f-4fe5-bf5e-2dec5f00a49f",
+      "number": "30",
+      "name": "Chiffre d'affaires de la production vendue",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "5a5c5524-e1d9-41a7-afef-7f37f1570374",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "aa9d444d-8858-4167-94cf-a122f16893fc",
+      "number": "300",
+      "name": "Ventes de produits fabriqués",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "b249f884-8c7f-4fe5-bf5e-2dec5f00a49f",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "c84098c7-95f6-4035-82d6-2525d6058c71",
+      "number": "32",
+      "name": "Ventes de marchandises",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "5a5c5524-e1d9-41a7-afef-7f37f1570374",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "aeadfa7f-1e58-4988-bfbb-c86172d6f6ff",
+      "number": "320",
+      "name": "Ventes de marchandises",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "c84098c7-95f6-4035-82d6-2525d6058c71",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "8abaf08f-e38a-438f-a97d-151fbbd1933e",
+      "number": "34",
+      "name": "Ventes de prestations",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "5a5c5524-e1d9-41a7-afef-7f37f1570374",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "b698098c-8823-4bde-bc87-cd2ae85a4e71",
+      "number": "340",
+      "name": "Ventes brutes de prestations",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "8abaf08f-e38a-438f-a97d-151fbbd1933e",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "6f44b126-58b2-410a-a65c-74ea59c2e936",
+      "number": "36",
+      "name": "Produits annexes résultant de la vente",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "5a5c5524-e1d9-41a7-afef-7f37f1570374",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "73c4ee03-037c-4b7f-9ca5-1da2d256dc3b",
+      "number": "360",
+      "name": "Produits annexes résultant de livraisons et de prestations de services",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "6f44b126-58b2-410a-a65c-74ea59c2e936",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "b9c0b88a-9551-4a5f-8330-0b4b974f6369",
+      "number": "368",
+      "name": "Autres produits",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "6f44b126-58b2-410a-a65c-74ea59c2e936",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "4b509e5c-d40e-43ad-ad09-4f6617674409",
+      "number": "38",
+      "name": "Déductions sur ventes",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "5a5c5524-e1d9-41a7-afef-7f37f1570374",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "e4237f13-27dc-4355-9505-43c393e77675",
+      "number": "380",
+      "name": "Déductions sur ventes",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "4b509e5c-d40e-43ad-ad09-4f6617674409",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "2a505fac-b730-44c7-8588-82010f896c58",
+      "number": "39",
+      "name": "Variation des stocks",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "5a5c5524-e1d9-41a7-afef-7f37f1570374",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "f984b401-9b94-46ec-93b1-c2ed7428b0aa",
+      "number": "394",
+      "name": "Variation de la valeur des prestations non facturées",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "2a505fac-b730-44c7-8588-82010f896c58",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "c4149da4-b8fc-4e51-af7b-ba068a2f484d",
+      "number": "4",
+      "name": "Charges de matériel, de marchandises et des prestations",
+      "is_system_accounts_group": true,
+      "parent_accounts_group_id": null,
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": false,
+        "is_parent_changeable": false
+      }
+    },
+    {
+      "id": "a66cdb7c-1258-4c38-9358-1283b77a6378",
+      "number": "40",
+      "name": "Charges de matériel",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "c4149da4-b8fc-4e51-af7b-ba068a2f484d",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "f31874b4-70c2-4b80-bcd5-c47b7a19953f",
+      "number": "42",
+      "name": "Charges de marchandises",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "c4149da4-b8fc-4e51-af7b-ba068a2f484d",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "f17ef978-4b97-4073-9134-797247ee3f3e",
+      "number": "420",
+      "name": "Charges de marchandises destinées à la revente",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "f31874b4-70c2-4b80-bcd5-c47b7a19953f",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "9e8111ff-cc0e-414b-8ba7-c62e3e7184df",
+      "number": "427",
+      "name": "Charges directes d'achat Commerce",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "f31874b4-70c2-4b80-bcd5-c47b7a19953f",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "991f6413-21be-40ea-9934-3506f3a37d7a",
+      "number": "44",
+      "name": "Prestations et travaux de tiers",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "c4149da4-b8fc-4e51-af7b-ba068a2f484d",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "7fc3c657-e8b1-4c32-846f-fdc6052387fc",
+      "number": "440",
+      "name": "Charges de prestations de tiers",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "991f6413-21be-40ea-9934-3506f3a37d7a",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "7b1a0670-6349-4985-8253-7e3fc610a187",
+      "number": "46",
+      "name": "Autres charges",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "c4149da4-b8fc-4e51-af7b-ba068a2f484d",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "950560d7-3075-4f1c-8ddb-b419aa2e691c",
+      "number": "462",
+      "name": "Autres charges de marchandises",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "7b1a0670-6349-4985-8253-7e3fc610a187",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "3dce0617-a9f8-4b9e-846b-133b32c2a394",
+      "number": "464",
+      "name": "Autres charges pour prestations de tiers",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "7b1a0670-6349-4985-8253-7e3fc610a187",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "a8771fd5-82f7-4207-8d14-b4f408b34594",
+      "number": "465",
+      "name": "Charges d'emballage",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "7b1a0670-6349-4985-8253-7e3fc610a187",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "b6281e2a-60e4-44fe-8c69-5966812d4b19",
+      "number": "466",
+      "name": "Variation des provisions pour garantie",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "7b1a0670-6349-4985-8253-7e3fc610a187",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "5079a9c3-f378-4059-bbf4-00aff61862b6",
+      "number": "47",
+      "name": "Charges directes d'achat",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "c4149da4-b8fc-4e51-af7b-ba068a2f484d",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "994b24df-d880-45f8-9cbb-92d4bf928a1c",
+      "number": "48",
+      "name": "Variation des stocks",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "c4149da4-b8fc-4e51-af7b-ba068a2f484d",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "eaf3fdef-0d06-4bfe-8606-7cbd6dc5e34d",
+      "number": "480",
+      "name": "Variation des stocks de matières et marchandises",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "994b24df-d880-45f8-9cbb-92d4bf928a1c",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "b2a3e391-af61-4acb-b7af-bc24146ba67e",
+      "number": "49",
+      "name": "Déductions obtenues sur achats",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "c4149da4-b8fc-4e51-af7b-ba068a2f484d",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "1e9c9da1-1f46-43e3-a6e4-539bec331bdc",
+      "number": "490",
+      "name": "Réductions des prix d'achat",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "b2a3e391-af61-4acb-b7af-bc24146ba67e",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "76639710-432f-4cf7-b9fc-5d174d9da1fc",
+      "number": "5",
+      "name": "Charges de personnel",
+      "is_system_accounts_group": true,
+      "parent_accounts_group_id": null,
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": false,
+        "is_parent_changeable": false
+      }
+    },
+    {
+      "id": "27fbdd09-d65f-4d85-8193-b843878cf96d",
+      "number": "50",
+      "name": "Charges de personnel Production",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "76639710-432f-4cf7-b9fc-5d174d9da1fc",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "8db54708-9a53-468b-a461-9ab59c32a66c",
+      "number": "500",
+      "name": "Charges salariales Production - secteur A",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "27fbdd09-d65f-4d85-8193-b843878cf96d",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "a46fea2a-cd31-4b11-ad1a-9b79cdfa6520",
+      "number": "57",
+      "name": "Charges sociales",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "76639710-432f-4cf7-b9fc-5d174d9da1fc",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "9d64a01e-a2c0-4dd4-b6d5-261c0c1a6059",
+      "number": "570",
+      "name": "Charges sociales",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "a46fea2a-cd31-4b11-ad1a-9b79cdfa6520",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "a7c475e6-94c4-4788-ba27-b49662e19a13",
+      "number": "58",
+      "name": "Autres charges de personnel",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "76639710-432f-4cf7-b9fc-5d174d9da1fc",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "af12b100-4d9a-4b60-9e0c-0f2cb1f52586",
+      "number": "581",
+      "name": "Formation et formation continue",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "a7c475e6-94c4-4788-ba27-b49662e19a13",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "09351c62-779a-4218-9cd1-d935133a9d20",
+      "number": "582",
+      "name": "Indemnités effectives",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "a7c475e6-94c4-4788-ba27-b49662e19a13",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "d79ec3db-511b-49d4-98ef-1c217dd40c2d",
+      "number": "583",
+      "name": "Indemnités forfaitaires",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "a7c475e6-94c4-4788-ba27-b49662e19a13",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "3998dea6-94a8-4653-a5f9-04f0e263464c",
+      "number": "588",
+      "name": "Autres charges de personnel",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "a7c475e6-94c4-4788-ba27-b49662e19a13",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "19f8b2e3-88bb-46f2-bab6-559613fc1e15",
+      "number": "589",
+      "name": "Parts privées sur charges de personnel",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "a7c475e6-94c4-4788-ba27-b49662e19a13",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "a61318b9-a693-4a78-b72f-4b322fd9d9ac",
+      "number": "6",
+      "name": "Autres charges d'exploitation",
+      "is_system_accounts_group": true,
+      "parent_accounts_group_id": null,
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": false,
+        "is_parent_changeable": false
+      }
+    },
+    {
+      "id": "fa6d62cc-21d1-48cb-bd09-e65e27699a16",
+      "number": "60",
+      "name": "Charges de locaux",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "a61318b9-a693-4a78-b72f-4b322fd9d9ac",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "c0f76eda-5972-4cda-bbd3-f3f94e00ed92",
+      "number": "600",
+      "name": "Loyers pour locaux de tiers",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "fa6d62cc-21d1-48cb-bd09-e65e27699a16",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "05c32610-d15d-4ef4-ac4f-9f1cc50cb252",
+      "number": "61",
+      "name": "Entretien, réparations, remplacements (ERR), leasing",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "a61318b9-a693-4a78-b72f-4b322fd9d9ac",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "642e6dcb-f27f-4a7c-8a48-30ac88bfc07e",
+      "number": "610",
+      "name": "ERR installations de production",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "05c32610-d15d-4ef4-ac4f-9f1cc50cb252",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "ac292095-895a-48e6-8b5b-b264f0fe502e",
+      "number": "62",
+      "name": "Charges de véhicules et de transport",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "a61318b9-a693-4a78-b72f-4b322fd9d9ac",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "05a4d5ef-a9de-4c7b-810d-4af307f60c21",
+      "number": "620",
+      "name": "Charges de véhicules",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "ac292095-895a-48e6-8b5b-b264f0fe502e",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "1bf6c1dc-712f-4e32-98b7-ff1d56bc0445",
+      "number": "63",
+      "name": "Assurances-choses, droits, taxes, autorisations",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "a61318b9-a693-4a78-b72f-4b322fd9d9ac",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "af22eb5d-57d9-4cd9-95e6-3316f2def767",
+      "number": "630",
+      "name": "Assurances-choses",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "1bf6c1dc-712f-4e32-98b7-ff1d56bc0445",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "265fa911-f5ed-44b5-8476-ad4debe8fe3b",
+      "number": "636",
+      "name": "Droits, taxes et autorisations",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "1bf6c1dc-712f-4e32-98b7-ff1d56bc0445",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "82f73b4a-c479-44e2-b4bb-32a20eab19a8",
+      "number": "64",
+      "name": "Charges d'énergie et évacuation des déchets",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "a61318b9-a693-4a78-b72f-4b322fd9d9ac",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "8e447bde-f86a-4190-b199-b05ac97e4f22",
+      "number": "640",
+      "name": "Charges d'énergie",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "82f73b4a-c479-44e2-b4bb-32a20eab19a8",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "549fbcd0-6982-4062-8f18-f1e29c09a148",
+      "number": "65",
+      "name": "Charges d'administration et d'informatique",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "a61318b9-a693-4a78-b72f-4b322fd9d9ac",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "f17c254a-f153-4962-8642-1fd9cd4c11c7",
+      "number": "650",
+      "name": "Charges d'administration",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "549fbcd0-6982-4062-8f18-f1e29c09a148",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "3a729a82-9025-489a-a7db-a2fb65746977",
+      "number": "657",
+      "name": "Frais informatiques",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "549fbcd0-6982-4062-8f18-f1e29c09a148",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "2d99d33d-edf4-472e-882a-d4353140509a",
+      "number": "66",
+      "name": "Charges de publicité",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "a61318b9-a693-4a78-b72f-4b322fd9d9ac",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "6714adac-3eaa-4abd-bc6b-426fb689fadb",
+      "number": "660",
+      "name": "Publicité, médias électroniques",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "2d99d33d-edf4-472e-882a-d4353140509a",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "8c4bdce8-4e3f-4718-a9d5-c82bab031080",
+      "number": "664",
+      "name": "Frais de déplacement, service à la clientèle",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "2d99d33d-edf4-472e-882a-d4353140509a",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "6155f9d6-1e1e-43c1-a79c-eb9b2656e78c",
+      "number": "68",
+      "name": "Amortissements et corrections de la valeur des actifs immobilisés",
+      "is_system_accounts_group": true,
+      "parent_accounts_group_id": "a61318b9-a693-4a78-b72f-4b322fd9d9ac",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": false,
+        "is_parent_changeable": false
+      }
+    },
+    {
+      "id": "79407a86-2a50-4841-b75a-6442df9c1ddb",
+      "number": "680",
+      "name": "Ajustement de la valeur des immobilisations financières",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "6155f9d6-1e1e-43c1-a79c-eb9b2656e78c",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "5a3bf656-38cb-4da3-8210-cee45e37b898",
+      "number": "69",
+      "name": "Charges et produits financiers",
+      "is_system_accounts_group": true,
+      "parent_accounts_group_id": "a61318b9-a693-4a78-b72f-4b322fd9d9ac",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": false,
+        "is_parent_changeable": false
+      }
+    },
+    {
+      "id": "688d0ab6-41a7-4288-9ff4-31e393d2c44e",
+      "number": "690",
+      "name": "Charges financières",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "5a3bf656-38cb-4da3-8210-cee45e37b898",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "a3b8e7af-5188-4de9-9f45-e50226b775e3",
+      "number": "695",
+      "name": "Produits financiers",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "5a3bf656-38cb-4da3-8210-cee45e37b898",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "189a40cf-23d3-458a-a5c1-119a37cb5d9a",
+      "number": "8",
+      "name": "Résultats exceptionnels et hors exploitation",
+      "is_system_accounts_group": true,
+      "parent_accounts_group_id": null,
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": false,
+        "is_parent_changeable": false
+      }
+    },
+    {
+      "id": "68630501-9d07-412a-be69-dae52910676e",
+      "number": "80",
+      "name": "Résultats hors exploitation",
+      "is_system_accounts_group": true,
+      "parent_accounts_group_id": "189a40cf-23d3-458a-a5c1-119a37cb5d9a",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": false,
+        "is_parent_changeable": false
+      }
+    },
+    {
+      "id": "93861b1b-5cd3-49d3-86be-14480e71521d",
+      "number": "85",
+      "name": "Charges et produits exceptionnels, uniques ou hors période",
+      "is_system_accounts_group": true,
+      "parent_accounts_group_id": "189a40cf-23d3-458a-a5c1-119a37cb5d9a",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": false,
+        "is_parent_changeable": false
+      }
+    },
+    {
+      "id": "fb533267-4ff6-4965-96b4-a714ded3828e",
+      "number": "89",
+      "name": "Impôts directs",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "189a40cf-23d3-458a-a5c1-119a37cb5d9a",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    },
+    {
+      "id": "8ccf0e89-ffd6-4349-8e28-117fe5c6425a",
+      "number": "9",
+      "name": "Clôture",
+      "is_system_accounts_group": true,
+      "parent_accounts_group_id": null,
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": false,
+        "is_parent_changeable": false
+      }
+    },
+    {
+      "id": "0774f160-9a91-4093-bf83-5b16ad9a2d3d",
+      "number": "91",
+      "name": "Clôture",
+      "is_system_accounts_group": false,
+      "parent_accounts_group_id": "8ccf0e89-ffd6-4349-8e28-117fe5c6425a",
+      "actions": {
+        "is_deletable": false,
+        "is_number_changeable": true,
+        "is_parent_changeable": true
+      }
+    }
+  ]
+}

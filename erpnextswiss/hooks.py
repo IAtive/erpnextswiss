@@ -102,9 +102,15 @@ email_append_to = ["EDI File"]
 # ------------
 
 # before_install = "erpnextswiss.install.before_install"
-after_install = "erpnextswiss.setup.install.after_install"
+after_install = [
+    "erpnextswiss.setup.install.after_install",
+    "erpnextswiss.swiss_vat_config.vat_setup.after_install",
+]
 
-after_migrate = "erpnextswiss.erpnextswiss.doctype.swiss_exchange_rate_settings.swiss_exchange_rate_settings.ensure_defaults"
+after_migrate = [
+    "erpnextswiss.erpnextswiss.doctype.swiss_exchange_rate_settings.swiss_exchange_rate_settings.ensure_defaults",
+    "erpnextswiss.swiss_vat_config.vat_setup.after_migrate",
+]
 
 # Desk Notifications
 # ------------------
@@ -139,7 +145,15 @@ doc_events = {
     "Contact": {
         "on_update": "erpnextswiss.erpnextswiss.nextcloud.contacts.send_contact_to_nextcloud",
         "on_trash": "erpnextswiss.erpnextswiss.nextcloud.contacts.delete_contact_from_nextcloud"
-    }
+    },
+    # Swiss VAT Config : garde-fou de plausibilité du décompte TVA + routage des escomptes achat.
+    "VAT Declaration": {
+        "validate": "erpnextswiss.swiss_vat_config.plausibility.vat_declaration_warn",
+        "before_submit": "erpnextswiss.swiss_vat_config.plausibility.vat_declaration_block",
+    },
+    "Payment Entry": {
+        "validate": "erpnextswiss.swiss_vat_config.escompte.route_purchase_discount_to_4900",
+    },
 }
 
 # Scheduled Tasks
@@ -187,7 +201,7 @@ scheduler_events = {
 
 # Fixtures (to import DocType customisations)
 # --------
-fixtures = ["Custom Field"]
+fixtures = ["Custom Field", "AFC VAT Box"]
 
 domains = {
     'HLK': 'erpnextswiss.domains.hlk'

@@ -86,7 +86,7 @@
    "hidden": 0,
    "is_query_report": 0,
    "label": "Taxes",
-   "link_count": 2,
+   "link_count": 3,
    "link_type": "DocType",
    "onboard": 0,
    "type": "Card Break"
@@ -107,6 +107,16 @@
    "label": "Kontrolle MwSt",
    "link_count": 0,
    "link_to": "Kontrolle MwSt",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Controle plausibilite TVA",
+   "link_count": 0,
+   "link_to": "Controle plausibilite TVA",
    "link_type": "Report",
    "onboard": 0,
    "type": "Link"
@@ -242,7 +252,7 @@
    "hidden": 0,
    "is_query_report": 0,
    "label": "Configuration",
-   "link_count": 9,
+   "link_count": 10,
    "link_type": "DocType",
    "onboard": 0,
    "type": "Card Break"
@@ -333,6 +343,16 @@
    "label": "Swiss Exchange Rate Import Log",
    "link_count": 0,
    "link_to": "Swiss Exchange Rate Import Log",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "AFC VAT Box",
+   "link_count": 0,
+   "link_to": "AFC VAT Box",
    "link_type": "DocType",
    "onboard": 0,
    "type": "Link"
@@ -594,7 +614,7 @@
    "type": "Link"
   }
  ],
- "modified": "2026-07-12 12:00:00.000000",
+ "modified": "2026-07-17 10:00:00.000000",
  "modified_by": "Administrator",
  "module": "ERPNextSwiss",
  "name": "ERPNextSwiss",

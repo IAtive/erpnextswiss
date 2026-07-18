@@ -1,2 +1,3 @@
 ERPNextSwiss
 Scripts
+Swiss VAT Config

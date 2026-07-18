@@ -4,10 +4,12 @@
 > par rapport à l'upstream libracore/erpnextswiss. Objectif : savoir exactement ce qui est modifié
 > (indispensable pour les futurs merges upstream) et pourquoi.
 >
-> **Répartition** : l'**infrastructure lourde** (décompte TVA, QR-facture, ISO 20022, Lohnausweis)
-> vit dans le **fork erpnextswiss** ; la **logique métier / config** (codes AFC, plausibilité, print
-> format, company_setup) vit dans l'app **`swiss_compliance_setup`**. Ce doc couvre le **fork** ; la
-> partie codes AFC / plan comptable est dans `ch_accounting_setup.md` de l'app **`swiss_compliance_setup`**.
+> **Consolidation (2026-07)** : l'app métier **`swiss_compliance_setup`** a été **fusionnée dans le fork**
+> sous le module dédié **`Swiss VAT Config`** (voir §9). Désormais **tout** vit dans erpnextswiss :
+> l'**infrastructure** (décompte TVA, QR-facture, ISO 20022, Lohnausweis) **et** la **logique métier /
+> config** (codes AFC, plausibilité, print format, `company_setup`). Le module `Swiss VAT Config` isole
+> cette partie métier pour garder un merge upstream propre. La doc AFC / plan comptable est dans
+> **`docs/ch_accounting_setup.md`** (rapatriée depuis l'ex-app).
 
 ---
 
@@ -126,9 +128,9 @@ Ajout du schéma officiel **`eCH-0217-2-0-0.xsd`** + ses dépendances (eCH-0058,
   (sans elle, `get_party_account` rend déjà 1100/2000).
 - Import ajouté : `from erpnext.accounts.party import get_party_account`.
 
-> Côté `swiss_compliance_setup` : le setup épingle `default_receivable_account = 1100` /
+> Côté module `Swiss VAT Config` : le setup épingle `default_receivable_account = 1100` /
 > `default_payable_account = 2000` (sinon 2030, typé `Receivable`, est choisi par défaut pour les
-> **factures** — bug distinct, corrigé séparément). Voir `ch_accounting_setup.md` §11.
+> **factures** — bug distinct, corrigé séparément). Voir `docs/ch_accounting_setup.md` §11.
 
 ### 5.4 Taux de change au rapprochement d'une facture en devise (gain/perte de change)
 `bank_wizard.py` (`read_camt053` + `make_payment_entry`) + `bank_wizard.js` :
@@ -183,16 +185,16 @@ restaurer le Contract natif :
 
 ---
 
-## 7. Complément côté `swiss_compliance_setup` (hors fork)
+## 7. Configuration métier (module `Swiss VAT Config`)
 
-Ces éléments **s'appuient** sur le fork mais vivent dans l'app métier :
+Ces éléments vivent désormais **dans le fork** (module `Swiss VAT Config`, ex-`swiss_compliance_setup` — cf. §9) :
 
 | Élément | Fichier | Rôle |
 |---|---|---|
-| Print Format **« Décompte TVA (AFC) »** + défini **par défaut** | `print_formats.py` | PDF au format officiel AFC/bexio pour le doctype VAT Declaration (créé à l'install/migrate) |
-| Génération des `VAT query` (`viewVAT_*`) en **`COALESCE(ligne, compte)`** | `vat_declaration.py` | alimente le décompte par case (voir `ch_accounting_setup.md` §7) |
-| Contrôle de plausibilité (7 contrôles) | `plausibility.py` | réconciliation GL ↔ décompte, hook validate/before_submit |
-| Compte intermédiaire Bank Wizard = **1099** | `company_setup.py` (`set_erpnextswiss_settings`) | pose `ERPNextSwiss Settings.intermediate_account` |
+| Print Format **« Décompte TVA (AFC) »** + défini **par défaut** | `swiss_vat_config/print_formats.py` | PDF au format officiel AFC/bexio pour le doctype VAT Declaration (créé à l'install/migrate) |
+| Génération des `VAT query` (`viewVAT_*`) en **`COALESCE(ligne, compte)`** | `swiss_vat_config/vat_declaration.py` | alimente le décompte par case (voir `docs/ch_accounting_setup.md` §7) |
+| Contrôle de plausibilité (7 contrôles) + report | `swiss_vat_config/plausibility.py` · `swiss_vat_config/report/controle_plausibilite_tva/` | réconciliation GL ↔ décompte, hook validate/before_submit + rapport UI |
+| Compte intermédiaire Bank Wizard = **1099** | `swiss_vat_config/company_setup.py` (`set_erpnextswiss_settings`) | pose `ERPNextSwiss Settings.intermediate_account` |
 
 ---
 
@@ -215,6 +217,55 @@ utiliser à tort par les factures datées du 31.12 (incohérence méthode « cou
 
 ---
 
+## 9. Consolidation : app `swiss_compliance_setup` fusionnée dans le fork (module `Swiss VAT Config`)
+
+L'app métier séparée **`swiss_compliance_setup`** (repo GitLab privé) a été **repliée dans le fork** pour
+n'avoir **qu'une seule app** à maintenir. Toute la logique métier vit maintenant sous un **module dédié**
+`Swiss VAT Config` (`erpnextswiss/swiss_vat_config/`), isolé des modules upstream (`ERPNextSwiss`, `Scripts`)
+pour garder un merge libracore propre.
+
+**Ce qui a migré** (imports repointés `swiss_compliance_setup.*` → `erpnextswiss.swiss_vat_config.*`) :
+- **Doctype `AFC VAT Box`** + **report `Controle plausibilite TVA`** (le module `Swiss VAT Config` change
+  simplement d'app propriétaire — aucun champ `module` touché).
+- **Python** : `company_setup.py`, `vat_setup.py`, `plausibility.py`, `vat_declaration.py`,
+  `financial_reports.py`, `print_formats.py`, `escompte.py`.
+- **Tests** (`tests/`) et **docs** (→ `docs/`, dont `ch_accounting_setup.md`).
+
+**Hooks fusionnés** (`hooks.py`) :
+- `after_install` / `after_migrate` passés en **listes** : `…swiss_exchange_rate_settings…ensure_defaults`
+  + `…swiss_vat_config.vat_setup.after_install/after_migrate` (seed AFC VAT Box + custom fields
+  `afc_box`/`afc_box_secondary` + templates financiers).
+- `doc_events` : `VAT Declaration` → plausibilité (`validate`/`before_submit`) ; `Payment Entry` →
+  `escompte.route_purchase_discount_to_4900`.
+- `fixtures` : `["Custom Field", "AFC VAT Box"]`.
+
+**Nouveaux chemins** (bench) : `erpnextswiss.swiss_vat_config.company_setup.setup_company`, etc.
+**Workspace** : liens **Taxes → `Controle plausibilite TVA`** et **Configuration → `AFC VAT Box`** ajoutés.
+
+> ⚠️ **Ne plus installer `swiss_compliance_setup`** (dépréciée) : elle déclare le même module `Swiss VAT
+> Config` → conflit si les deux apps cohabitent sur un site. Une **install neuve** d'erpnextswiss suffit.
+
+## 10. Cours de change AFC — import automatique (Swiss Exchange Rate)
+
+Récupération **programmée** des cours mensuels moyens AFC/BAZG dans `Currency Exchange`, avec écran de
+config, suivi et déclenchement manuel. *(À distinguer de §8 `year_end_rates`, qui est le cours de
+**clôture** en lecture seule pour la réévaluation.)*
+
+- **Doctypes** : `Swiss Exchange Rate Settings` (Single : config + dernier run + boutons), `Swiss Exchange
+  Rate Import Log` (historique), + child `Swiss Exchange Rate Currency` / `Swiss Exchange Rate Import Row`.
+- **`scripts/swiss_exchange_rates.py`** : `fetch_and_store()` — parse `xmlavgmonth`, **date au 1er du mois**
+  (`<monat>`), **idempotent / jamais d'écrasement**, gère le diviseur (100 JPY) + sens inverse. Wrappers
+  compat `read_rates` / `read_daily_rates`.
+- **Planification** : `hooks.scheduler_events["daily"]` → `scheduled_fetch()` avec **porte interne**
+  (enabled + frequency Daily/Weekly/Monthly). Choix « hook + porte » car `sync_jobs()` supprime les
+  Scheduled Job Type hors hooks.
+- **`after_migrate` → `ensure_defaults()`** : seed devises EUR/USD/GBP + création du job.
+- **Réglages liés** (posés par `company_setup.set_accounting_settings`) : `Accounts Settings.allow_stale = 1`,
+  `Currency Exchange Settings.disabled = 1`, et normalisation `Currency CHF` (`fraction = centime`,
+  `symbol = CHF`).
+- **Workspace** : liens `Swiss Exchange Rate Settings` + `Swiss Exchange Rate Import Log` (Configuration).
+- **Doc** : `docs/swiss_exchange_rates.md`.
+
 ## Récapitulatif des fichiers du fork modifiés
 
 ```
@@ -229,11 +280,24 @@ erpnextswiss/page/bank_wizard/bank_wizard.py                   # hrms fix, tolé
 erpnextswiss/page/bank_wizard/bank_wizard.html                 # page d'accueil pro, theme-aware
 erpnextswiss/page/bank_wizard/transaction_table.html           # tableau + badges, theme-aware
 erpnextswiss/public/xsd/                                       # eCH-0217 v2 + dépendances
-erpnextswiss/workspace/erpnextswiss/erpnextswiss.json          # retrait lien Contract
+erpnextswiss/workspace/erpnextswiss/erpnextswiss.json          # retrait lien Contract (§6) ; + liens plausibilité / AFC VAT Box / Swiss Exchange Rate (§9/§10)
 erpnextswiss/config/erpnextswiss.py                            # retrait item Contract
-erpnextswiss/hooks.py                                          # doctype_js Exchange Rate Revaluation (§8) ; retrait templates.min.js (§1)
-erpnextswiss/scripts/swiss_exchange_rates.py                   # year_end_rates() lecture seule — cours de clôture AFC (§8)
+erpnextswiss/hooks.py                                          # Exch. Rate Reval. §8 ; retrait templates.min.js §1 ; fusion swiss_vat_config (after_install/migrate, doc_events, fixtures) §9 ; scheduler_events daily §10
+erpnextswiss/scripts/swiss_exchange_rates.py                   # year_end_rates() clôture §8 + fetch_and_store()/scheduled_fetch() import auto §10
 erpnextswiss/public/js/exchange_rate_revaluation.js            # bouton « Appliquer cours de clôture AFC » (§8)
+erpnextswiss/modules.txt                                       # + module « Swiss VAT Config » (§9)
+erpnextswiss/swiss_vat_config/                                 # (§9) module métier fusionné (ex-swiss_compliance_setup) :
+    doctype/afc_vat_box/                                       #   référentiel des cases AFC
+    report/controle_plausibilite_tva/                         #   rapport de plausibilité (lien Taxes)
+    company_setup.py · vat_setup.py                            #   setup_company + seed AFC/custom fields
+    plausibility.py · vat_declaration.py                       #   contrôles + VAT queries
+    financial_reports.py · print_formats.py · escompte.py     #   CO959b, print format TVA, routage escompte
+    tests/                                                    #   scénarios
+erpnextswiss/erpnextswiss/doctype/swiss_exchange_rate_settings/     # (§10) config + scheduled_fetch + boutons
+erpnextswiss/erpnextswiss/doctype/swiss_exchange_rate_import_log/   # (§10) historique + bouton
+erpnextswiss/erpnextswiss/doctype/swiss_exchange_rate_currency/     # (§10) child devises
+erpnextswiss/erpnextswiss/doctype/swiss_exchange_rate_import_row/   # (§10) child lignes (read-only)
+erpnextswiss/docs/                                             # (§9) doc rapatriée : ch_accounting_setup.md, swiss_exchange_rates.md
 (supprimés) erpnextswiss/doctype/contract{,_period,_service}/  # collision Contract natif
 ```
 

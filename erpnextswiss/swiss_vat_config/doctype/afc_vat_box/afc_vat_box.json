@@ -1,0 +1,154 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:box_code",
+ "creation": "2026-07-05 12:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "box_code",
+  "box_label",
+  "enabled",
+  "column_break_head",
+  "part",
+  "side",
+  "amount_type",
+  "computation",
+  "classification_section",
+  "rate",
+  "formula",
+  "column_break_class",
+  "ech_identifier",
+  "legal_ref",
+  "sort_order"
+ ],
+ "fields": [
+  {
+   "fieldname": "box_code",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Box Code",
+   "reqd": 1,
+   "unique": 1,
+   "description": "Numéro de case du décompte AFC (ex. 200, 303, 400)"
+  },
+  {
+   "fieldname": "box_label",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Label"
+  },
+  {
+   "default": "1",
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "label": "Enabled"
+  },
+  {
+   "fieldname": "column_break_head",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "part",
+   "fieldtype": "Select",
+   "label": "Part",
+   "options": "\nI - Chiffre d'affaires\nII - Impot\nIII - Autres"
+  },
+  {
+   "fieldname": "side",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Side",
+   "options": "\nSales\nPurchase"
+  },
+  {
+   "fieldname": "amount_type",
+   "fieldtype": "Select",
+   "label": "Amount Type",
+   "options": "\nBase\nTax\nBase+Tax"
+  },
+  {
+   "default": "Declared",
+   "fieldname": "computation",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Computation",
+   "options": "Declared\nTotal\nCalculated",
+   "description": "Declared = agrege depuis transactions ; Total = somme de toutes les ventes ; Calculated = formule dans le decompte"
+  },
+  {
+   "fieldname": "classification_section",
+   "fieldtype": "Section Break",
+   "label": "Classification & Reference"
+  },
+  {
+   "fieldname": "rate",
+   "fieldtype": "Float",
+   "label": "Legal Rate (%)",
+   "description": "Taux legal si la case est liee a un taux (8.1, 2.6, 3.8)"
+  },
+  {
+   "fieldname": "formula",
+   "fieldtype": "Small Text",
+   "label": "Formula (Calculated)",
+   "description": "Pour les cases calculees, ex. 200-220-221-225-230-235"
+  },
+  {
+   "fieldname": "column_break_class",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "ech_identifier",
+   "fieldtype": "Data",
+   "label": "eCH-0217 Identifier"
+  },
+  {
+   "fieldname": "legal_ref",
+   "fieldtype": "Data",
+   "label": "Legal Reference (LTVA)"
+  },
+  {
+   "fieldname": "sort_order",
+   "fieldtype": "Int",
+   "label": "Sort Order"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-07-05 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Swiss VAT Config",
+ "name": "AFC VAT Box",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Accounts Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "sort_order",
+ "sort_order": "ASC",
+ "states": []
+}

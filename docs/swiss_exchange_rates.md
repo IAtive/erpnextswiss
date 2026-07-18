@@ -108,5 +108,5 @@ Pour que ces cours soient réellement utilisés par ERPNext (et pas un cours en 
 - **Currency Exchange Settings → Disabled = coché** : coupe le fallback API en ligne ; un cours manquant
   bloque la transaction (sûr) au lieu de booker un taux non conforme.
 
-Ces deux réglages sont posés par l'app **`swiss_compliance_setup`** (`setup_company`). Voir sa
+Ces deux réglages sont posés par l'app **`erpnextswiss`** (`setup_company`). Voir sa
 documentation `documentation/ch_accounting_setup.md`.
