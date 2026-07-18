@@ -30,6 +30,12 @@ def _acc(company, num):
     return name
 
 
+def _acc_silent(company, num):
+    """Comme _acc mais SANS warning — pour les vérifs « existe déjà ? » AVANT une création
+    (un compte absent est alors NORMAL : on va justement le créer)."""
+    return frappe.db.get_value("Account", {"account_number": num, "company": company})
+
+
 def _box(box):
     return box if (box and frappe.db.exists("AFC VAT Box", box)) else None
 
@@ -393,9 +399,9 @@ def setup_currency_accounts(company):
     Pas de compte bancaire EUR : la société paie/encaisse l'EUR via son compte CHF (conversion)."""
     print("→ Comptes multi-devises (EUR)…")
     for num, name, atype, curr, ref in CURRENCY_ACCOUNTS:
-        if _acc(company, num):
-            continue
-        ref_acc = _acc(company, ref)
+        if _acc_silent(company, num):
+            continue  # déjà présent → rien à faire (pas de warning parasite)
+        ref_acc = _acc(company, ref)  # 1100/2000 : vrai lookup (warn justifié si absent)
         if not ref_acc:
             continue
         parent = frappe.db.get_value("Account", ref_acc, "parent_account")
@@ -404,6 +410,7 @@ def setup_currency_accounts(company):
                               "account_currency": curr, "parent_account": parent})
         doc.flags.ignore_permissions = True
         doc.insert(ignore_if_duplicate=True)
+        print(f"  ✓ {num} « {name} » créé")
 
 
 def setup_fx_revaluation_account(company):
@@ -413,9 +420,9 @@ def setup_fx_revaluation_account(company):
     de tourner (frappe.throw). Idempotent. Aucune case AFC (change = zéro impact TVA)."""
     print("→ Compte de change latent (réévaluation)…")
     num, name, ref = UNREALIZED_FX
-    acc = _acc(company, num)
+    acc = _acc_silent(company, num)  # « existe déjà ? » sans warning
     if not acc:
-        ref_acc = _acc(company, ref)   # 6999 « Gains de change »
+        ref_acc = _acc(company, ref)   # 6999 « Gains de change » : vrai lookup
         if not ref_acc:
             return
         parent = frappe.db.get_value("Account", ref_acc, "parent_account")
