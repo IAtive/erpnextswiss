@@ -450,6 +450,15 @@ def set_accounting_settings():
         print("→ Currency CHF : fraction = centime, symbol = CHF (facturation suisse FR)")
 
 
+def setup_vat_queries():
+    """Génère les requêtes du décompte TVA (`viewVAT_*`) à partir du référentiel AFC VAT Box.
+    GLOBAL (les requêtes prennent la société en paramètre au runtime) et IDEMPOTENT (create/update).
+    ⚠️ Indispensable : SANS ces requêtes, **toutes les cases du décompte TVA renvoient 0**."""
+    from erpnextswiss.swiss_vat_config.vat_declaration import generate_vat_queries
+    generate_vat_queries()
+    print(f"→ Décompte TVA : {frappe.db.count('VAT query')} requêtes viewVAT_* générées/à jour")
+
+
 def setup_currency_accounts(company):
     """Crée les comptes de créance/dette en devise (EUR) — idempotent.
     Nécessaires pour suivre créances/dettes en EUR et calculer l'écart de change au règlement.
@@ -637,6 +646,7 @@ def setup_company(company):
     setup_perpetual_inventory(company)
     set_erpnextswiss_settings(company)
     set_accounting_settings()
+    setup_vat_queries()
     setup_currency_accounts(company)
     setup_fx_revaluation_account(company)
     cleanup_bank_accounts(company)

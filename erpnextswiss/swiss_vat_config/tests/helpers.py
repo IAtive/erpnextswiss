@@ -56,6 +56,11 @@ def _leaf(doctype):
     return frappe.db.get_value(doctype, {"is_group": 0}, "name")
 
 
+def _warehouse(company):
+    """Un entrepôt-feuille de la société (pour les mouvements de stock en inventaire perpétuel)."""
+    return frappe.db.get_value("Warehouse", {"company": company, "is_group": 0, "disabled": 0}, "name")
+
+
 def ensure_masters(company):
     """Crée les tiers/articles de test s'ils n'existent pas (feuilles de groupe résolues dynamiquement)."""
     if not frappe.db.exists("Customer", "SCEN Client CH"):
@@ -81,6 +86,18 @@ def ensure_masters(company):
             frappe.get_doc({"doctype": "Item", "item_code": it, "item_name": it,
                             "item_group": _leaf("Item Group"), "stock_uom": "Nos",
                             "is_stock_item": 0}).insert(ignore_permissions=True)
+    # article DE STOCK (inventaire perpétuel) : maintenu en stock + comptes produit/charge par société
+    if not frappe.db.exists("Item", "SCEN Stock"):
+        frappe.get_doc({"doctype": "Item", "item_code": "SCEN Stock", "item_name": "SCEN Stock",
+                        "item_group": _leaf("Item Group"), "stock_uom": "Nos",
+                        "is_stock_item": 1, "valuation_method": "FIFO"}).insert(ignore_permissions=True)
+    itm = frappe.get_doc("Item", "SCEN Stock")
+    if not any(d.company == company for d in itm.get("item_defaults", [])):
+        itm.append("item_defaults", {"company": company,
+                                     "income_account": _acc(company, "3200"),   # Ventes de marchandises
+                                     "expense_account": _acc(company, "4200"),   # COGS (achats/coût des ventes)
+                                     "default_warehouse": _warehouse(company)})
+        itm.save(ignore_permissions=True)
     # rattacher le compte de tiers EN DEVISE aux tiers EUR (1101 client / 2001 fournisseur) : ainsi
     # get_party_account renvoie le bon compte au rapprochement Bank Wizard (créance/dette EUR).
     for party_dt, party, num in (("Customer", "SCEN Client EUR", "1101"),
@@ -285,6 +302,86 @@ class Ctx:
             self.vouchers.append(("Journal Entry", jv))
         return jv
 
+    # ---- BUILDERS STOCK (inventaire perpétuel) ----
+    def make_purchase_receipt(self, supplier, item="SCEN Stock", qty=10, rate=100,
+                              warehouse=None, date=DATE):
+        """Réception de marchandise en stock (Purchase Receipt) : Dr 1200 / Cr 2301 SRBNB (au net, sans TVA)."""
+        pr = frappe.get_doc({"doctype": "Purchase Receipt", "company": self.company, "supplier": supplier,
+                             "posting_date": date, "set_posting_time": 1,
+                             "items": [{"item_code": item, "qty": qty, "rate": rate,
+                                        "warehouse": warehouse or _warehouse(self.company)}]})
+        pr.set_missing_values()
+        pr.insert(ignore_permissions=True)
+        pr.submit()
+        self.vouchers.append(("Purchase Receipt", pr.name))
+        return pr
+
+    def invoice_receipt(self, pr, tax_template=None, date=DATE):
+        """Facture d'achat LIÉE à une réception : solde le SRBNB (Dr 2301 / Cr 2000 + TVA éventuelle)."""
+        from erpnext.stock.doctype.purchase_receipt.purchase_receipt import make_purchase_invoice
+        pi = frappe.get_doc(make_purchase_invoice(pr.name))
+        pi.posting_date = date
+        pi.set_posting_time = 1
+        pi.bill_no = frappe.generate_hash(length=10)
+        if tax_template:
+            self._apply_template(pi, "Purchase Taxes and Charges Template",
+                                 _tax_template(self.company, tax_template, purchase=True))
+        pi.set_missing_values()
+        pi.calculate_taxes_and_totals()
+        pi.insert(ignore_permissions=True)
+        pi.submit()
+        self.vouchers.append(("Purchase Invoice", pi.name))
+        return pi
+
+    def make_landed_cost(self, pr, charges, expense="2302", date=DATE):
+        """Landed Cost Voucher : capitalise des frais accessoires (douane, transport) DANS le stock.
+        charges = {'Droits de douane': 300, 'Transport': 200}. Écriture : Dr 1200 / Cr 2302 EIIV."""
+        lcv = frappe.get_doc({"doctype": "Landed Cost Voucher", "company": self.company,
+                              "posting_date": date, "distribute_charges_based_on": "Amount",
+                              "purchase_receipts": [{"receipt_document_type": "Purchase Receipt",
+                                                     "receipt_document": pr.name,
+                                                     "supplier": pr.supplier,
+                                                     "grand_total": pr.base_grand_total or pr.grand_total}]})
+        lcv.get_items_from_purchase_receipts()
+        acc = _acc(self.company, expense)
+        for desc, amt in charges.items():
+            lcv.append("taxes", {"description": desc, "expense_account": acc, "amount": amt})
+        lcv.insert(ignore_permissions=True)
+        lcv.submit()
+        self.vouchers.append(("Landed Cost Voucher", lcv.name))
+        return lcv
+
+    def make_delivery_note(self, customer, item="SCEN Stock", qty=10, rate=200,
+                           warehouse=None, item_tax_template=None, date=DATE):
+        """Bon de livraison (Delivery Note) : sortie de stock AU COÛT — Dr 4200 COGS / Cr 1200 (sans TVA)."""
+        d = {"item_code": item, "qty": qty, "rate": rate,
+             "warehouse": warehouse or _warehouse(self.company)}
+        if item_tax_template:
+            d["item_tax_template"] = _item_tax_template(self.company, item_tax_template)
+        dn = frappe.get_doc({"doctype": "Delivery Note", "company": self.company, "customer": customer,
+                             "posting_date": date, "set_posting_time": 1, "items": [d]})
+        dn.set_missing_values()
+        dn.insert(ignore_permissions=True)
+        dn.submit()
+        self.vouchers.append(("Delivery Note", dn.name))
+        return dn
+
+    def invoice_delivery(self, dn, tax_template=None, date=DATE):
+        """Facture de vente LIÉE à un bon de livraison : produit + TVA (le stock est déjà sorti à la livraison)."""
+        from erpnext.stock.doctype.delivery_note.delivery_note import make_sales_invoice
+        si = frappe.get_doc(make_sales_invoice(dn.name))
+        si.posting_date = date
+        si.set_posting_time = 1
+        if tax_template:
+            self._apply_template(si, "Sales Taxes and Charges Template",
+                                 _tax_template(self.company, tax_template, purchase=False))
+        si.set_missing_values()
+        si.calculate_taxes_and_totals()
+        si.insert(ignore_permissions=True)
+        si.submit()
+        self.vouchers.append(("Sales Invoice", si.name))
+        return si
+
     # ---- ASSERTERS ----
     def assert_gl(self, voucher, expected):
         """expected = {num_compte: montant_signé} ; +=débit net, −=crédit net."""
@@ -328,6 +425,14 @@ class Ctx:
             WHERE company = %s AND account = %s AND is_cancelled = 0
             AND posting_date BETWEEN %s AND %s""", (self.company, acc, self.ps, self.pe))[0][0] or 0
         self._rec("Solde", num, exp, float(val), abs(float(val) - exp) < 0.01)
+
+    def assert_stock_value(self, item, exp, warehouse=None):
+        """Valeur du stock d'un article (somme des stock_value_difference des SLE) sur la période."""
+        wh = warehouse or _warehouse(self.company)
+        val = frappe.db.sql("""SELECT ROUND(SUM(stock_value_difference), 2) FROM `tabStock Ledger Entry`
+            WHERE company = %s AND item_code = %s AND warehouse = %s AND is_cancelled = 0""",
+            (self.company, item, wh))[0][0] or 0
+        self._rec("Stock", item, exp, float(val), abs(float(val) - exp) < 0.01)
 
     def assert_plausibilite_ok(self):
         from erpnextswiss.swiss_vat_config.plausibility import collect, KO

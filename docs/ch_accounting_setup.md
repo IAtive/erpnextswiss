@@ -598,6 +598,7 @@ touchent la **présentation**, la **traçabilité** ou le **mécanisme**.
 | 12  | **Multi-devises : CHF + EUR (achat & vente)**                       | comptes créance/dette **en EUR** (**1101** / **2001**) créés hors chart (car `account_currency` est ignoré sur un chart `verified`) ; **pas de banque EUR par défaut** (paiement/encaissement EUR via le compte CHF — 1021 à ajouter seulement si compte bancaire EUR réel, voir §11) ; la **TVA reste en CHF** (taux facture) ; l'**écart de change** au règlement → **6999**, en mode **réalisé à l'encaissement** (conversion CHF) — alternative : soldes en devise + **réévaluation périodique** (voir §11)   | **quelles devises** le client utilise réellement (EUR seul ? + USD ?), **quels sens** (vente/achat), et **réalisé à l'encaissement ou réévaluation périodique** ?                                                                                                                                       |
 | 13  | **Acomptes : compte de tiers séparé (2030/1130) — ON ou OFF**       | option _Book Advance Payments in Separate Party Account_ **activée par défaut** → acomptes isolés **en continu** sur **2030/1130**. Alternative : **désactiver** → acomptes en **solde du tiers** (1100/2000) + **reclassement à la clôture** des acomptes matériels. **Conforme CO 959a dans les deux cas** ; détails, écritures de reclassement et arbitrage complet au **§11** | le **volume réel d'acomptes** (reçus de clients / versés à des fournisseurs) : flux **régulier** → garder la **séparation** (bilan propre en continu) ; **rares** → **désactiver** (plus simple, zéro friction Bank Wizard, reclassement ponctuel au bouclement)                                        |
 | 14  | **Cours de change : moyennes mensuelles AFC**                       | on utilise **actuellement** le **cours mensuel moyen de l'AFC** (daté du 1er du mois, importé automatiquement), **pas** le cours du jour ni un cours de marché/BCE ; fallback en ligne coupé (`Currency Exchange Settings.disabled`) et cours « périmés » autorisés (`allow_stale`) — cf. §11                                                                                     | que le **cours mensuel moyen AFC** convient pour le décompte TVA (art. 45 OTVA autorise **mensuel moyen _ou_ cours du jour, devises vente** — la méthode doit être **conservée durant toute une période fiscale**) ; sinon basculer sur **cours du jour** (`rate_type = Daily`) dès le début de période |
+| 15  | **Prestations à soi-même / part privée** _(spécifique métier)_ | usage privé de biens/services déduits (**véhicule**, **cadeaux > ~500 CHF**, **échantillons/PLV prélevés**) → correction TVA. **Deux méthodes** : **(A) produit imposable** — part privée = CA (case 200/301) + TVA due 2200, *recommandée véhicule* ; **(B) correction d'impôt préalable** — case 415 via 1174 (approche ProConcept 106100). ⚠️ **Lacune vérifiée** de la méthode B : le mécanisme actuel (template **IPPS** sur facture d'achat) donne le **bon chiffre** de décompte mais une **écriture GL au signe inversé**, et `viewVAT_415` ne lit **que les factures d'achat** (l'écriture correcte n'est pas captée) → **à corriger** (extension `viewVAT_415`, façon escompte) avant usage. Détail : **§20.2**. | la **méthode** (produit imposable vs correction préalable) ; la **base véhicule** (forfait **0,8 %/mois** vs effectif) ; le **seuil cadeaux** (~500 CHF) ; la politique **échantillons/testers** ; **et faire corriger le mécanisme case 415** |
 
 ### Détail des points principaux
 
@@ -1137,6 +1138,48 @@ rattaché à `Company.unrealized_exchange_gain_loss_account` — sans lui, l'out
 9. **Contre-passation** : à l'ouverture de l'exercice suivant, ouvre la Journal Entry de réévaluation → **Reverse Journal Entry** → date `01.01` → Submit. On repart de la valeur d'origine ; le vrai écart se figera au **paiement** (réalisé → **6999**), sans double comptage.
 
 **Rappels :** cours de clôture ≠ cours moyen mensuel · **jamais** de case AFC sur 6998 · **ne pas** stocker le cours de clôture dans _Currency Exchange_ (sinon il polluerait les transactions du 31.12) — tout est expliqué en **§11**.
+
+---
+
+### 20.2 Prestations à soi-même / part privée
+
+**Concept** — quand des biens/services dont tu as **déduit l'impôt préalable** servent finalement à des fins
+**non imposables** (usage **privé**, **cadeaux**, **prélèvements** gratuits), la TVA doit être **corrigée**
+(art. 31 LTVA). Deux familles : **part privée** (bien à usage **mixte** privé/professionnel, ex. véhicule)
+et **prélèvement / prestation à soi-même** (biens **sortis** du cadre imposable).
+
+**Spécifique à ce métier (distribution cosmétique)** — deux gros postes :
+- **Véhicules** utilisés aussi en privé → **part privée véhicule** (correction **récurrente**).
+- **Échantillons / testers / factices / cadeaux / PLV prélevée sur stock** : échantillons & testers pour
+  **promouvoir la vente** = **déductibles** (publicité) ; **cadeaux > ~500 CHF/destinataire/an** → correction ;
+  **prélèvement de produits finis** hors cadre imposable → correction.
+
+**Deux méthodes — à trancher avec la fiduciaire (§15 #15) :**
+
+**A. Produit imposable (recommandée pour le véhicule).** La part privée est une **prestation imposable**
+→ déclarée en **chiffre d'affaires** (case 200/301) avec **TVA due** (2200). Économiquement correcte,
+**réconciliée** proprement (GL ↔ décompte, plausibilité au vert).
+- *Forfait véhicule* : **0,8 %/mois** du prix d'achat **HT** (min. ~150 CHF/mois) = montant **TTC** de la part privée.
+- Exemple — voiture 40'000 HT → 0,8 %/mois = 320 → **3'840 TTC/an** → net 3'552.27 + TVA 8,1 % = **287.73** :
+  ```
+  Débit    C/C actionnaire (bénéficiaire)      3'840.00
+    Crédit   Produit part privée véhicule (CA)          3'552.27
+    Crédit   2200  TVA due (case 301)                     287.73
+  ```
+
+**B. Correction de l'impôt préalable (case 415).** Réduit la **déduction** (le formulaire **soustrait** la
+case 415 du total 479). C'est l'approche du client sur ProConcept (compte `106100`).
+- ⚠️ **Limite ACTUELLE de notre config** *(vérifiée empiriquement)* : le mécanisme (template **IPPS** appliqué
+  à une **facture d'achat** → compte **1174**, case 415) donne le **bon chiffre** de décompte (case 415 = +TVA)
+  **mais** une **écriture GL au signe inversé** — l'IPPS **débite** 1174 (comme un achat qui *augmente* la
+  déduction), alors qu'une correction doit la **réduire** ; au règlement, GL et décompte **divergent**. De plus
+  `viewVAT_415` ne lit **que les factures d'achat**, donc l'écriture **correcte** (un Journal Entry qui
+  **crédite** 1174) **n'est pas captée**. → **À corriger** avant usage : étendre `viewVAT_415` pour capter la
+  correction (sur le **modèle de l'escompte** — union d'un Journal Entry / mouvement GL sur 1174).
+
+**Périodicité** — c'est une écriture de **bouclement** (trimestrielle/annuelle), en général **contre-passée**
+à l'ouverture suivante si provisoire. Les cadres exacts (méthode, base véhicule, seuil cadeaux, politique
+échantillons) sont un **point de validation fiduciaire (§15 #15)**.
 
 ---
 

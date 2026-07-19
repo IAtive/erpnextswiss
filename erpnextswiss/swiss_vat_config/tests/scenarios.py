@@ -77,6 +77,28 @@ def scenario_vente_taux_normal(ctx):
     ctx.assert_plausibilite_ok()
 
 
+def scenario_part_privee_vehicule(ctx):
+    """
+    SCÉNARIO : Part privée d'un véhicule — méthode PRODUIT IMPOSABLE (recommandée véhicule)
+    DÉCISION §15 #15 : la part privée d'un véhicule de société est traitée comme une PRESTATION IMPOSABLE
+                       → chiffre d'affaires (case 200/303) + TVA due (2200). Économiquement correct et
+                       réconcilié (GL ↔ décompte).
+    POURQUOI : l'usage privé d'un véhicule est une contre-prestation imposable ; on la déclare en CA au
+               taux normal (forfait AFC 0,8 %/mois du prix d'achat HT, montant TTC).
+    NOTE : la méthode ALTERNATIVE « correction d'impôt préalable » (case 415 via 1174 / template IPPS) a
+           une LACUNE VÉRIFIÉE (écriture GL au signe inversé ; viewVAT_415 ne lit que les factures d'achat)
+           → voir doc §20.2 / §15 #15. Donc NON testée ici : on teste la méthode correcte (produit imposable).
+    OPÉRATIONS : part privée forfaitaire 2 000 CHF net (exemple), facturée au bénéficiaire, template NC81.
+    ÉCRITURES : Cr Produit (part privée) 3000 −2 000 · Cr TVA due 2200 −162 · Dr Débiteur/C-C 2 162.
+    DÉCOMPTE : case 200 (CA) 2 000 · case 303 base 2 000 / impôt 162 → AUGMENTE ce qui est dû à l'AFC.
+    """
+    si = ctx.make_sales_invoice("SCEN Client CH", net=2000, tax_template="NC81")
+    ctx.assert_gl(si, {"3000": -2000, "2200": -162})
+    ctx.assert_vat(base={"200": 2000, "303": 2000})
+    ctx.assert_pl("PRODUITS", 2000)
+    ctx.assert_plausibilite_ok()
+
+
 def scenario_vente_multi_taux(ctx):
     """
     SCÉNARIO : Une facture de vente avec DEUX taux (8.1% + 2.6%)
@@ -506,4 +528,95 @@ def scenario_lot_mixte_escomptes(ctx):
     # --- Décompte ---
     ctx.assert_vat(base={"303": 4500, "235": 250})   # base brute + diminutions
     ctx.assert_vat(tax={"400": 174.15})              # impôt préalable net
+    ctx.assert_plausibilite_ok()
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# STOCK — inventaire PERPÉTUEL (négoce / revendeur). Voir doc §21.
+# ══════════════════════════════════════════════════════════════════════════════
+
+def scenario_achat_stock_national(ctx):
+    """
+    SCÉNARIO : Achat de marchandise EN STOCK (national) — flux réception + facture (perpétuel)
+    POURQUOI : flux perpétuel de base — la réception entre le stock (Dr 1200 / Cr 2301 SRBNB), la
+               facture solde le SRBNB (Dr 2301 / Cr 2000 + TVA). La marchandise est à l'ACTIF, pas de charge.
+    OPÉRATIONS : réception 10 pcs × 100 = 1000 (SCEN Fournisseur CH) ; facture liée 1000 + 81 TVA (IPM81, case 400).
+    ÉCRITURES : Réception Dr 1200 +1000 / Cr 2301 −1000 · Facture Dr 2301 +1000, Dr 1170 +81 / Cr 2000 −1081.
+    STOCK : 1200 = +1000 · SRBNB (2301) soldé à 0.
+    DÉCOMPTE : case 400 (impôt préalable) = 81.  RÉSULTAT : aucun (marchandise à l'actif).
+    """
+    pr = ctx.make_purchase_receipt("SCEN Fournisseur CH", qty=10, rate=100)
+    ctx.assert_gl(pr, {"1200": +1000, "2301": -1000})
+    pi = ctx.invoice_receipt(pr, tax_template="IPM81")
+    ctx.assert_gl(pi, {"2301": +1000, "1170": +81, "2000": -1081})
+    ctx.assert_stock_value("SCEN Stock", 1000)
+    ctx.assert_balance("2301", 0)          # SRBNB soldé
+    ctx.assert_vat(tax={"400": 81})
+    ctx.assert_plausibilite_ok()
+
+
+def scenario_achat_stock_import_landed_cost(ctx):
+    """
+    SCÉNARIO : Achat de marchandise IMPORTÉE avec douane + transport CAPITALISÉS (landed cost)
+    POURQUOI : les frais accessoires (douane, transport) entrent DANS la valeur du stock via l'EIIV (2302) ;
+               les deux tampons (SRBNB 2301, EIIV 2302) reviennent à zéro après facturation.
+    OPÉRATIONS : réception 10 × 500 = 5000 ; Landed Cost 300 (douane) + 200 (transport) = 500 → stock ;
+                 facture marchandise 5000 (import, sans TVA CH) ; factures douane 300 et transport 200 (→ solde EIIV).
+    STOCK : 1200 = 5500 (prix + douane + transport) · SRBNB et EIIV soldés à 0.
+    RÉSULTAT : aucun (tout capitalisé). (TVA à l'import : testée séparément, cf. achat_douane_import.)
+    """
+    pr = ctx.make_purchase_receipt("SCEN Fournisseur Etranger", qty=10, rate=500)
+    ctx.assert_gl(pr, {"1200": +5000, "2301": -5000})
+    ctx.make_landed_cost(pr, {"Droits de douane": 300, "Transport": 200})
+    # NB : ERPNext poste l'écriture du landed cost (Dr 1200 +500 / Cr 2302 −500) sur la RÉCEPTION (pr),
+    # pas sur le LCV → on la vérifie via le stock (5500) et le solde EIIV (2302 → 0 après factures).
+    ctx.assert_gl(pr, {"2302": -500})          # crédit EIIV posté sur la réception (revalorisation)
+    ctx.assert_stock_value("SCEN Stock", 5500)
+    pi = ctx.invoice_receipt(pr)                                                  # marchandise (import, sans TVA CH)
+    ctx.assert_gl(pi, {"2301": +5000, "2000": -5000})
+    ctx.make_purchase_invoice("SCEN Fournisseur CH", net=300, expense="2302")     # douane → solde EIIV
+    ctx.make_purchase_invoice("SCEN Fournisseur CH", net=200, expense="2302", tax_template="IPM81")  # transport
+    ctx.assert_balance("2301", 0)          # SRBNB soldé
+    ctx.assert_balance("2302", 0)          # EIIV soldé
+    ctx.assert_plausibilite_ok()
+
+
+def scenario_vente_stock(ctx):
+    """
+    SCÉNARIO : Vente de marchandise EN STOCK — flux livraison + facture (COGS temps réel)
+    POURQUOI : la livraison SORT le stock au coût (Dr 4200 COGS / Cr 1200), la facture pose produit + TVA.
+    OPÉRATIONS : réception 10 × 100 (stock à 100/pc) ; livraison 10 × 200 (vente 2000, coût 1000) ;
+                 facture liée 2000 + 162 TVA (NC81, case 303).
+    ÉCRITURES : Livraison Dr 4200 +1000 / Cr 1200 −1000 · Facture Dr 1100 +2162 / Cr 3200 −2000 / Cr 2200 −162.
+    STOCK : 1200 revient à 0.  DÉCOMPTE : 200 (CA) 2000 · 303 base 2000 / impôt 162.
+    RÉSULTAT : Produits (3200) +2000 · COGS (4200) −1000 → marge 1000.
+    """
+    ctx.make_purchase_receipt("SCEN Fournisseur CH", qty=10, rate=100)            # stock à 100/pc
+    dn = ctx.make_delivery_note("SCEN Client CH", qty=10, rate=200)
+    ctx.assert_gl(dn, {"4200": +1000, "1200": -1000})
+    si = ctx.invoice_delivery(dn, tax_template="NC81")
+    ctx.assert_gl(si, {"3200": -2000, "2200": -162})
+    ctx.assert_stock_value("SCEN Stock", 0)
+    ctx.assert_vat(base={"200": 2000, "303": 2000})
+    ctx.assert_plausibilite_ok()
+
+
+def scenario_cycle_stock_marge(ctx):
+    """
+    SCÉNARIO : Cycle complet achat → vente de marchandise en stock — contrôle de la MARGE
+    POURQUOI : boucler un cycle négoce (acheter, revendre) et vérifier la marge brute + le retour du stock à 0.
+    OPÉRATIONS : achat 10 × 100 (réception + facture IPM81) ; vente 10 × 200 (livraison + facture NC81).
+    STOCK : 1200 revient à 0 (tout vendu).
+    RÉSULTAT : Produits (3200) +2000 − COGS (4200) −1000 → MARGE BRUTE 1000.
+    DÉCOMPTE : case 400 (achat) 81 · case 303 (vente) impôt 162.
+    """
+    pr = ctx.make_purchase_receipt("SCEN Fournisseur CH", qty=10, rate=100)
+    ctx.invoice_receipt(pr, tax_template="IPM81")
+    dn = ctx.make_delivery_note("SCEN Client CH", qty=10, rate=200)
+    si = ctx.invoice_delivery(dn, tax_template="NC81")
+    ctx.assert_stock_value("SCEN Stock", 0)
+    ctx.assert_pl("PRODUITS", 2000)                     # produit de la vente
+    ctx.assert_pl("CH_MAT", -1000)                      # COGS → marge brute 1000
+    ctx.assert_gl(si, {"2200": -162})                   # TVA due (vente) sur 2200
+    ctx.assert_vat(base={"303": 2000}, tax={"400": 81}) # base vente 303 + impôt préalable achat 400
     ctx.assert_plausibilite_ok()
