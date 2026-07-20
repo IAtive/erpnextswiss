@@ -186,18 +186,15 @@ def scenario_achat_investissement_405(ctx):
 
 def scenario_achat_degrevement_410(ctx):
     """
-    SCÉNARIO : Dégrèvement ultérieur de l'impôt préalable (DUIP → case 410)
-    POURQUOI : LE cas qui justifie la case portée par la LIGNE : le compte 1170 doit alimenter
-               400 (achat normal) ET 410 (dégrèvement). Vérifie le SPLIT 1170 = 400 + 410.
-    OPÉRATIONS : facture d'achat 2 000 CHF net, template « DUIP » (8.1%, ligne 1170 → case 410).
-    ÉCRITURES : Dr Charge 4200 +2 000 · Dr Préalable 1170 +162 · Cr Fournisseur −2 162.
-    DÉCOMPTE : case 410 = 162 · case 400 = 0 (le montant va bien en 410, PAS en 400).
-    RÉSULTAT : Charges matériel −2 000.
+    SCÉNARIO : Dégrèvement ultérieur de l'impôt préalable (case 410) — via ÉCRITURE taguée
+    POURQUOI : un dégrèvement (art. 32) n'est PAS un achat (pas de fournisseur, pas de charge) → il se
+               comptabilise en Journal Entry, ligne taguée case 410 (feature « TVA sur Journal Entry »).
+               L'ancien template DUIP (facture d'achat) créait une dette/charge fantôme → SUPPRIMÉ.
+    OPÉRATIONS : écriture de dégrèvement 162 CHF, ligne taguée 410 (débit — case qui AJOUTE la déduction).
+    DÉCOMPTE : case 410 = 162 (impôt préalable supplémentaire) · case 400 = 0 (le tag prime sur le compte).
     """
-    pi = ctx.make_purchase_invoice("SCEN Fournisseur CH", net=2000, tax_template="DUIP")
-    ctx.assert_gl(pi, {"4200": +2000, "1170": +162})
+    ctx.make_journal_entry(box="410", tag_account="1170", amount=162)
     ctx.assert_vat(tax={"410": 162, "400": 0})
-    ctx.assert_pl("CH_MAT", -2000)
     ctx.assert_plausibilite_ok()
 
 
@@ -619,4 +616,21 @@ def scenario_cycle_stock_marge(ctx):
     ctx.assert_pl("CH_MAT", -1000)                      # COGS → marge brute 1000
     ctx.assert_gl(si, {"2200": -162})                   # TVA due (vente) sur 2200
     ctx.assert_vat(base={"303": 2000}, tax={"400": 81}) # base vente 303 + impôt préalable achat 400
+    ctx.assert_plausibilite_ok()
+
+
+def scenario_correction_tva_ecriture(ctx):
+    """
+    SCÉNARIO : Correction de TVA par ÉCRITURE MANUELLE taguée (feature « TVA sur Journal Entry »)
+    DÉCISION : les corrections/ajustements qui ne rentrent pas dans une facture (prestations à soi-même,
+               dégrèvements, réductions) se comptabilisent en Journal Entry, avec la LIGNE taguée d'une
+               case AFC. Équivalent du « code TVA sur l'écriture » de bexio.
+    POURQUOI : la case est portée par le TAG de la ligne (pas par le compte) → account-agnostic ; le SIGNE
+               vient de la case (réduction 415/420 → crédit ; ajout 410 → débit) ; seules les lignes
+               taguées comptent (pas de pollution) ; décompte ET plausibilité alignés sur le même signe.
+    OPÉRATIONS : écriture de correction 162 CHF, ligne taguée case 415 (crédit sur 1174).
+    DÉCOMPTE : case 415 = 162 (impôt) → réduit la déduction ; case 400 = 0 (le compte ne pollue pas).
+    """
+    ctx.make_journal_entry(box="415", tag_account="1174", amount=162)
+    ctx.assert_vat(tax={"415": 162, "400": 0})   # le tag alimente 415, PAS 400
     ctx.assert_plausibilite_ok()

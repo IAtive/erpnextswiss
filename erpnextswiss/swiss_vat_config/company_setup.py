@@ -103,10 +103,12 @@ PURCHASE = [
     ("IPCE38", "Inv./CE (TS)", 3.8, "On Net Total", "1171", False, False),
     ("IP00", "Sans TVA", 0, "On Net Total", "1171", True, False),
     ("DOUACE", "Entree inv./CE (douane)", 100, "Actual", "1171", True, False),
-    ("DUIP", "Deduction ulterieure de l'impot prealable", 8.1, "On Net Total", "1170", False, False),
-    ("RIP", "Reductions de l'impot prealable", 8.1, "On Net Total", "1173", False, False),
-    ("IPPS", "Correction prestation a soi-meme", 8.1, "On Net Total", "1174", False, False),
+    # NB : DUIP (410), RIP (420), IPPS (415) RETIRÉS — ce sont des corrections/ajustements qui ne rentrent
+    # pas dans une facture (dette/charge fantôme, ou signe inversé). Ils se gèrent désormais par ÉCRITURE
+    # taguée (feature « TVA sur Journal Entry », case portée par la ligne). Voir cleanup_obsolete_templates.
 ]
+# Templates obsolètes à supprimer d'une société existante (remplacés par la voie écriture taguée).
+OBSOLETE_PURCHASE_TEMPLATES = ("IPPS", "RIP", "DUIP")
 # REVERSE CHARGE (acquisitions, 2 lignes Add/Deduct) : (code, desc, rate, deductible_num, due_num, active)
 REVERSE = [
     ("IAM81", "Impot sur les acquisitions Mat./Ser.", 8.1, "1170", "2203", True),
@@ -632,11 +634,27 @@ def create_company(company_name, abbr, currency="CHF"):
 
 
 # =============================================== ENTRY POINT ==================
+def cleanup_obsolete_templates(company):
+    """Supprime les templates d'achat obsolètes (IPPS/RIP/DUIP) d'une société existante — remplacés par
+    la voie « TVA sur Journal Entry » (case portée par la ligne d'écriture). Idempotent."""
+    for code in OBSOLETE_PURCHASE_TEMPLATES:
+        for name in frappe.get_all("Purchase Taxes and Charges Template",
+                                   filters={"company": company, "title": ["like", f"{code} %"]},
+                                   pluck="name"):
+            try:
+                frappe.delete_doc("Purchase Taxes and Charges Template", name,
+                                  ignore_permissions=True, force=True)
+                print(f"  ✓ template obsolète supprimé : {name}")
+            except Exception:
+                frappe.db.set_value("Purchase Taxes and Charges Template", name, "disabled", 1)
+
+
 def setup_company(company):
     if not frappe.db.exists("Company", company):
         frappe.throw(f"Societe '{company}' introuvable.")
     print(f"\n=== Configuration comptable/TVA (bexio) : {company} ===")
     cleanup_defaults(company)
+    cleanup_obsolete_templates(company)
     create_sales(company)
     create_purchase(company)
     create_reverse_charge(company)

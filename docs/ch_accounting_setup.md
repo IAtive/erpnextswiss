@@ -38,6 +38,7 @@
 19. [Gestion des salaires (paie externe → comptabilisation ERPNext)](#19-gestion-des-salaires-paie-externe--comptabilisation-erpnext)
 20. [Gestion de la clôture (bouclement)](#20-gestion-de-la-clôture-bouclement)
 21. [Gestion des stocks — inventaire perpétuel (négoce)](#21-gestion-des-stocks--inventaire-perpétuel-négoce)
+22. [TVA sur écriture manuelle (code TVA sur Journal Entry)](#22-tva-sur-écriture-manuelle--code-tva-sur-journal-entry--à-la-bexio)
 20. [Gestion de la clôture (bouclement)](#20-gestion-de-la-clôture-bouclement)
 
 ---
@@ -598,7 +599,7 @@ touchent la **présentation**, la **traçabilité** ou le **mécanisme**.
 | 12  | **Multi-devises : CHF + EUR (achat & vente)**                       | comptes créance/dette **en EUR** (**1101** / **2001**) créés hors chart (car `account_currency` est ignoré sur un chart `verified`) ; **pas de banque EUR par défaut** (paiement/encaissement EUR via le compte CHF — 1021 à ajouter seulement si compte bancaire EUR réel, voir §11) ; la **TVA reste en CHF** (taux facture) ; l'**écart de change** au règlement → **6999**, en mode **réalisé à l'encaissement** (conversion CHF) — alternative : soldes en devise + **réévaluation périodique** (voir §11)   | **quelles devises** le client utilise réellement (EUR seul ? + USD ?), **quels sens** (vente/achat), et **réalisé à l'encaissement ou réévaluation périodique** ?                                                                                                                                       |
 | 13  | **Acomptes : compte de tiers séparé (2030/1130) — ON ou OFF**       | option _Book Advance Payments in Separate Party Account_ **activée par défaut** → acomptes isolés **en continu** sur **2030/1130**. Alternative : **désactiver** → acomptes en **solde du tiers** (1100/2000) + **reclassement à la clôture** des acomptes matériels. **Conforme CO 959a dans les deux cas** ; détails, écritures de reclassement et arbitrage complet au **§11** | le **volume réel d'acomptes** (reçus de clients / versés à des fournisseurs) : flux **régulier** → garder la **séparation** (bilan propre en continu) ; **rares** → **désactiver** (plus simple, zéro friction Bank Wizard, reclassement ponctuel au bouclement)                                        |
 | 14  | **Cours de change : moyennes mensuelles AFC**                       | on utilise **actuellement** le **cours mensuel moyen de l'AFC** (daté du 1er du mois, importé automatiquement), **pas** le cours du jour ni un cours de marché/BCE ; fallback en ligne coupé (`Currency Exchange Settings.disabled`) et cours « périmés » autorisés (`allow_stale`) — cf. §11                                                                                     | que le **cours mensuel moyen AFC** convient pour le décompte TVA (art. 45 OTVA autorise **mensuel moyen _ou_ cours du jour, devises vente** — la méthode doit être **conservée durant toute une période fiscale**) ; sinon basculer sur **cours du jour** (`rate_type = Daily`) dès le début de période |
-| 15  | **Prestations à soi-même / part privée** _(spécifique métier)_ | usage privé de biens/services déduits (**véhicule**, **cadeaux > ~500 CHF**, **échantillons/PLV prélevés**) → correction TVA. **Deux méthodes** : **(A) produit imposable** — part privée = CA (case 200/301) + TVA due 2200, *recommandée véhicule* ; **(B) correction d'impôt préalable** — case 415 via 1174 (approche ProConcept 106100). ⚠️ **Lacune vérifiée** de la méthode B : le mécanisme actuel (template **IPPS** sur facture d'achat) donne le **bon chiffre** de décompte mais une **écriture GL au signe inversé**, et `viewVAT_415` ne lit **que les factures d'achat** (l'écriture correcte n'est pas captée) → **à corriger** (extension `viewVAT_415`, façon escompte) avant usage. Détail : **§20.2**. | la **méthode** (produit imposable vs correction préalable) ; la **base véhicule** (forfait **0,8 %/mois** vs effectif) ; le **seuil cadeaux** (~500 CHF) ; la politique **échantillons/testers** ; **et faire corriger le mécanisme case 415** |
+| 15  | **Prestations à soi-même / part privée** _(spécifique métier)_ | usage privé de biens/services déduits (**véhicule**, **cadeaux > ~500 CHF**, **échantillons/PLV prélevés**) → correction TVA. **Deux méthodes** : **(A) produit imposable** — part privée = CA (case 200/301) + TVA due 2200, *recommandée véhicule* ; **(B) correction d'impôt préalable** — case 415, désormais **supportée proprement** via la feature **« TVA sur Journal Entry »** (§22) : écriture taguée, bon signe, compte libre (le template IPPS cassé a été supprimé). Détail : **§20.2 / §22**. | la **méthode** (produit imposable vs correction préalable) ; la **base véhicule** (forfait **0,8 %/mois** vs effectif) ; le **seuil cadeaux** (~500 CHF) ; la politique **échantillons/testers** |
 
 ### Détail des points principaux
 
@@ -1169,13 +1170,11 @@ et **prélèvement / prestation à soi-même** (biens **sortis** du cadre imposa
 
 **B. Correction de l'impôt préalable (case 415).** Réduit la **déduction** (le formulaire **soustrait** la
 case 415 du total 479). C'est l'approche du client sur ProConcept (compte `106100`).
-- ⚠️ **Limite ACTUELLE de notre config** *(vérifiée empiriquement)* : le mécanisme (template **IPPS** appliqué
-  à une **facture d'achat** → compte **1174**, case 415) donne le **bon chiffre** de décompte (case 415 = +TVA)
-  **mais** une **écriture GL au signe inversé** — l'IPPS **débite** 1174 (comme un achat qui *augmente* la
-  déduction), alors qu'une correction doit la **réduire** ; au règlement, GL et décompte **divergent**. De plus
-  `viewVAT_415` ne lit **que les factures d'achat**, donc l'écriture **correcte** (un Journal Entry qui
-  **crédite** 1174) **n'est pas captée**. → **À corriger** avant usage : étendre `viewVAT_415` pour capter la
-  correction (sur le **modèle de l'escompte** — union d'un Journal Entry / mouvement GL sur 1174).
+- ✅ **Désormais supporté proprement** via la feature **« TVA sur Journal Entry »** (§22) : on **book la
+  correction en écriture** (crédit du compte d'impôt préalable) et on **tague la ligne** avec la case 415.
+  L'ancien template **IPPS** (facture d'achat → signe inversé + dette fantôme) a été **supprimé**. Le décompte
+  et la plausibilité captent la ligne taguée, avec le **bon signe** (réduction → crédit), sur **n'importe quel
+  compte**. Idem pour les autres corrections (case **420**) et le **dégrèvement** (case **410**).
 
 **Périodicité** — c'est une écriture de **bouclement** (trimestrielle/annuelle), en général **contre-passée**
 à l'ouverture suivante si provisoire. Les cadres exacts (méthode, base véhicule, seuil cadeaux, politique
@@ -1273,6 +1272,47 @@ peut **mélanger** stock et services sur la **même facture** — ERPNext traite
 - **Raccourci** : une facture avec la case **« Update Stock »** fait réception+facture (ou livraison+facture)
   **en un seul document** — pratique si réception = facturation le même jour ; mais le **flux 2-documents**
   reste requis pour les **frais accessoires** (Landed Cost) et les livraisons décalées.
+
+---
+
+## 22. TVA sur écriture manuelle (« code TVA sur Journal Entry », à la bexio)
+
+**Objectif** — comptabiliser la TVA via une **écriture manuelle** (Journal Entry), pas seulement via des
+factures, pour les cas **exceptionnels** qui ne rentrent pas dans une facture : **prestations à soi-même /
+part privée (indépendant)**, **dégrèvement ultérieur (410)**, **corrections/réductions (415/420)**, cadeaux
+> 500, prélèvements. C'est l'équivalent du **code TVA sur une écriture** de bexio.
+
+### 22.1 Comment ça marche
+- Sur **chaque ligne** d'écriture (`Journal Entry Account`), un champ **« Case AFC (TVA) »** : on **tague**
+  la ligne qui porte la TVA. Le menu ne propose que les cases **taguables** (flag `je_taggable`) — en phase 1 :
+  **410 / 415 / 420**. Les totaux calculés et les cases de vente ne sont pas proposés (les ventes → facture).
+- **Account-agnostic** : le tag est sur la **ligne**, pas le compte → tu utilises **n'importe quel compte**
+  (le client crée/organise librement son plan). C'est le **tag** qui détermine la case, jamais le compte.
+- **Le signe vient de la CASE** (référentiel `AFC VAT Box`) : `reduces_total` coché (415/420) → la case se lit
+  au **crédit** ; sinon (410) au **débit**. Le décompte **et** la plausibilité utilisent ce **même signe**.
+- **Seules les lignes taguées** comptent → aucune pollution des écritures système (règlement, réévaluation).
+
+### 22.2 Exemple — correction art. 31 (case 415)
+```
+Journal Entry
+  Débit   6605 Cadeaux non déductibles    162
+    Crédit  1174 (ou tout compte)          162   ← Case AFC = 415
+```
+→ décompte **case 415 = 162** (réduit la déduction) ; plausibilité **verte** (GL ↔ décompte alignés).
+
+### 22.3 Sous le capot (pour maintenance)
+- Référentiel `AFC VAT Box` : champs **`reduces_total`** (signe) + **`je_taggable`** (filtre du menu) — cf. `vat_setup.py`.
+- **Garde-fou** : `vat_declaration.je_supported()` = **source de vérité unique** de la couverture « écriture »
+  (phase 1 = impôt achat). Le `validate` du doctype **refuse** `je_taggable` sur une case non gérée (pas de tag
+  orphelin) ; `_sql_for` gate l'union dessus. Phase 2 = étendre `je_supported` à **un seul endroit**.
+- Champ‑tag `afc_box` sur `Journal Entry Account` (Custom Field, filtré `je_taggable = 1`).
+- `viewVAT` : pattern **`PAT_JE_TAGGED_TAX`** union‑é dans `_sql_for` (modèle escompte), signe piloté par `reduces_total`.
+- Plausibilité : mouvement par compte **hors Journal Entry** + soustraction de la **part écriture** (`_je_tagged_amount`) ;
+  contrôle 5 ignore les JE **taguées**. → GL ↔ décompte cohérents, account‑agnostic.
+- Templates **IPPS / RIP / DUIP supprimés** (remplacés par cette voie). Cf. FORK_CHANGES.
+- Tests : `scenario_correction_tva_ecriture` (415), `scenario_achat_degrevement_410` (410).
+
+**Extensible** : cocher `je_taggable` sur d'autres cases (phase 2 : base de vente 200/303) sans re‑coder.
 
 ---
 

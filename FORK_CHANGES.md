@@ -266,6 +266,28 @@ config, suivi et déclenchement manuel. *(À distinguer de §8 `year_end_rates`,
 - **Workspace** : liens `Swiss Exchange Rate Settings` + `Swiss Exchange Rate Import Log` (Configuration).
 - **Doc** : `docs/swiss_exchange_rates.md`.
 
+## 11. TVA sur écriture manuelle (« code TVA sur Journal Entry », à la bexio)
+
+Permet de comptabiliser la TVA via une **écriture manuelle** taguée (pas seulement via des factures), pour
+les cas qui ne rentrent pas dans une facture : **prestations à soi-même / part privée (indépendant)**,
+**dégrèvement (410)**, **corrections (415/420)**, cadeaux > 500, prélèvements. Équivalent du code TVA sur
+écriture de bexio. **Account-agnostic** (le tag est sur la ligne, pas le compte). Détail : `docs/ch_accounting_setup.md` §22.
+
+- **Référentiel `AFC VAT Box`** (2 champs) : **`reduces_total`** (dérive le signe : réduction → crédit, sinon
+  débit) + **`je_taggable`** (filtre du menu). Seedés dans `vat_setup.py` (`REDUCES_TOTAL`/`JE_TAGGABLE`).
+- **Custom field** `afc_box` sur **`Journal Entry Account`** (`vat_setup.CUSTOM_FIELDS`), filtré `je_taggable = 1`.
+- **`vat_declaration.py`** : pattern **`PAT_JE_TAGGED_TAX`** union-é dans `_sql_for` pour les cases d'impôt
+  taguables ; signe piloté par `reduces_total` (substitué avant `.format`). `generate_vat_queries` fetch les
+  2 nouveaux champs.
+- **`plausibility.py`** : Contrôle 1 exclut les Journal Entries du mouvement par compte (`exclude_je`) et
+  soustrait la **part écriture** (`_je_tagged_amount`) — GL ↔ décompte cohérents, account-agnostic ;
+  Contrôle 5 ignore les JE **taguées** (feature légitime).
+- **`company_setup.py`** : templates **IPPS / RIP / DUIP supprimés** de `PURCHASE` (corrections inadaptées au
+  modèle facture — signe inversé / dette fantôme) + `cleanup_obsolete_templates()` (suppression sur société existante).
+- **Tests** : `scenario_correction_tva_ecriture` (415), `scenario_achat_degrevement_410` (410, réécrit en écriture),
+  helper `Ctx.make_journal_entry`.
+- **Phase 1** = cases d'impôt/correction (410/415/420). Extensible (cocher `je_taggable`) sans re-coder.
+
 ## Récapitulatif des fichiers du fork modifiés
 
 ```

@@ -15,6 +15,8 @@
   "side",
   "amount_type",
   "computation",
+  "reduces_total",
+  "je_taggable",
   "classification_section",
   "rate",
   "formula",
@@ -76,6 +78,20 @@
    "label": "Computation",
    "options": "Declared\nTotal\nCalculated",
    "description": "Declared = agrege depuis transactions ; Total = somme de toutes les ventes ; Calculated = formule dans le decompte"
+  },
+  {
+   "default": "0",
+   "fieldname": "reduces_total",
+   "fieldtype": "Check",
+   "label": "Reduces Total",
+   "description": "Coche = cette case REDUIT le total du decompte (ex. 415/420 : corrections soustraites de 479). Sert a deduire le sens comptable : une case qui reduit se lit au CREDIT du compte, une case qui ajoute (400/405/410) au DEBIT ; toute case de vente au CREDIT. Ne pas cocher pour les ventes ni les deductions normales."
+  },
+  {
+   "default": "0",
+   "fieldname": "je_taggable",
+   "fieldtype": "Check",
+   "label": "Taggable en ecriture (Journal Entry)",
+   "description": "Coche = cette case peut etre selectionnee sur une ligne d'ecriture (Journal Entry) pour alimenter le decompte TVA HORS facture (corrections, prestations a soi-meme, degrevements). Decoche = alimentee uniquement par les factures/paiements. Les cases calculees (totaux) ne sont JAMAIS taguables, meme si cochee."
   },
   {
    "fieldname": "classification_section",

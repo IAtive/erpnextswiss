@@ -27,12 +27,30 @@ def _acc(company, num):
     return frappe.db.get_value("Account", {"account_number": num, "company": company})
 
 
-def _gl_movement(company, account, start, end):
-    r = frappe.db.sql("""SELECT IFNULL(SUM(debit),0), IFNULL(SUM(credit),0)
+def _gl_movement(company, account, start, end, exclude_je=False):
+    # exclude_je : ignore les Journal Entries — les lignes d'écriture TAGUÉES sont réconciliées par leur
+    # tag (voir _je_tagged_amount), pas par le compte (une ligne peut être taguée d'une case ≠ son compte).
+    cond = " AND voucher_type != 'Journal Entry'" if exclude_je else ""
+    r = frappe.db.sql(f"""SELECT IFNULL(SUM(debit),0), IFNULL(SUM(credit),0)
         FROM `tabGL Entry`
-        WHERE company=%s AND account=%s AND posting_date BETWEEN %s AND %s AND is_cancelled=0""",
+        WHERE company=%s AND account=%s AND posting_date BETWEEN %s AND %s AND is_cancelled=0{cond}""",
                       (company, account, start, end))
     return float(r[0][0]), float(r[0][1])
+
+
+def _je_tagged_amount(company, box, start, end):
+    """Part « écriture manuelle » du décompte pour une case : somme signée des lignes de Journal Entry
+    TAGUÉES avec cette case, avec le SIGNE de la case (réduction → crédit−débit ; sinon débit−crédit).
+    C'est exactement ce que la UNION `PAT_JE_TAGGED_TAX` ajoute au viewVAT → on le soustrait du viewVAT
+    pour comparer la partie STRUCTURÉE (factures/paiements) au mouvement GL hors écritures."""
+    reduces = frappe.db.get_value("AFC VAT Box", box, "reduces_total")
+    expr = "credit - debit" if reduces else "debit - credit"
+    r = frappe.db.sql(f"""SELECT IFNULL(SUM({expr}),0)
+        FROM `tabJournal Entry Account` jea
+        JOIN `tabJournal Entry` je ON je.name = jea.parent
+        WHERE je.company=%s AND je.docstatus=1 AND jea.afc_box=%s
+          AND je.posting_date BETWEEN %s AND %s""", (company, box, start, end))
+    return float(r[0][0])
 
 
 def _row(control, item, expected, actual, status, detail=""):
@@ -72,7 +90,9 @@ def collect(company, start_date, end_date):
 
     for a in frappe.get_all("Account", filters={"company": company, "afc_box": ["is", "set"]},
                             fields=["name", "account_number", "afc_box", "root_type"]):
-        d, c = _gl_movement(company, a.name, start_date, end_date)
+        # On EXCLUT les Journal Entries du mouvement : les lignes d'écriture taguées sont réconciliées
+        # par leur tag (ci-dessous), pas par le compte (une ligne peut être taguée d'une case ≠ son compte).
+        d, c = _gl_movement(company, a.name, start_date, end_date, exclude_je=True)
         movement = (d - c) if a.root_type == "Asset" else (c - d)
         # un compte peut alimenter PLUSIEURS cases (override ligne, ex. 1170 = 400 + 410 via DUIP) :
         # on somme les viewVAT de toutes les cases que ses lignes de taxe résolvent.
@@ -84,10 +104,13 @@ def collect(company, start_date, end_date):
               AND pi.posting_date BETWEEN %(s)s AND %(e)s""",
             {"dft": a.afc_box, "c": company, "acc": a.name, "s": start_date, "e": end_date})] or [a.afc_box]
         vtax = sum(get_view_tax(f"viewVAT_{b}", start_date, end_date, company)["total"] or 0 for b in boxes)
-        ok = abs(movement - vtax) < TOL
+        # on compare la partie STRUCTURÉE : viewVAT MOINS la part écriture (déjà exclue du mouvement GL).
+        je_part = sum(_je_tagged_amount(company, b, start_date, end_date) for b in boxes)
+        expected = vtax - je_part
+        ok = abs(movement - expected) < TOL
         rows.append(_row(C1, f"compte {a.account_number} → case(s) {', '.join(sorted(boxes))}",
-                         round(vtax, 2), round(movement, 2), OK if ok else KO,
-                         "" if ok else f"écart {movement - vtax:.2f}"))
+                         round(expected, 2), round(movement, 2), OK if ok else KO,
+                         "" if ok else f"écart {movement - expected:.2f}"))
 
     # ===================== Contrôle 2 : lignes taxables NON classées =====================
     C2 = "2 · Lignes non classées"
@@ -226,11 +249,18 @@ def collect(company, start_date, end_date):
     decompte_accts = [acc2200] + [a.name for a in frappe.get_all(
         "Account", filters={"company": company, "afc_box": ["is", "set"]}, fields=["name"])]
     decompte_accts = tuple(a for a in decompte_accts if a) or ("",)
+    # On EXCLUT les lignes TAGUÉES (afc_box posé) : une écriture taguée alimente légitimement le décompte
+    # (feature « TVA sur Journal Entry »). On ne signale que les JE NON taguées sur un compte de TVA —
+    # celles-là échappent vraiment au décompte.
     je = frappe.db.sql("""
         SELECT g.voucher_no AS vno, g.account AS acc, g.debit AS d, g.credit AS c
         FROM `tabGL Entry` g
         WHERE g.company = %(c)s AND g.voucher_type = 'Journal Entry' AND g.is_cancelled = 0
           AND g.posting_date BETWEEN %(s)s AND %(e)s AND g.account IN %(accts)s
+          AND NOT EXISTS (
+            SELECT 1 FROM `tabJournal Entry Account` jea
+            WHERE jea.parent = g.voucher_no AND jea.account = g.account
+              AND jea.afc_box IS NOT NULL AND jea.afc_box != '')
     """, {"c": company, "s": start_date, "e": end_date, "accts": decompte_accts}, as_dict=True)
     if je:
         for r in je[:50]:

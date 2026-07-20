@@ -382,6 +382,27 @@ class Ctx:
         self.vouchers.append(("Sales Invoice", si.name))
         return si
 
+    def make_journal_entry(self, box, tag_account, amount=162.0, contra="4200", date=DATE):
+        """Écriture manuelle avec une ligne TAGUÉE d'une case AFC (feature « TVA sur Journal Entry »).
+        Le côté tagué suit le signe de la case : réduction (415/420) → crédit ; ajout (410) → débit.
+        `tag_account` peut être n'importe quel compte (account-agnostic : c'est le tag qui compte)."""
+        reduces = frappe.db.get_value("AFC VAT Box", box, "reduces_total")
+        tagged = {"account": _acc(self.company, tag_account), "afc_box": box}
+        other = {"account": _acc(self.company, contra)}
+        if reduces:
+            tagged["credit_in_account_currency"] = amount
+            other["debit_in_account_currency"] = amount
+        else:
+            tagged["debit_in_account_currency"] = amount
+            other["credit_in_account_currency"] = amount
+        je = frappe.get_doc({"doctype": "Journal Entry", "company": self.company, "posting_date": date,
+                             "voucher_type": "Journal Entry", "user_remark": f"Correction case {box}",
+                             "accounts": [other, tagged]})
+        je.insert(ignore_permissions=True)
+        je.submit()
+        self.vouchers.append(("Journal Entry", je.name))
+        return je
+
     # ---- ASSERTERS ----
     def assert_gl(self, voucher, expected):
         """expected = {num_compte: montant_signé} ; +=débit net, −=crédit net."""

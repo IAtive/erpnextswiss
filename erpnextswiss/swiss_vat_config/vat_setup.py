@@ -38,6 +38,21 @@ def strip_box_suffix(company):
 
 # --- Custom fields afc_box (Link -> AFC VAT Box) sur les 3 doctypes -----------
 CUSTOM_FIELDS = {
+    # Ligne d'écriture manuelle : « code TVA » de la ligne (à la bexio). Alimente le décompte HORS
+    # facture (corrections, prestations à soi-même, dégrèvements). Seules les cases « taguables » sont
+    # proposées ; le compte utilisé est libre (c'est le tag qui compte).
+    "Journal Entry Account": [
+        {
+            "fieldname": "afc_box",
+            "label": "Case AFC (TVA)",
+            "fieldtype": "Link",
+            "options": "AFC VAT Box",
+            "insert_after": "credit_in_account_currency",
+            "link_filters": '[["AFC VAT Box","je_taggable","=",1]]',
+            "in_list_view": 1,
+            "description": "Case du decompte TVA alimentee par cette ligne (equivalent d'un code TVA sur l'ecriture). A poser sur la ligne qui porte le montant de TVA. Seules les cases marquees 'Taguable en ecriture' apparaissent. Montant repris = debit ou credit de la ligne selon le sens de la case. Laisser vide si la ligne n'a aucun effet TVA.",
+        }
+    ],
     "Item Tax Template": [
         {
             "fieldname": "afc_box",
@@ -150,10 +165,24 @@ BOXES = [
 ]
 
 
+# Cases qui RÉDUISENT le total (soustraites dans 479 = 400+405+410-415-420) → gl_sign = crédit.
+REDUCES_TOTAL = {"415", "420"}
+# Cases sélectionnables sur une ligne d'écriture (corrections/ajustements hors facture). Phase 1 :
+# uniquement les cases d'impôt préalable qui ne rentrent pas dans une facture (dégrèvement + corrections).
+JE_TAGGABLE = {"410", "415", "420"}
+
+
 def seed_afc_boxes():
-    created = 0
+    created = updated = 0
     for (code, label, part, side, amount, comp, rate, ech, legal, sort, formula) in BOXES:
+        reduces = 1 if code in REDUCES_TOTAL else 0
+        taggable = 1 if code in JE_TAGGABLE else 0
         if frappe.db.exists("AFC VAT Box", code):
+            # màj idempotente des flags (au cas où la case a été seedée avant l'ajout des champs)
+            frappe.db.set_value("AFC VAT Box", code,
+                                {"reduces_total": reduces, "je_taggable": taggable},
+                                update_modified=False)
+            updated += 1
             continue
         frappe.get_doc({
             "doctype": "AFC VAT Box",
@@ -168,6 +197,8 @@ def seed_afc_boxes():
             "legal_ref": legal,
             "sort_order": sort,
             "formula": formula,
+            "reduces_total": reduces,
+            "je_taggable": taggable,
             "enabled": 1,
         }).insert(ignore_permissions=True)
         created += 1
@@ -349,7 +380,13 @@ def after_install():
 
 def after_migrate():
     create_afc_custom_fields()
+    seed_afc_boxes()          # idempotent : (re)pose les flags reduces_total / je_taggable
     _create_financial_templates()
+    try:
+        from erpnextswiss.swiss_vat_config.vat_declaration import generate_vat_queries
+        generate_vat_queries()   # régénère les viewVAT (dont l'union écriture PAT_JE_TAGGED_TAX)
+    except Exception:
+        frappe.log_error(frappe.get_traceback(), "erpnextswiss.swiss_vat_config: generate_vat_queries")
 
 
 def _create_financial_templates():

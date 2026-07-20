@@ -131,6 +131,37 @@ WHERE pe.docstatus = 1 AND pe.company = '{{company}}'
   AND acc.afc_box = '{box}'"""
 
 
+# G. Écritures manuelles taguées (case portée par la LIGNE de Journal Entry, hors facture) — cases
+#    d'impôt/correction (410/415/420…). Le « code TVA sur l'écriture » à la bexio : la fiduciaire tague
+#    la ligne qui porte la TVA, sur N'IMPORTE QUEL compte. Le SIGNE vient de la CASE (pas du compte) :
+#    {sign} = 'jea.debit - jea.credit' (case qui ajoute, ex. 410) ou 'jea.credit - jea.debit' (case qui
+#    réduit, ex. 415/420). Seules les lignes TAGUÉES sont lues → aucune pollution (règlement, réévaluation).
+PAT_JE_TAGGED_TAX = """
+UNION ALL
+SELECT
+    je.name AS name, 'Journal Entry' AS doctype, je.posting_date AS posting_date,
+    jea.account AS account, COALESCE(je.user_remark, je.title, '') AS description,
+    '' AS tax_code, (SELECT c.default_currency FROM `tabCompany` c WHERE c.name = '{{company}}') AS currency,
+    0 AS base_grand_total,
+    ({sign}) AS tax_amount,
+    ({sign}) AS total_amount,
+    ({sign}) AS total_taxes_and_charges
+FROM `tabJournal Entry Account` jea
+JOIN `tabJournal Entry` je ON je.name = jea.parent
+WHERE je.docstatus = 1 AND je.company = '{{company}}' AND jea.afc_box = '{box}'"""
+
+
+def je_supported(box):
+    """SOURCE DE VÉRITÉ de la couverture « TVA sur écriture » : vrai si `_sql_for` sait lire une
+    ligne de Journal Entry taguée pour cette case. Utilisée par le moteur (ci-dessous) ET par la
+    validation du doctype AFC VAT Box (empêche de rendre `je_taggable` une case non gérée).
+    PHASE 1 : cases d'IMPÔT côté ACHAT (400/405/410/415/420). Étendre ICI pour la phase 2 (ex. base
+    de vente) — moteur, validation et filtre restent cohérents automatiquement."""
+    def g(k):
+        return box.get(k) if hasattr(box, "get") else getattr(box, k, None)
+    return g("computation") == "Declared" and g("side") == "Purchase" and g("amount_type") == "Tax"
+
+
 def _sql_for(box):
     """Retourne le SQL de la case, ou None si non générable (Calculated)."""
     comp, side, amt = box.computation, box.side, box.amount_type
@@ -145,7 +176,13 @@ def _sql_for(box):
         return pat.format(box=box.box_code, rate=rate)
     if comp == "Declared" and side == "Purchase" and amt == "Tax":
         # Cases impôt préalable : on soustrait les reprises d'escompte obtenu (déductions d'achat).
-        return (PAT_PURCHASE_TAX + PAT_PURCHASE_ESCOMPTE).format(box=box.box_code, rate=rate)
+        pat = PAT_PURCHASE_TAX + PAT_PURCHASE_ESCOMPTE
+        # + écritures manuelles taguées (hors facture) si la case est taguable ET supportée. Le SIGNE vient
+        # de la CASE : réduction (415/420) → crédit ; ajout (410) → débit. Substitué AVANT .format.
+        if box.get("je_taggable") and je_supported(box):
+            sign = "jea.credit - jea.debit" if box.get("reduces_total") else "jea.debit - jea.credit"
+            pat = pat + PAT_JE_TAGGED_TAX.replace("{sign}", sign)
+        return pat.format(box=box.box_code, rate=rate)
     if comp == "Declared" and side == "Purchase" and amt == "Base+Tax":
         return PAT_ACQUISITION.format(box=box.box_code, rate=rate)
     return None
@@ -154,7 +191,8 @@ def _sql_for(box):
 def generate_vat_queries():
     created, updated, skipped = [], [], []
     boxes = frappe.get_all("AFC VAT Box", filters={"enabled": 1},
-                           fields=["box_code", "side", "amount_type", "computation", "rate"])
+                           fields=["box_code", "side", "amount_type", "computation", "rate",
+                                   "reduces_total", "je_taggable"])
     for b in boxes:
         sql = _sql_for(b)
         name = f"viewVAT_{b.box_code}"
