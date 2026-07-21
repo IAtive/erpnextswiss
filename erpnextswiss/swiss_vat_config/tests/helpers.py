@@ -81,7 +81,8 @@ def ensure_masters(company):
         frappe.get_doc({"doctype": "Supplier", "supplier_name": "SCEN Fournisseur EUR",
                         "supplier_group": _leaf("Supplier Group"),
                         "default_currency": "EUR"}).insert(ignore_permissions=True)
-    for it in ("SCEN Service", "SCEN Marchandise"):
+    # SCEN RFA : item dédié aux ristournes de fin d'année (notes de crédit) — non stock.
+    for it in ("SCEN Service", "SCEN Marchandise", "SCEN RFA"):
         if not frappe.db.exists("Item", it):
             frappe.get_doc({"doctype": "Item", "item_code": it, "item_name": it,
                             "item_group": _leaf("Item Group"), "stock_uom": "Nos",

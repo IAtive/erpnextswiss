@@ -315,6 +315,43 @@ def scenario_achat_avoir_fournisseur(ctx):
     ctx.assert_plausibilite_ok()
 
 
+def scenario_rfa_accordee_client(ctx):
+    """
+    SCÉNARIO : RFA / ristourne de fin d'année ACCORDÉE à un client → AVOIR DE VENTE (item « SCEN RFA »)
+    POURQUOI : une ristourne sur volume accordée APRÈS COUP (annuelle) = diminution de la contre-prestation
+               (art. 41 LTVA) → un avoir de vente qui RÉDUIT le CA et la TVA due. Distinct de l'escompte
+               (au paiement) : ici c'est un événement séparé, géré par note de crédit (pas d'écriture manuelle).
+    OPÉRATIONS : avoir de vente 5 000 CHF (net), client CH, item dédié « SCEN RFA », template NC81 (8.1%).
+    ÉCRITURES : Dr Produit 3000 +5 000 · Dr TVA due 2200 +405 · Cr Débiteur −5 405 (vente inversée).
+    DÉCOMPTE : case 200 = −5 000 · case 303 base = −5 000 → TVA due réduite de 405 (on paie MOINS à l'AFC).
+    NOTE : en production, le produit peut viser un contra-compte « RFA accordée » (façon ProConcept 448000).
+    """
+    cn = ctx.make_sales_invoice("SCEN Client CH", net=5000, tax_template="NC81",
+                                item="SCEN RFA", is_return=True)
+    ctx.assert_gl(cn, {"3000": +5000, "2200": +405})
+    ctx.assert_vat(base={"200": -5000, "303": -5000})
+    ctx.assert_pl("PRODUITS", -5000)
+    ctx.assert_plausibilite_ok()
+
+
+def scenario_rfa_recue_fournisseur(ctx):
+    """
+    SCÉNARIO : RFA / ristourne de fin d'année REÇUE d'une marque → AVOIR D'ACHAT (item « SCEN RFA »)
+    POURQUOI : une ristourne sur volume reçue = diminution de la contre-prestation → un avoir d'achat qui
+               RÉDUIT le coût et l'impôt préalable (case 400 en négatif). Distinct de l'escompte obtenu.
+    OPÉRATIONS : avoir d'achat 3 000 CHF (net), fournisseur CH, item dédié « SCEN RFA », template IPM81 (8.1%).
+    ÉCRITURES : Cr Charge 4200 −3 000 · Cr Impôt préalable 1170 −243 · Dr Fournisseur +3 243 (achat inversé).
+    DÉCOMPTE : case 400 = −243 → impôt préalable réduit (on récupère MOINS).
+    NOTE : en production, la charge peut viser un contra-compte « Remises fournisseurs » (façon ProConcept 370000).
+    """
+    dn = ctx.make_purchase_invoice("SCEN Fournisseur CH", net=3000, tax_template="IPM81",
+                                   item="SCEN RFA", is_return=True)
+    ctx.assert_gl(dn, {"4200": -3000, "1170": -243})
+    ctx.assert_vat(tax={"400": -243})
+    ctx.assert_pl("CH_MAT", +3000)
+    ctx.assert_plausibilite_ok()
+
+
 def scenario_vente_acompte_client(ctx):
     """
     SCÉNARIO : Acompte reçu d'un client (avant facturation)
