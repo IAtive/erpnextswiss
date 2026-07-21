@@ -379,6 +379,31 @@ def setup_perpetual_inventory(company):
     print("  ✓ perpétuel activé (stock 1200, ajustement 4208/4800, SRBNB 2301, EIIV 2302)")
 
 
+def setup_payroll_accounts(company):
+    """Compte « Saisie sur salaire » (Lohnpfändung) — dette à court terme, créée « au cas où ».
+
+    Quand l'Office des poursuites (ou un jugement : pension alimentaire…) ordonne à l'employeur de
+    RETENIR une part du salaire NET pour la reverser directement à un créancier, cette part est
+    parquée ici entre la paie et le reversement, puis le compte se solde (Dr 2208 / Cr 1020).
+    **Hors TVA** (pas d'`afc_box`) et **sans impact sur le résultat** : c'est un pur reclassement de
+    bilan du net à payer (une part va à l'employé, une part au créancier). Rangé sous le groupe
+    « 220 Autres dettes à court terme » — et NON sous 227 (charges sociales), car c'est une dette
+    envers un créancier privé. HJD l'utilisait déjà (Proconcept 204300). Voir doc §19.3 / §19.7."""
+    num, name = "2208", "Saisie sur salaire"
+    if _acc_silent(company, num):
+        return
+    ref = _acc(company, "2200")  # membre du groupe « 220 Autres dettes à court terme »
+    parent = frappe.db.get_value("Account", ref, "parent_account") if ref else None
+    if not parent:
+        print(f"  ⚠️ parent (220) introuvable — {num} non créé")
+        return
+    doc = frappe.get_doc({"doctype": "Account", "company": company, "account_number": num,
+                          "account_name": name, "parent_account": parent})
+    doc.flags.ignore_permissions = True
+    doc.insert(ignore_if_duplicate=True)
+    print(f"→ Paie : {num} « {name} » créé (dette court terme, hors TVA)")
+
+
 def set_erpnextswiss_settings(company):
     """Configure ERPNextSwiss Settings : compte intermediaire (compte d'attente) = 1099.
     Utilise par le Bank Wizard pour parquer les lignes bancaires non identifiees.
@@ -662,6 +687,7 @@ def setup_company(company):
     tag_account_boxes(company)
     set_company_defaults(company)
     setup_perpetual_inventory(company)
+    setup_payroll_accounts(company)
     set_erpnextswiss_settings(company)
     set_accounting_settings()
     setup_vat_queries()

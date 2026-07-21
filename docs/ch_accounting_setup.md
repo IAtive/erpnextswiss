@@ -600,6 +600,7 @@ touchent la **présentation**, la **traçabilité** ou le **mécanisme**.
 | 13  | **Acomptes : compte de tiers séparé (2030/1130) — ON ou OFF**       | option _Book Advance Payments in Separate Party Account_ **activée par défaut** → acomptes isolés **en continu** sur **2030/1130**. Alternative : **désactiver** → acomptes en **solde du tiers** (1100/2000) + **reclassement à la clôture** des acomptes matériels. **Conforme CO 959a dans les deux cas** ; détails, écritures de reclassement et arbitrage complet au **§11** | le **volume réel d'acomptes** (reçus de clients / versés à des fournisseurs) : flux **régulier** → garder la **séparation** (bilan propre en continu) ; **rares** → **désactiver** (plus simple, zéro friction Bank Wizard, reclassement ponctuel au bouclement)                                        |
 | 14  | **Cours de change : moyennes mensuelles AFC**                       | on utilise **actuellement** le **cours mensuel moyen de l'AFC** (daté du 1er du mois, importé automatiquement), **pas** le cours du jour ni un cours de marché/BCE ; fallback en ligne coupé (`Currency Exchange Settings.disabled`) et cours « périmés » autorisés (`allow_stale`) — cf. §11                                                                                     | que le **cours mensuel moyen AFC** convient pour le décompte TVA (art. 45 OTVA autorise **mensuel moyen _ou_ cours du jour, devises vente** — la méthode doit être **conservée durant toute une période fiscale**) ; sinon basculer sur **cours du jour** (`rate_type = Daily`) dès le début de période |
 | 15  | **Prestations à soi-même / part privée** _(spécifique métier)_ | usage privé de biens/services déduits (**véhicule**, **cadeaux > ~500 CHF**, **échantillons/PLV prélevés**) → correction TVA. **Deux méthodes** : **(A) produit imposable** — part privée = CA (case 200/301) + TVA due 2200, *recommandée véhicule* ; **(B) correction d'impôt préalable** — case 415, désormais **supportée proprement** via la feature **« TVA sur Journal Entry »** (§22) : écriture taguée, bon signe, compte libre (le template IPPS cassé a été supprimé). Détail : **§20.2 / §22**. | la **méthode** (produit imposable vs correction préalable) ; la **base véhicule** (forfait **0,8 %/mois** vs effectif) ; le **seuil cadeaux** (~500 CHF) ; la politique **échantillons/testers** |
+| 16  | **Granularité stock par marque : Item Group, pas comptes GL** _(Option A)_ | ProConcept tenait **un compte GL de stock par marque** (~30 comptes `107xxx`). On retient **un compte stock unique (1200)** ; le détail **par marque** est porté par le **groupe d'articles (Item Group = marque)** et lu via les **rapports** natifs (*Stock Balance*, *Stock Ledger* filtrés par groupe), **pas** par des soldes de comptes séparés. Le **bilan a une seule ligne stock** ; la ventilation marque reste **auditable en rapport**. Réversible : on peut basculer vers **1 compte stock/Item Group** (Option B) si le détail par marque **au bilan** est exigé. **Impact TVA : aucun.** | que la **ventilation marque en rapport** (compte stock unique) suffit — ou si la fiduciaire exige le **détail par marque au bilan** (→ Option B : un compte stock par groupe d'articles). Cf. **§21** |
 
 ### Détail des points principaux
 
@@ -979,23 +980,34 @@ par ERPNext.
 | Compte | Usage |
 | --- | --- |
 | **5000** | Salaires (brut) |
+| **5001** | Indemnités |
+| **5003** | Commissions |
+| **5008** | Autres charges de personnel |
 | **5700** | AVS, AI, APG, AC (part patronale) |
 | **5710** | Caisse d'allocations familiales (CAF) |
 | **5720** | Prévoyance professionnelle — LPP (part patronale) |
 | **5730** | Assurance-accidents — LAA (part patronale) |
 | **5740** | Assurance maladie — IJM (part patronale) |
 | **5790** | Impôts à la source (charge, si à charge employeur) |
+| **5810 / 5820 / 5832 / 5880** | Formation, frais effectifs, voyages, manifestations |
 
-**Dettes envers les caisses (passifs, comptes courants)** :
+**Dettes envers les caisses (passifs, comptes courants)** — **tous présents** dans le plan bexio :
 
 | Compte | Destinataire |
 | --- | --- |
 | **2271** | C/C AVS, AI, APG, AC → **caisse de compensation** |
 | **2272** | C/C Caisse d'allocations familiales (CAF) → caisse de compensation |
 | **2270** | C/C Prévoyance professionnelle → **caisse de pension (LPP)** |
+| **2273** | C/C Assurance-accidents (LAA) → **assureur** |
+| **2274** | C/C Assurance maladie — indemnité journalière (IJM) → **assureur** |
 | **2279** | C/C Impôt à la source → **administration fiscale cantonale** |
-| *(2273 à créer)* | *C/C Assurance-accidents/maladie (LAA/IJM) → assureur* — optionnel |
-| *(2069 à créer)* | *C/C Saisie sur salaire → créancier* — **seulement si saisie réelle** |
+| **2208** | Saisie sur salaire → **créancier / Office des poursuites** — utilisé **seulement en cas de saisie réelle** (créé par le setup « au cas où ») |
+
+**Compte de passage pour le net à payer** :
+
+| Compte | Usage |
+| --- | --- |
+| **1091** | **Compte d'attente pour salaires** — crédité du **net** lors de l'écriture de paie, soldé au versement bancaire. Découple la comptabilisation du paiement et fiabilise la réconciliation bancaire (équivalent d'un compte *« Salaires à payer »*). |
 
 ### 19.4 Le paiement d'un salaire, étape par étape
 
@@ -1003,13 +1015,15 @@ par ERPNext.
 **fiche de salaire** du mois et la remet à l'employé (obligation, art. 323b CO).
 
 **Étape 2 — Comptabilisation dans ERPNext.** On enregistre **une écriture mensuelle** (Journal Entry)
-qui : débite les **charges** (5xxx), crédite les **dettes sociales** (227x) et crédite la **banque**
-(le net). → *voir §19.5 pour l'écriture chiffrée.* Le mieux : **importer le journal comptable exporté
-par le logiciel de paie** (la plupart le proposent) plutôt que le ressaisir.
+qui : débite les **charges** (5xxx), crédite les **dettes sociales** (227x) et crédite le **net** sur
+**1091** (compte d'attente pour salaires) — ou directement la banque si le net est versé le jour même.
+→ *voir §19.5 pour l'écriture chiffrée.* Le mieux : **importer le journal comptable exporté par le
+logiciel de paie** (la plupart le proposent) plutôt que le ressaisir.
 
 **Étape 3 — Versement du NET au salarié.** Payé depuis **1020** (banque), en général en fin de mois
-(échéance contractuelle). Peut se faire via un fichier **`pain.001`** (généré par le logiciel de paie
-ou par ERPNext). *Obligation contractuelle* (le salaire est dû à l'échéance convenue).
+(échéance contractuelle), ce qui **solde 1091** (Débit 1091 / Crédit 1020). Peut se faire via un
+fichier **`pain.001`** (généré par le logiciel de paie ou par ERPNext). *Obligation contractuelle*
+(le salaire est dû à l'échéance convenue).
 
 **Étape 4 — Versement des cotisations sociales aux caisses.** Selon la périodicité de chaque caisse :
 - **AVS/AI/APG/AC + CAF** → caisse de compensation (souvent **acomptes** trimestriels + **décompte
@@ -1050,15 +1064,16 @@ viennent du logiciel de paie.)*
 | **2271** | C/C AVS/AI/APG/AC (retenue 640 + patronale 640) | | 1 280 |
 | **2272** | C/C CAF (patronale) | | 160 |
 | **2270** | C/C LPP (retenue 500 + patronale 500) | | 1 000 |
-| **2273** | C/C LAA/IJM (retenue 160 + patronale 80) | | 240 |
+| **2273** | C/C LAA (retenue AANP 160 + patronale AAP 80) | | 240 |
+| **1091** | **Salaires à payer** — net (soldé au versement) | | 7 900 |
 | **2279** | C/C Impôt à la source (retenue) | | 800 |
-| **1020** | Banque — **net versé au salarié** | | 7 900 |
 | | **Totaux** | **11 380** | **11 380** |
 
-> Le **net** (7 900) = brut − retenues salariales (640 AVS/AC + 500 LPP + 160 LAA/IJM + 800 impôt
+> Le **net** (7 900) = brut − retenues salariales (640 AVS/AC + 500 LPP + 160 LAA + 800 impôt
 > source). Les **charges patronales** (1 380) s'ajoutent en charge **sans** réduire le net.
-> *Variante* : si le net n'est pas payé le jour même, créditer un compte **« Salaires à payer »**
-> plutôt que 1020, puis solder ce compte au paiement.
+> *(IJM `5740`/`2274` non mouvementé ici pour rester lisible — même mécanique que la LAA.)*
+> **Versement du net** : Débit **1091** 7 900 / Crédit **1020** 7 900 (solde 1091). Variante : créditer
+> directement **1020** dans l'écriture de paie si le salaire est versé le jour même.
 
 **Écritures de règlement** (quand on paie les caisses/le canton) :
 
@@ -1066,7 +1081,7 @@ viennent du logiciel de paie.)*
 | --- | --- |
 | Caisse de compensation (AVS/AC + CAF) | Débit **2271** 1 280 + **2272** 160 / Crédit **1020** 1 440 |
 | Caisse de pension (LPP) | Débit **2270** 1 000 / Crédit **1020** |
-| Assureur (LAA/IJM) | Débit **2273** 240 / Crédit **1020** |
+| Assureur (LAA / IJM) | Débit **2273** 240 (+ **2274** pour l'IJM) / Crédit **1020** |
 | Administration fiscale (impôt source) | Débit **2279** 800 / Crédit **1020** |
 
 Après ces règlements, les comptes courants sociaux reviennent à **zéro** (réconciliation OK).
@@ -1094,9 +1109,16 @@ Après ces règlements, les comptes courants sociaux reviennent à **zéro** (r�
   recopie, montants exacts.
 - 🧾 **Certificat de salaire & déclarations ELM** : produits par le **logiciel de paie**, **jamais**
   par ERPNext (non certifié Swissdec).
-- ➕ **Comptes à créer au besoin** : `2273` (C/C LAA/IJM) pour suivre l'assureur séparément ;
-  `2069`/`227x` (C/C Saisie sur salaire) **uniquement** en cas de saisie réelle.
+- ✅ **Comptes déjà présents** : tous les comptes de charge (5xxx) et de dette sociale (`2270`–`2274`,
+  `2279`) ainsi que `1091` (salaires à payer) existent dans le plan bexio — **rien à créer** pour le
+  cas standard.
+- ⛓️ **Saisie sur salaire** (`2208`) : créé par le setup « au cas où », **mais mouvementé uniquement**
+  s'il y a une saisie réelle (ordre de l'Office des poursuites / jugement). Dette envers un créancier
+  privé → rangé sous « 220 Autres dettes à court terme » (**pas** sous 227 charges sociales). Hors TVA,
+  sans impact sur le résultat : pur reclassement du net à payer (voir mécanique ci-dessous).
 - 🏷️ Les charges de personnel portent un **cost center** (ex. `Main`) comme toute charge.
+- 🧮 **HRMS est installé mais son module Payroll n'est PAS utilisé** (non certifié Swissdec) — la
+  comptabilisation se fait exclusivement par Journal Entry / import du journal de paie.
 
 ---
 
