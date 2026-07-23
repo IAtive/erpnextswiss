@@ -38,8 +38,8 @@ def _qrbill_address(party_name, address, mandatory=True):
 	if not address or not (address.get("pincode") and address.get("city")):
 		if mandatory:
 			frappe.throw(_(
-				"Adresse incomplète pour « {0} » : le bulletin QR exige une adresse "
-				"structurée (rue, NPA, localité, pays)."
+				"Incomplete address for '{0}': the QR-bill requires a structured "
+				"address (street, postal code, town, country)."
 			).format(party_name))
 		return None
 	return {
@@ -64,7 +64,7 @@ def get_qr_bill_svg(sales_invoice):
 		return (
 			'<div style="border:1px solid #c0392b;color:#c0392b;padding:8px;'
 			'font-size:9pt;">{0} {1}</div>'
-		).format(_("Bulletin QR indisponible :"), frappe.utils.escape_html(str(e)))
+		).format(_("QR-bill unavailable:"), frappe.utils.escape_html(str(e)))
 
 
 def _build_qr_bill_svg(sales_invoice):
@@ -81,7 +81,7 @@ def _build_qr_bill_svg(sales_invoice):
 
 	if doc.currency not in _ALLOWED_CURRENCIES:
 		frappe.throw(_(
-			"Le bulletin QR n'accepte que CHF ou EUR (facture en {0})."
+			"The QR-bill only supports CHF or EUR (invoice in {0})."
 		).format(doc.currency))
 
 	# Source de vérité = le SNAPSHOT figé sur la facture à l'émission (immutable) :
@@ -96,7 +96,7 @@ def _build_qr_bill_svg(sales_invoice):
 		account_name = frappe.db.get_value("Company", doc.company, "default_bank_account")
 		if not account_name:
 			frappe.throw(_(
-				"Veuillez définir un compte bancaire par défaut sur la société {0}."
+				"Please set a default bank account on company {0}."
 			).format(doc.company))
 		acc = frappe.db.get_value(
 			"Account", account_name, ["qr_method", "iban", "qr_iban"], as_dict=True
@@ -108,7 +108,7 @@ def _build_qr_bill_svg(sales_invoice):
 
 	if not iban:
 		frappe.throw(_(
-			"IBAN de réception manquant pour la méthode {0}."
+			"Receiving IBAN missing for method {0}."
 		).format(method))
 
 	creditor = _qrbill_address(

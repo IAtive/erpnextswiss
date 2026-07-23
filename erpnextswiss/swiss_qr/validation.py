@@ -32,20 +32,20 @@ def validate_account_qr(doc, method=None):
 	# l'IBAN classique ne doit jamais être une QR-IBAN
 	if doc.get("iban") and is_qr_iban(doc.iban):
 		frappe.throw(_(
-			"Le champ IBAN contient une QR-IBAN. Placez la QR-IBAN dans le champ "
-			"« QR-IBAN » (méthode QRR) et renseignez ici l'IBAN classique, utilisé "
-			"pour les paiements (pain.001)."
+			"The IBAN field contains a QR-IBAN. Put the QR-IBAN in the 'QR-IBAN' "
+			"field (QRR method) and enter the regular IBAN here, which is used for "
+			"payments (pain.001)."
 		))
 
 	# le champ QR-IBAN doit contenir une vraie QR-IBAN
 	if doc.get("qr_iban") and not is_qr_iban(doc.qr_iban):
 		frappe.throw(_(
-			"Le champ QR-IBAN doit contenir une vraie QR-IBAN "
-			"(institution 30000–31999, 5e chiffre = 3)."
+			"The QR-IBAN field must contain a valid QR-IBAN "
+			"(institution 30000-31999, 5th digit = 3)."
 		))
 
 	# méthode QRR -> QR-IBAN obligatoire
 	if doc.get("qr_method") == "QRR" and not doc.get("qr_iban"):
 		frappe.throw(_(
-			"Méthode QRR : renseignez une QR-IBAN dans le champ « QR-IBAN »."
+			"QRR method: please provide a QR-IBAN in the 'QR-IBAN' field."
 		))
