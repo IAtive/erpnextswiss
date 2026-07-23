@@ -46,6 +46,21 @@ def create_zugferd_xml(sales_invoice, verify=True):
 """
 Function to compile the data sources into a dictionary
 """
+def _receiving_iban(company):
+    """IBAN de réception pour la e-facture (celui où le client paie).
+
+    = IBAN classique du compte bancaire par défaut de la société (comme le
+    bulletin QR). Jamais la QR-IBAN : une e-facture SEPA/ZUGFeRD utilise l'IBAN
+    normal. Renvoie "" si aucun compte de réception n'est configuré.
+    (Avant : lu par erreur sur le compte de créance `debit_to`, qui n'a pas
+    d'IBAN -> champ toujours vide.)
+    """
+    account = company.get("default_bank_account")
+    if not account:
+        return ""
+    return frappe.get_value("Account", account, "iban") or ""
+
+
 def prepare_data(sales_invoice):
     data = {}
     try:
@@ -103,7 +118,7 @@ def prepare_data(sales_invoice):
             'customer_contact_phone': html.escape(sinv.contact_mobile or ""),
             'customer_contact_email': html.escape(sinv.contact_email or ""),
             'is_return': cint(sinv.is_return),
-            'iban': frappe.get_value("Account", sinv.debit_to, "iban"),
+            'iban': _receiving_iban(company),
             'tax_category': "S"
         })
         if sinv.taxes_and_charges:
