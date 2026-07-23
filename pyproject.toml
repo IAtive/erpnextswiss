@@ -13,6 +13,7 @@ dependencies = [
     # (pypika en dépendance-URL) casse `uv pip install`. Fix de compatibilité (Frappe v16).
     "bs4",
     "factur-x>=2.3",
+    "qrbill>=1.2",
     "unidecode",
     "opencv-python",
     "pymupdf",

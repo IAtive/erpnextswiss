@@ -74,7 +74,9 @@ jinja = {
         "erpnextswiss.scripts.crm_tools.get_primary_supplier_address",
         "erpnextswiss.erpnextswiss.report.kontrolle_mwst.kontrolle_mwst.get_vat_control_details",
         "erpnextswiss.erpnextswiss.planzer.get_planzer_barcode",
-        "erpnextswiss.erpnextswiss.planzer.get_planzer_qr_code"
+        "erpnextswiss.erpnextswiss.planzer.get_planzer_qr_code",
+        # Swiss QR : rendu LOCAL du bulletin QR (récépissé + section paiement) via qrbill
+        "erpnextswiss.swiss_qr.render.get_qr_bill_svg"
     ]
 }
 
@@ -114,6 +116,7 @@ after_migrate = [
     "erpnextswiss.erpnextswiss.doctype.swiss_exchange_rate_settings.swiss_exchange_rate_settings.ensure_defaults",
     "erpnextswiss.swiss_vat_config.vat_setup.after_migrate",
     "erpnextswiss.treasury.setup.after_migrate",
+    "erpnextswiss.swiss_qr.setup.after_migrate",
 ]
 
 # Desk Notifications
@@ -162,6 +165,15 @@ doc_events = {
             # créé depuis une transaction FX enrichie (sur-ensemble strict, gardé).
             "erpnextswiss.treasury.overrides.payment_entry_apply_bank_fx",
         ],
+    },
+    # Swiss QR : génère la référence du bulletin QR (QRR/SCOR/NON) selon la méthode
+    # du compte de réception. Remplace l'ancienne génération cliente onload.
+    "Sales Invoice": {
+        "validate": "erpnextswiss.swiss_qr.references.set_qr_reference",
+    },
+    # Swiss QR : cohérence QR-IBAN / IBAN classique / méthode sur le compte.
+    "Account": {
+        "validate": "erpnextswiss.swiss_qr.validation.validate_account_qr",
     },
 }
 
