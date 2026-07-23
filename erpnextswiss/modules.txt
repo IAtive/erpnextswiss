@@ -1,3 +1,4 @@
 ERPNextSwiss
 Scripts
 Swiss VAT Config
+Treasury

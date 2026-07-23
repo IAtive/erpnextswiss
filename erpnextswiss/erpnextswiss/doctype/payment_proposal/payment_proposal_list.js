@@ -1,5 +1,10 @@
 frappe.listview_settings['Payment Proposal'] = {
     onload: function(listview) {
+        // bouton visible et mis en évidence en haut
+        listview.page.add_inner_button( __("Create Payment Proposal"), function() {
+            prepare_payment_proposal();
+        }).addClass("btn-primary").removeClass("btn-default");
+        // on garde aussi l'option dans le menu (trois points)
         listview.page.add_menu_item( __("Create Payment Proposal"), function() {
             prepare_payment_proposal();
         });

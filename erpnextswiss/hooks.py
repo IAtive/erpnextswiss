@@ -45,12 +45,15 @@ doctype_js = {
     "Address":              "public/js/address.js",
     "Holiday List":         "public/js/holiday_list.js",
     "Shipment":             "public/js/shipment.js",
-    "Exchange Rate Revaluation": "public/js/exchange_rate_revaluation.js"
+    "Exchange Rate Revaluation": "public/js/exchange_rate_revaluation.js",
+    "Bank Transaction":     "public/js/bank_transaction.js",
+    "Bank Reconciliation Tool Beta": "public/js/bank_reconciliation_tool_beta.js"
 }
 
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 doctype_list_js = {
-    "Purchase Invoice" : "public/js/purchase_invoice_list.js"
+    "Purchase Invoice" : "public/js/purchase_invoice_list.js",
+    "Bank Transaction" : "public/js/bank_transaction_list.js"
 }
 
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
@@ -110,6 +113,7 @@ after_install = [
 after_migrate = [
     "erpnextswiss.erpnextswiss.doctype.swiss_exchange_rate_settings.swiss_exchange_rate_settings.ensure_defaults",
     "erpnextswiss.swiss_vat_config.vat_setup.after_migrate",
+    "erpnextswiss.treasury.setup.after_migrate",
 ]
 
 # Desk Notifications
@@ -152,7 +156,12 @@ doc_events = {
         "before_submit": "erpnextswiss.swiss_vat_config.plausibility.vat_declaration_block",
     },
     "Payment Entry": {
-        "validate": "erpnextswiss.swiss_vat_config.escompte.route_purchase_discount_to_4900",
+        "validate": [
+            "erpnextswiss.swiss_vat_config.escompte.route_purchase_discount_to_4900",
+            # Treasury : montant tiers réel + taux banque sur un paiement on-account
+            # créé depuis une transaction FX enrichie (sur-ensemble strict, gardé).
+            "erpnextswiss.treasury.overrides.payment_entry_apply_bank_fx",
+        ],
     },
 }
 
@@ -198,6 +207,16 @@ scheduler_events = {
 # override_whitelisted_methods = {
 #     "frappe.desk.doctype.event.event.get_events": "erpnextswiss.event.get_events"
 # }
+
+# Treasury : pré-remplit le prompt de réconciliation ALYF avec le taux banque.
+# (L'upload camt, lui, court-circuite les overrides -> traité par monkeypatch, cf. boot_session.)
+override_whitelisted_methods = {
+    "banking.klarna_kosma_integration.doctype.bank_reconciliation_tool_beta.bank_reconciliation_tool_beta.get_reconcile_amount_context": "erpnextswiss.treasury.overrides.get_reconcile_amount_context",
+}
+
+# Treasury : monkeypatch de l'upload camt d'ALYF (les uploads court-circuitent
+# override_whitelisted_methods) -> l'écran ALYF utilise notre import FX/ZIP.
+boot_session = "erpnextswiss.treasury.overrides.apply_monkeypatches"
 
 # Fixtures (to import DocType customisations)
 # --------
