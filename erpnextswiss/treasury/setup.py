@@ -12,7 +12,7 @@ FX_CUSTOM_FIELDS = {
 	"Bank Transaction": [
 		{
 			"fieldname": "treasury_fx_section",
-			"label": "Devise d'origine (FX)",
+			"label": "Original Currency (FX)",
 			"fieldtype": "Section Break",
 			"insert_after": "bank_party_account_number",
 			"collapsible": 1,
@@ -24,7 +24,7 @@ FX_CUSTOM_FIELDS = {
 			"options": "Currency",
 			"insert_after": "treasury_fx_section",
 			"read_only": 1,
-			"description": "Devise d'origine de l'opération (ex. EUR) quand le compte est en CHF.",
+			"description": "Original currency of the transaction when it differs from the account currency.",
 		},
 		{
 			"fieldname": "original_amount",
@@ -33,7 +33,7 @@ FX_CUSTOM_FIELDS = {
 			"precision": "2",
 			"insert_after": "original_currency",
 			"read_only": 1,
-			"description": "Montant dans la devise d'origine (ex. 1440.00 EUR).",
+			"description": "Amount expressed in the original currency of the transaction.",
 		},
 		{
 			"fieldname": "treasury_fx_col",
@@ -47,7 +47,26 @@ FX_CUSTOM_FIELDS = {
 			"precision": "9",
 			"insert_after": "treasury_fx_col",
 			"read_only": 1,
-			"description": "Taux appliqué par la banque le jour du paiement (montant compte / montant d'origine).",
+			"description": "Rate applied by the bank on the payment date (account amount / original amount).",
+		},
+		{
+			"fieldname": "treasury_reconcile_section",
+			"label": "Reconciliation (Treasury)",
+			"fieldtype": "Section Break",
+			"insert_after": "bank_exchange_rate",
+			"collapsible": 0,
+		},
+		{
+			"fieldname": "treasury_pmtinfid",
+			"label": "Payment Info ID (pain.001)",
+			"fieldtype": "Data",
+			"insert_after": "treasury_reconcile_section",
+			"read_only": 1,
+			"description": (
+				"Payment block identifier (PmtInfId) from the camt message, "
+				"matching the pain.001 order issued via a payment proposal. "
+				"Used for automatic reconciliation of outgoing payments."
+			),
 		},
 	]
 }

@@ -9551,3 +9551,98 @@ msgstr "Premier rappel"
 msgid "Second reminder"
 msgstr "Deuxième rappel"
 
+msgid "Original Currency (FX)"
+msgstr "Devise d'origine (FX)"
+
+msgid "Reconciliation (Treasury)"
+msgstr "Rapprochement (Treasury)"
+
+msgid "Original Currency"
+msgstr "Devise d'origine"
+
+msgid "Original Amount"
+msgstr "Montant d'origine"
+
+msgid "Bank Exchange Rate"
+msgstr "Taux de change de la banque"
+
+msgid "Payment Info ID (pain.001)"
+msgstr "Identifiant de paiement (pain.001)"
+
+msgid "QR-Bill Method"
+msgstr "Méthode du bulletin QR"
+
+msgid "QR Reference"
+msgstr "Référence QR"
+
+msgid "QR Reference Type"
+msgstr "Type de référence QR"
+
+msgid "QR Account IBAN"
+msgstr "IBAN du compte QR"
+
+msgid ""
+"Original currency of the transaction when it differs from the account "
+"currency."
+msgstr ""
+"Devise d'origine de l'opération lorsqu'elle diffère de la devise du "
+"compte."
+
+msgid "Amount expressed in the original currency of the transaction."
+msgstr "Montant exprimé dans la devise d'origine de l'opération."
+
+msgid ""
+"Rate applied by the bank on the payment date (account amount / original "
+"amount)."
+msgstr ""
+"Taux appliqué par la banque à la date du paiement (montant du compte / "
+"montant d'origine)."
+
+msgid ""
+"Payment block identifier (PmtInfId) from the camt message, matching the "
+"pain.001 order issued via a payment proposal. Used for automatic "
+"reconciliation of outgoing payments."
+msgstr ""
+"Identifiant du bloc de paiement (PmtInfId) issu du message camt, "
+"correspondant à l'ordre pain.001 émis via une proposition de paiement. "
+"Utilisé pour le rapprochement automatique des paiements sortants."
+
+msgid ""
+"QR-bill method: SCOR = regular IBAN with RF creditor reference; QRR = QR-"
+"IBAN with 27-digit structured reference; NON = regular IBAN, without "
+"reference."
+msgstr ""
+"Méthode du bulletin QR : SCOR = IBAN classique avec référence créancier "
+"RF ; QRR = QR-IBAN avec référence structurée à 27 chiffres ; NON = IBAN "
+"classique, sans référence."
+
+msgid ""
+"QR-IBAN (institution identification between 30000 and 31999). Used "
+"exclusively to issue QR-bills with the QRR method. The regular IBAN "
+"remains used for payments (pain.001)."
+msgstr ""
+"QR-IBAN (identification d'institution comprise entre 30000 et 31999). "
+"Utilisée exclusivement pour l'émission de bulletins QR selon la méthode "
+"QRR. L'IBAN classique demeure utilisé pour les paiements (pain.001)."
+
+msgid ""
+"Active QR-bill reference (QRR or SCOR depending on the receiving account "
+"method). Unified field read by the print format and by bank "
+"reconciliation."
+msgstr ""
+"Référence active du bulletin QR (QRR ou SCOR selon la méthode du compte "
+"de réception). Champ unifié lu par le format d'impression et par le "
+"rapprochement bancaire."
+
+msgid "Method frozen on the invoice at issuance time (QRR/SCOR/NON)."
+msgstr "Méthode figée sur la facture au moment de l'émission (QRR/SCOR/NON)."
+
+msgid ""
+"Receiving IBAN frozen at issuance time (QR-IBAN for the QRR method, "
+"regular IBAN otherwise). Ensures identical reprinting even if the account"
+" configuration changes later."
+msgstr ""
+"IBAN de réception figé au moment de l'émission (QR-IBAN pour la méthode "
+"QRR, IBAN classique sinon). Garantit une réimpression à l'identique même "
+"en cas de modification ultérieure de la configuration du compte."
+

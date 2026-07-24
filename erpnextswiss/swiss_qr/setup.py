@@ -27,10 +27,10 @@ QR_CUSTOM_FIELDS = {
 			"default": "SCOR",
 			"insert_after": "bic",
 			"description": (
-				"Méthode du bulletin QR (comme bexio) : "
-				"SCOR = IBAN classique + référence créancier RF ; "
-				"QRR = QR-IBAN + référence 27 chiffres ; "
-				"NON = IBAN classique, sans référence."
+				"QR-bill method: "
+				"SCOR = regular IBAN with RF creditor reference; "
+				"QRR = QR-IBAN with 27-digit structured reference; "
+				"NON = regular IBAN, without reference."
 			),
 		},
 		{
@@ -41,9 +41,9 @@ QR_CUSTOM_FIELDS = {
 			"depends_on": "eval:doc.qr_method=='QRR'",
 			"mandatory_depends_on": "eval:doc.qr_method=='QRR'",
 			"description": (
-				"IBAN-QR (5e caractère de l'institution = 3). Utilisée UNIQUEMENT "
-				"pour émettre des QR-factures QRR. L'IBAN classique ci-dessus reste "
-				"utilisé pour les paiements (pain.001) — jamais la QR-IBAN."
+				"QR-IBAN (institution identification between 30000 and 31999). "
+				"Used exclusively to issue QR-bills with the QRR method. The regular "
+				"IBAN remains used for payments (pain.001)."
 			),
 		},
 	],
@@ -55,9 +55,9 @@ QR_CUSTOM_FIELDS = {
 			"read_only": 1,
 			"insert_after": "reference_number",
 			"description": (
-				"Référence active du bulletin QR (QRR ou SCOR selon la méthode du "
-				"compte de réception). Champ unifié lu par le print format et par le "
-				"rapprochement bancaire."
+				"Active QR-bill reference (QRR or SCOR depending on the receiving "
+				"account method). Unified field read by the print format and by bank "
+				"reconciliation."
 			),
 		},
 		{
@@ -66,7 +66,7 @@ QR_CUSTOM_FIELDS = {
 			"fieldtype": "Data",
 			"read_only": 1,
 			"insert_after": "qr_reference",
-			"description": "Snapshot de la méthode utilisée sur cette facture (QRR/SCOR/NON).",
+			"description": "Method frozen on the invoice at issuance time (QRR/SCOR/NON).",
 		},
 		{
 			"fieldname": "qr_account_iban",
@@ -75,9 +75,9 @@ QR_CUSTOM_FIELDS = {
 			"read_only": 1,
 			"insert_after": "qr_reference_type",
 			"description": (
-				"Snapshot de l'IBAN de réception au moment de l'émission (QR-IBAN si "
-				"QRR, sinon IBAN classique). Garantit une réimpression à l'identique "
-				"même si la config du compte change ensuite."
+				"Receiving IBAN frozen at issuance time (QR-IBAN for the QRR method, "
+				"regular IBAN otherwise). Ensures identical reprinting even if the "
+				"account configuration changes later."
 			),
 		},
 	],

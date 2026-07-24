@@ -119,6 +119,7 @@ def _parse_entry(ntry, account_currency):
 	reference = None
 	party_name = None
 	party_iban = None
+	pmtinfid = None
 	orig_ccy = None
 	orig_amount = None
 	xchg_rate = None
@@ -138,6 +139,9 @@ def _parse_entry(ntry, account_currency):
 			else:
 				party_name = _text(rlt, "Dbtr", "Nm") or _text(rlt, "Dbtr", "Pty", "Nm")
 				party_iban = _text(rlt, "DbtrAcct", "Id", "IBAN")
+			# PmtInfId : identifiant du bloc de paiement de TON pain.001 (UBS le
+			# renvoie dans Refs/PmtInfId) -> bouclage des paiements sortants.
+			pmtinfid = _text(txdtls, "Refs", "PmtInfId")
 		# FX : on cherche, dans les détails, le premier montant dont la devise
 		# diffère de celle du compte (= le montant d'origine, ex. EUR).
 		for amt_e in _iter(txdtls, "Amt"):
@@ -181,6 +185,7 @@ def _parse_entry(ntry, account_currency):
 		"transaction_id": transaction_id,
 		"party_name": party_name,
 		"party_iban": party_iban,
+		"pmtinfid": pmtinfid,
 		# FX : renseigné seulement si devise d'origine != devise du compte
 		"original_currency": orig_ccy if (orig_ccy and orig_ccy != booked_ccy) else None,
 		"original_amount": orig_amount if (orig_ccy and orig_ccy != booked_ccy) else None,
@@ -214,7 +219,7 @@ def create_bank_transactions(statements, fallback_bank_account=None):
 				skipped.append(t["transaction_id"])
 				continue
 			try:
-				bt = frappe.get_doc({
+				values = {
 					"doctype": "Bank Transaction",
 					"date": t["date"],
 					"bank_account": bank_account,
@@ -232,7 +237,15 @@ def create_bank_transactions(statements, fallback_bank_account=None):
 					"original_currency": t["original_currency"],
 					"original_amount": t["original_amount"],
 					"bank_exchange_rate": t["bank_exchange_rate"],
-				})
+				}
+				# enrichissement rapprochement : PmtInfId + résolution du tiers
+				# (silencieux si non résolu ou si les champs custom sont absents)
+				try:
+					from erpnextswiss.treasury.reconcile_enrich import enrich_bank_transaction_values
+					enrich_bank_transaction_values(values, t)
+				except Exception:
+					frappe.log_error(frappe.get_traceback(), "Treasury reconcile enrich")
+				bt = frappe.get_doc(values)
 				bt.insert(ignore_permissions=True)
 				bt.submit()
 				created.append(bt.name)
