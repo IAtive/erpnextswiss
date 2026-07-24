@@ -134,7 +134,7 @@ def add_payment_proposal_to_alyf_sidebar():
 # encaissements clients se rapprochent automatiquement par la référence QR.
 ALYF_REFERENCE_FIELDS = {
 	"Sales Invoice": "qr_reference",
-	# "Purchase Invoice": "esr_reference_number",  # achats : à activer plus tard
+	"Purchase Invoice": "esr_reference_number",
 }
 
 
