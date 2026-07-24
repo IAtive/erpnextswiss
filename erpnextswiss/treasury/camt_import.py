@@ -13,12 +13,27 @@
 #   3. Accepte un ZIP de plusieurs camt (routés par IBAN) ou un seul XML.
 
 import io
+import re
 import zipfile
 import hashlib
 from xml.etree import ElementTree as ET
 
 import frappe
 from frappe import _
+
+
+def _is_structured_ref(reference):
+	"""True si la référence est une référence structurée QR-bill (QRR ou SCOR).
+
+	QRR = 26-27 chiffres (éventuellement espacés). SCOR/RF = 'RF' + 2 chiffres + corps.
+	On nettoie les espaces AVANT de tester pour couvrir les deux formats espacés.
+	"""
+	compact = re.sub(r"\s", "", reference or "")
+	if re.fullmatch(r"\d{26,27}", compact):          # QRR
+		return True
+	if re.fullmatch(r"RF\d{2}[0-9A-Za-z]{1,21}", compact):  # SCOR (ISO 11649)
+		return True
+	return False
 
 
 # ---------------------------------------------------------------------------
@@ -147,6 +162,11 @@ def _parse_entry(ntry, account_currency):
 		xchg_rate = round(abs(booked_amount) / abs(orig_amount), 9)
 
 	reference = reference or acct_svcr_ref
+	# normalisation : QRR/SCOR sans espaces internes -> égalité EXACTE avec
+	# Sales Invoice.qr_reference (stocké sans espaces) côté matching ALYF.
+	# Certaines banques livrent la référence structurée espacée -> on nettoie.
+	if reference and _is_structured_ref(reference):
+		reference = re.sub(r"\s", "", reference)
 
 	# transaction_id stable pour la déduplication
 	basis = acct_svcr_ref or "{0}|{1}|{2}|{3}".format(date, booked_amount, cdtdbt, reference)

@@ -103,29 +103,75 @@ def add_payment_proposal_to_alyf_sidebar():
 	frappe.db.commit()
 
 
-# Traductions de NOS libellés custom (sources en anglais dans les JS).
-# En v15, le format translations/*.csv n'est plus lu -> on passe par le doctype
-# Translation (chargé en dernier = priorité max). Idempotent.
-TRANSLATION_OVERRIDES = [
-	{"language": "fr", "source_text": "Import camt / ZIP", "translated_text": "Importer camt / ZIP"},
-	# ajouter ici les autres libellés custom + langues (de, it, ...)
-]
+# NB : les traductions des libellés custom (« Import camt / ZIP », etc.) ne sont
+# plus gérées ici via le doctype Translation. Elles vivent dans les fichiers
+# erpnextswiss/locale/*.po (mécanisme standard Frappe, livré avec le fork).
 
 
-def apply_translation_overrides():
-	for t in TRANSLATION_OVERRIDES:
-		if not frappe.db.exists("Translation", {"language": t["language"], "source_text": t["source_text"]}):
-			frappe.get_doc({"doctype": "Translation", **t}).insert(ignore_permissions=True)
-	frappe.db.commit()
+# Mapping de référence pour le rapprochement ALYF : {document_type: field_name}.
+# ALYF (Banking Settings.reference_fields -> get_reference_field_map) compare
+# Bank Transaction.reference_number à ce champ du document. On pointe la Sales
+# Invoice sur qr_reference (QRR/SCOR unifié, stocké sans espaces) -> les
+# encaissements clients se rapprochent automatiquement par la référence QR.
+ALYF_REFERENCE_FIELDS = {
+	"Sales Invoice": "qr_reference",
+	# "Purchase Invoice": "esr_reference_number",  # achats : à activer plus tard
+}
+
+
+# Types de documents pré-activés par défaut dans l'onglet de rapprochement ALYF
+# (Banking Settings.voucher_matching_defaults). Vente + achat = les pièces qu'on
+# rapproche principalement.
+ALYF_VOUCHER_DEFAULTS = ["Sales Invoice", "Purchase Invoice"]
+
+
+def configure_alyf_reference_fields():
+	"""Ajoute nos mappings de référence à Banking Settings, idempotent.
+
+	N'écrase JAMAIS un mapping existant pour un document_type déjà configuré
+	(respect d'un choix manuel de l'utilisateur). N'ajoute que ce qui manque.
+	"""
+	if not frappe.db.exists("DocType", "Banking Reference Mapping"):
+		return
+	settings = frappe.get_single("Banking Settings")
+	existing = {row.document_type for row in settings.get("reference_fields", [])}
+	changed = False
+	for doctype, field_name in ALYF_REFERENCE_FIELDS.items():
+		if doctype in existing:
+			continue  # déjà configuré (peut-être manuellement) -> on ne touche pas
+		settings.append("reference_fields", {"document_type": doctype, "field_name": field_name})
+		changed = True
+	if changed:
+		settings.flags.ignore_permissions = True
+		settings.save(ignore_permissions=True)
+
+
+def configure_alyf_voucher_defaults():
+	"""Pré-active Facture de vente + Facture d'achat dans le rapprochement ALYF.
+
+	Même philosophie que le patch ALYF (set_voucher_matching_defaults) : on ne
+	peuple QUE si la liste est vide -> un choix manuel (même partiel) est respecté,
+	et un fresh install obtient bien les deux types par défaut.
+	"""
+	if not frappe.db.exists("DocType", "Voucher Matching Default"):
+		return
+	settings = frappe.get_single("Banking Settings")
+	if settings.get("voucher_matching_defaults"):
+		return  # déjà configuré (ALYF ou manuel) -> on ne touche pas
+	for doctype in ALYF_VOUCHER_DEFAULTS:
+		settings.append("voucher_matching_defaults", {"document_type": doctype})
+	settings.flags.ignore_permissions = True
+	settings.save(ignore_permissions=True)
 
 
 def after_migrate():
-	"""Hook after_migrate : traductions custom + (si banking) champs FX & menu ALYF."""
+	"""Hook after_migrate : (si banking) champs FX, menu ALYF & mapping de référence."""
 	from erpnextswiss.treasury.utils import is_banking_installed
 
-	apply_translation_overrides()
 	if not is_banking_installed():
 		return
 	create_custom_fields(FX_CUSTOM_FIELDS, ignore_validate=True)
 	add_payment_proposal_to_alyf_sidebar()
+	configure_alyf_reference_fields()
+	configure_alyf_voucher_defaults()
 	frappe.db.commit()
