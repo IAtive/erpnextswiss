@@ -55,8 +55,9 @@ In case you update from the sources and observe an error, make sure to update de
     * Bank import: allows to import bank account statements to update local payment entries (receiving; csv or camt)
     * Match payments: match unpaid sales invoices with the corresponding payments
     * Payment export: allows to create payment files for banks (pain.001) from payment entries (paying)
-    * QR invoices and ESR invoices: outgoing (sales invoices) as well as incoming (scan purchase invoices); QR invoice supports ESR/NON/SCOR
+    * QR invoices and ESR invoices: outgoing (sales invoices) as well as incoming (scan purchase invoices); QR invoice supports QRR/SCOR/NON per receiving account, generated locally (no external service) — see [docs/swiss_qr_bill.md](docs/swiss_qr_bill.md)
     * QR invoices It supports the generation of a reference number based on the Creditor Reference standard (ISO 11649)
+    * camt.053 import (XML/ZIP) with FX handling, party resolution and QR-reference matching, with or without the ALYF Banking app — see [docs/bank_reconciliation.md](docs/bank_reconciliation.md)
     * ZUGFeRD: fully electronic invoices.
     * ZUGFeRD Wizard: read and interpret both ZUGFeRD and QR-invoices to purchase invoices
 * Taxes

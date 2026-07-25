@@ -288,6 +288,129 @@ les cas qui ne rentrent pas dans une facture : **prestations à soi-même / part
   helper `Ctx.make_journal_entry`.
 - **Phase 1** = cases d'impôt/correction (410/415/420). Extensible (cocher `je_taggable`) sans re-coder.
 
+---
+
+## 12. Bulletin QR local & configuration par compte (module `Swiss QR`)
+
+Nouveau module `swiss_qr/` : la QR-facture suisse était générée par un **service PHP externe**
+(`data.libracore.ch` / `qr-code.2itea.global`, dont un en **HTTP simple**), qui recevait IBAN, montant et
+adresses en clair à chaque impression, sans repli. Le fork **remplace ce service par un rendu LOCAL** et
+**explicite le choix de méthode** (comme bexio), tout en supprimant l'ambiguïté QR-IBAN / IBAN classique.
+Détail utilisateur : `docs/swiss_qr_bill.md`.
+
+### 12.1 Trois méthodes explicites par compte (comme bexio)
+Custom fields sur **`Account`** (`swiss_qr/setup.py`) : **`qr_method`** (Select `SCOR`/`QRR`/`NON`, défaut SCOR),
+**`qr_iban`** (QR-IBAN, visible/obligatoire si QRR).
+- **SCOR** = IBAN classique + référence créancier RF (ISO 11649).
+- **QRR** = QR-IBAN + référence structurée à 27 chiffres.
+- **NON** = IBAN classique, sans référence.
+- **Séparation stricte** : `iban` (classique) reste dédié aux **paiements** (pain.001 débiteur, prélèvement,
+  e-facture) ; `qr_iban` sert **uniquement** à l'émission QRR. Fin du conflit « une QR-IBAN dans `iban`
+  casse le débiteur du pain.001 ».
+
+### 12.2 Génération serveur de la référence (`references.py`)
+`doc_event` **Sales Invoice.validate** (`set_qr_reference`) — remplace l'ancienne génération cliente `onload`
+(RF aléatoire, non conditionnel, cassée pour QRR). Selon `qr_method` du compte de réception
+(`Company.default_bank_account`) : QRR via `esr_qr_tools.add_check_digit_to_esr_reference` (27 chiffres),
+SCOR via `common_functions.get_scor_reference` (RF). Champ **unifié `qr_reference`** (stocké **sans espaces**)
+lu par le print format et le rapprochement ; champs legacy (`esr_reference`/`reference_number`) alimentés en
+miroir. **Immutabilité** : `qr_reference_type` + `qr_account_iban` figés à l'émission → une facture émise se
+réimprime à l'identique même si la config du compte change ensuite.
+
+### 12.3 Rendu local via `qrbill` (`render.py`)
+Méthode Jinja **`get_qr_bill_svg`** (dépendance `qrbill>=1.2`, ajoutée au `pyproject.toml`) : dessine le
+bulletin complet (récépissé + section paiement) en **SVG**, **aucune requête réseau**. Lit le **snapshot** de
+la facture (repli config live pour les factures antérieures) ; **langue** = sélecteur d'impression
+(`frappe.local.lang`, en/de/fr/it, repli anglais) ; débiteur optionnel si adresse client incomplète ;
+encart d'erreur lisible (jamais de crash). Validation métier gratuite (qrbill refuse QRR sur IBAN normal).
+
+### 12.4 Garde-fous & migration (`validation.py`)
+`doc_event` **Account.validate** : rejette une QR-IBAN dans le champ `iban`, un `qr_iban` non-QR-IBAN
+(institution hors 30000–31999), une méthode QRR sans `qr_iban`. Migration idempotente
+(`migrate_classic_qr_iban`) : déplace toute QR-IBAN mal placée `iban` → `qr_iban` et bascule en QRR.
+
+### 12.5 Print format unique & suppression des formats externes
+Nouveau **« Swiss QR Invoice »** (`print_format/swiss_qr_invoice/`, type Jinja) : facture + bulletin QR local,
+branché sur `qr_method`. **Supprimés** : `qr_sales_invoice/` (QRR cassé : envoyait `doc.name`),
+`qr_sales_invoice_switzerland_rounding_description_details/` (SCOR externe) et le template mort
+`templates/qrr_invoice/`.
+
+## 13. Import camt & enrichissement du rapprochement (module `Treasury`)
+
+Nouveau module `treasury/` : import de relevés **camt.053** autonome (parser ElementTree, **sans licence
+fintech**), correct en **multidevises**, avec enrichissement des Bank Transactions pour le rapprochement.
+Détail utilisateur : `docs/bank_reconciliation.md`.
+
+### 13.1 Import camt.053 / ZIP avec FX correct (`camt_import.py`)
+`upload_camt_file` (ZIP multi-relevés ou XML, routage par IBAN) crée des **Bank Transaction natives**.
+- **Montant/devise TOUJOURS en devise du compte** (montant BOOKÉ `<Ntry><Amt>`) → plus d'erreur
+  « Transaction currency EUR cannot be different from CHF ».
+- **Champs FX** (custom fields sur Bank Transaction) : `original_currency`, `original_amount`,
+  `bank_exchange_rate` renseignés quand la devise d'origine ≠ devise du compte (taux `<XchgRate>`, sinon
+  dérivé booké/origine).
+- **Priorité de référence** : QRR structurée (`RmtInf/Strd/CdtrRefInf/Ref`) > `EndToEndId` > `AcctSvcrRef`.
+- **Normalisation** : une référence structurée (QRR/SCOR) est stockée **sans espaces** → égalité exacte avec
+  `qr_reference` / `esr_reference_number` côté matching. Déduplication par `transaction_id` (md5 stable).
+
+### 13.2 Enrichissement : tiers & PmtInfId (`reconcile_enrich.py`)
+À l'import, pose `party_type`/`party` sur la Bank Transaction (aide le classement ALYF, utile même **sans**
+référence) :
+- **`resolve_party`** : IBAN de la contrepartie → Bank Account → tiers ; **fallback nom EXACT unique** selon
+  le sens (CRDT → Customer, DBIT → Supplier). Constat terrain : les banques omettent souvent l'IBAN du
+  **débiteur** sur les encaissements → le fallback nom est indispensable côté ventes. Jamais de résolution
+  ambiguë (aucun fuzzy).
+- **`resolve_pmtinfid`** : `Refs/PmtInfId` (custom field `treasury_pmtinfid`) ; format `PMTINF-{proposal}-{n}`
+  → Payment Proposal → Payment Entry (départagé par montant) → bouclage des **paiements sortants** émis via
+  le Payment Proposal ERPNextSwiss.
+
+### 13.3 Réconciliation FX au taux banque (`fx_reconcile.py`)
+`reconcile_at_bank_rate` + bouton `bank_transaction.js` : pour une transaction FX enrichie, crée le Payment
+Entry alloué à la facture **au taux exact de la banque** → écart de change auto en **6999**, sans saisie de
+taux. Doc_event `payment_entry_apply_bank_fx` (validate) pour un paiement on-account issu d'une transaction FX.
+
+## 14. Intégration ALYF Banking (module `Treasury`, gardé `is_banking_installed`)
+
+Glue **non-invasive** entre ERPNextSwiss et l'app ALYF Banking (aucune modif des fichiers ALYF) :
+- **Config auto** (`after_migrate`, idempotente) : `Banking Settings.reference_fields`
+  (**Sales Invoice → `qr_reference`**, **Purchase Invoice → `esr_reference_number`**) pour le matching par
+  référence QR ; `voucher_matching_defaults` (**Facture de vente + d'achat** pré-activées).
+- **Upload camt** : les uploads court-circuitent `override_whitelisted_methods` → **monkeypatch** de
+  `banking.ebics.utils.upload_camt_file` au `boot_session` → l'écran ALYF utilise notre import FX/ZIP.
+- **UI** : boutons *Import camt / ZIP* et *Reconcile* sur l'écran de réconciliation ; lien *Payment Proposal*
+  auto-ajouté à la sidebar ALYF (re-posé après chaque migrate).
+- **Pré-remplissage du taux** : `get_reconcile_amount_context` injecte le taux banque dans le dialogue ALYF.
+- Tout est **gardé** `is_banking_installed()` → ERPNextSwiss reste autonome sans ALYF.
+
+## 15. e-facture ZUGFeRD — IBAN du compte de réception (`zugferd/zugferd_xml.py`)
+
+- **Problème** : l'IBAN de la e-facture était lu sur `sinv.debit_to` (compte de **créance** 1100, sans IBAN)
+  → balise `<IBANID>` **toujours vide** (le client n'avait pas l'IBAN pour payer).
+- **Correctif** : helper `_receiving_iban(company)` → IBAN classique du **compte de réception**
+  (`Company.default_bank_account`), jamais la QR-IBAN (une e-facture ZUGFeRD/Factur-X est SEPA).
+- Cohérence avec le bulletin QR (§12) : les deux pointent le compte de réception, chacun avec le bon IBAN.
+
+## 16. Internationalisation — mécanisme `.po` (`locale/`)
+
+Le format `translations/*.csv` n'est **plus lu** en v15+. Le fork migre vers le mécanisme **`.po` standard** :
+- `migrate-csv-to-po` + merge : **revival** des ~600 traductions de/fr existantes (auparavant inertes).
+- **Sources anglaises** dans le code (`_()` Python, `__()` JS, labels & descriptions de champs) ;
+  traductions **fr/de/it** dans `locale/{fr,de,it}.po` (+ `main.pot`).
+- Tous les messages des modules `swiss_qr`/`treasury` : sources anglaises **formelles et génériques** (aucune
+  référence produit/plateforme), traduits fr/de/it.
+- Workflow : `bench generate-pot-file` → `update-po-files` → remplir les `.po` → `compile-po-to-mo`
+  (+ `clear-cache` après déploiement).
+
+## 17. Scénarios de test — paiements & rapprochement (`swiss_vat_config/tests/`)
+
+Extension du framework de scénarios existant (même `runner.py` / `reset_test_company` / `Ctx`) :
+- **`scenarios_payments.py`** : 13 scénarios e2e (génération QR SCOR/QRR/NON, immutabilité, garde-fous de
+  validation, import camt normalisation/FX, enrichissement tiers/PmtInfId, matching vente & achat, IBAN
+  ZUGFeRD, config ALYF), découverts via `from scenarios_payments import *` dans `scenarios.py` (runner inchangé).
+- **`helpers.py`** : builder **`build_camt053`** (camt.053 minimal **anonymisé**, paramétrable), masters
+  bancaires de test (`ensure_payment_masters`), asserters `assert_field`/`assert_reject`/`assert_ref_match`,
+  `import_camt`. `runner.py` : `Bank Transaction` ajouté au reset transactionnel.
+- **Résultat** : **42/42** scénarios au vert (29 TVA existants + 13 paiement), aucune régression.
+
 ## Récapitulatif des fichiers du fork modifiés
 
 ```
@@ -320,7 +443,31 @@ erpnextswiss/erpnextswiss/doctype/swiss_exchange_rate_import_log/   # (§10) his
 erpnextswiss/erpnextswiss/doctype/swiss_exchange_rate_currency/     # (§10) child devises
 erpnextswiss/erpnextswiss/doctype/swiss_exchange_rate_import_row/   # (§10) child lignes (read-only)
 erpnextswiss/docs/                                             # (§9) doc rapatriée : ch_accounting_setup.md, swiss_exchange_rates.md
+pyproject.toml                                                 # (§12) + dépendance qrbill>=1.2
+erpnextswiss/hooks.py                                          # (§12/§13/§14) after_migrate swiss_qr/treasury ; doc_events Sales Invoice+Account ; jinja get_qr_bill_svg ; boot_session monkeypatch ; override get_reconcile_amount_context ; doctype_js/list_js Bank Transaction
+erpnextswiss/swiss_qr/                                         # (§12) config QR par compte, génération réf serveur, rendu qrbill local, validation, migration
+    setup.py · references.py · render.py · validation.py       #   champs · génération · SVG local · garde-fous
+erpnextswiss/erpnextswiss/print_format/swiss_qr_invoice/       # (§12) print format unique (Jinja + SVG local)
+erpnextswiss/treasury/                                         # (§13/§14) module rapprochement (gardé is_banking_installed pour la partie ALYF)
+    camt_import.py                                             #   import camt.053/ZIP, FX correct, normalisation réf, PmtInfId
+    reconcile_enrich.py                                        #   résolution tiers (IBAN/nom) + bouclage PmtInfId
+    fx_reconcile.py · overrides.py                             #   réconciliation au taux banque · monkeypatch upload + doc_event FX
+    setup.py · utils.py                                        #   champs FX/PmtInfId, config ALYF (reference_fields, voucher_defaults), sidebar
+erpnextswiss/public/js/bank_transaction.js                     # (§13) bouton « Reconcile at bank rate »
+erpnextswiss/public/js/bank_transaction_list.js               # (§13/§14) menu Import camt / ZIP
+erpnextswiss/public/js/bank_reconciliation_tool_beta.js       # (§14) boutons Import / Reconcile sur l'écran ALYF
+erpnextswiss/erpnextswiss/zugferd/zugferd_xml.py               # (§15) IBAN du compte de réception (au lieu de debit_to)
+erpnextswiss/public/js/sales_invoice.js                        # (§12) retrait génération cliente onload (→ serveur)
+erpnextswiss/locale/                                           # (§16) fr.po / de.po / it.po / main.pot (mécanisme .po)
+erpnextswiss/swiss_vat_config/tests/scenarios_payments.py     # (§17) 13 scénarios paiement & rapprochement
+erpnextswiss/swiss_vat_config/tests/helpers.py                # (§17) build_camt053, ensure_payment_masters, asserters paiement
+erpnextswiss/swiss_vat_config/tests/{scenarios.py,runner.py}  # (§17) wiring module frère + Bank Transaction au reset
+erpnextswiss/modules.txt                                       # (§13) + module « Treasury »
+erpnextswiss/docs/swiss_qr_bill.md · docs/bank_reconciliation.md  # (§12/§13) guides utilisateur
 (supprimés) erpnextswiss/doctype/contract{,_period,_service}/  # collision Contract natif
+(supprimés) erpnextswiss/erpnextswiss/print_format/qr_sales_invoice{,_switzerland_rounding_description_details}/  # (§12) formats QR externes
+(supprimés) erpnextswiss/templates/qrr_invoice/                # (§12) template QR externe mort
+(supprimés) erpnextswiss/translations/{fr,de}.csv              # (§16) migrés vers locale/*.po
 ```
 
 > Après toute modif de `.js` / `.html` / `.json` de doctype/page : `bench build --app erpnextswiss`
