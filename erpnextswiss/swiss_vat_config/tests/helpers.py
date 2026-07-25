@@ -462,3 +462,151 @@ class Ctx:
         ko = [r for r in rows if r["status"] == KO]
         self._rec("Plausibilité", "7 contrôles", "0 anomalie", f"{len(ko)} anomalie(s)",
                   len(ko) == 0, detail=" ; ".join(f"{r['item']} → {r['detail']}" for r in ko))
+
+    # ---- BUILDERS / ASSERTERS PAIEMENTS & RAPPROCHEMENT ----
+    # (Swiss QR : génération de référence & rendu · Treasury : import camt, enrichissement,
+    #  matching ALYF). Les asserters enregistrent (ne lèvent pas), comme les autres.
+
+    def set_qr_config(self, account_num, method, iban=None, qr_iban=None):
+        """Configure le compte de réception (écriture directe : ne déclenche PAS la
+        validation, pour poser un état arbitraire sans blocage). Positionne aussi
+        company.default_bank_account sur ce compte (lu par la génération QR)."""
+        acc = _acc(self.company, account_num)
+        vals = {"qr_method": method}
+        if iban is not None:
+            vals["iban"] = iban
+        if qr_iban is not None:
+            vals["qr_iban"] = qr_iban
+        frappe.db.set_value("Account", acc, vals, update_modified=False)
+        frappe.db.set_value("Company", self.company, "default_bank_account", acc)
+        frappe.db.commit()
+        return acc
+
+    def assert_field(self, doc, field, expected):
+        """Vérifie la valeur d'un champ (relit le doc en base pour l'état persisté)."""
+        dt = doc.doctype if hasattr(doc, "doctype") else doc[0]
+        name = doc.name if hasattr(doc, "name") else doc[1]
+        val = frappe.db.get_value(dt, name, field)
+        self._rec("Champ", field, expected, val, val == expected)
+        return val
+
+    def assert_reject(self, target, fn):
+        """Vérifie que `fn()` lève une ValidationError (garde-fous de validation)."""
+        raised = False
+        try:
+            fn()
+        except frappe.ValidationError:
+            raised = True
+        except Exception:
+            raised = False
+        self._rec("Rejet", target, "rejeté", "rejeté" if raised else "accepté", raised)
+
+    def import_camt(self, xml_bytes):
+        """Importe un camt (bytes) via Treasury et renvoie la liste des Bank Transaction créées."""
+        from erpnextswiss.treasury.camt_import import import_zip_or_xml
+        res = import_zip_or_xml(xml_bytes)
+        return [frappe.get_doc("Bank Transaction", n) for n in res.get("created", [])]
+
+    def bt_by_reference(self, bts, ref):
+        """Retrouve la Bank Transaction dont reference_number == ref (ou None)."""
+        return next((b for b in bts if b.reference_number == ref), None)
+
+    def assert_ref_match(self, bt, invoice, invoice_field):
+        """Cœur du matching ALYF : égalité EXACTE BT.reference_number == invoice[field]."""
+        bt_ref = bt.reference_number if bt else None
+        inv_ref = frappe.db.get_value(invoice.doctype, invoice.name, invoice_field)
+        ok = bool(bt_ref) and bt_ref == inv_ref
+        self._rec("Match", invoice_field, inv_ref, bt_ref, ok)
+
+    def make_purchase_invoice_qr(self, supplier, net, esr_reference, expense="4200"):
+        """Facture d'achat portant la référence QR/ESR du fournisseur (comme après un scan)."""
+        pi = self.make_purchase_invoice(supplier, net=net, expense=expense)
+        frappe.db.set_value("Purchase Invoice", pi.name, "esr_reference_number", esr_reference)
+        pi.reload()
+        return pi
+
+
+# --- Masters PAIEMENTS : Bank + Bank Account de test (routage camt) ------------
+# IBAN de test (format valide) : normal (institution 00762) vs QR-IBAN (institution 31999).
+TEST_IBAN_NORMAL = "CH9300762011623852957"
+TEST_QR_IBAN = "CH4431999123000889012"
+TEST_BANK = "SCEN Test Bank"
+
+
+def ensure_payment_masters(company):
+    """Crée la banque + le Bank Account de test (IBAN normal) routant vers le compte 1020.
+    Idempotent. Nécessaire pour que l'import camt trouve un Bank Account par IBAN."""
+    if not frappe.db.exists("Bank", TEST_BANK):
+        frappe.get_doc({"doctype": "Bank", "bank_name": TEST_BANK}).insert(ignore_permissions=True)
+    gl_1020 = _acc(company, "1020")
+    ba_name = frappe.db.get_value("Bank Account", {"iban": TEST_IBAN_NORMAL, "company": company})
+    if not ba_name:
+        # is_company_account=0 : évite la validation d'unicité du compte GL (1020 est déjà
+        # rattaché à un autre Bank Account). _get_bank_account retombe sur l'IBAN de toute
+        # façon ; `account` reste renseigné pour dériver la devise du compte à l'import.
+        frappe.get_doc({
+            "doctype": "Bank Account", "account_name": "SCEN Bank CHF",
+            "bank": TEST_BANK, "company": company, "iban": TEST_IBAN_NORMAL,
+            "account": gl_1020, "is_company_account": 0,
+        }).insert(ignore_permissions=True)
+    frappe.db.commit()
+
+
+def build_camt053(entries, account_iban=TEST_IBAN_NORMAL, account_ccy="CHF"):
+    """Construit un camt.053 minimal (bytes) compatible avec treasury.camt_import.
+
+    entries : liste de dicts, clés : amount, cd ('CRDT'/'DBIT'), ref (Strd),
+      end_to_end, pmtinfid, party (Nm), party_iban, orig_ccy, orig_amount,
+      xchg_rate, date. Toutes optionnelles sauf amount + cd.
+    """
+    import html as _html
+
+    def esc(v):
+        return _html.escape(str(v)) if v is not None else ""
+
+    ntries = []
+    for i, e in enumerate(entries):
+        cd = e.get("cd", "CRDT")
+        date = e.get("date", DATE)
+        refs = ["<AcctSvcrRef>%s</AcctSvcrRef>" % esc(e.get("acct_svcr_ref", "SCEN%03d" % i))]
+        if e.get("end_to_end"):
+            refs.append("<EndToEndId>%s</EndToEndId>" % esc(e["end_to_end"]))
+        if e.get("pmtinfid"):
+            refs.append("<PmtInfId>%s</PmtInfId>" % esc(e["pmtinfid"]))
+        rmt = ""
+        if e.get("ref"):
+            rmt = ("<RmtInf><Strd><CdtrRefInf><Ref>%s</Ref></CdtrRefInf></Strd></RmtInf>"
+                   % esc(e["ref"]))
+        parties = ""
+        if e.get("party") or e.get("party_iban"):
+            role = "Cdtr" if cd == "DBIT" else "Dbtr"
+            acct = "CdtrAcct" if cd == "DBIT" else "DbtrAcct"
+            nm = "<%s><Nm>%s</Nm></%s>" % (role, esc(e.get("party", "")), role) if e.get("party") else ""
+            ib = ("<%s><Id><IBAN>%s</IBAN></Id></%s>" % (acct, esc(e["party_iban"]), acct)
+                  if e.get("party_iban") else "")
+            parties = "<RltdPties>%s%s</RltdPties>" % (nm, ib)
+        fx = ""
+        if e.get("orig_ccy") and e.get("orig_amount") is not None:
+            fx += ('<AmtDtls><InstdAmt><Amt Ccy="%s">%s</Amt></InstdAmt></AmtDtls>'
+                   % (esc(e["orig_ccy"]), esc(e["orig_amount"])))
+        if e.get("xchg_rate") is not None:
+            fx += "<XchgRate>%s</XchgRate>" % esc(e["xchg_rate"])
+        ntries.append(
+            '<Ntry>'
+            '<Amt Ccy="%s">%s</Amt>'
+            '<CdtDbtInd>%s</CdtDbtInd>'
+            '<Sts>BOOK</Sts>'
+            '<BookgDt><Dt>%s</Dt></BookgDt>'
+            '<NtryDtls><TxDtls><Refs>%s</Refs>%s%s%s</TxDtls></NtryDtls>'
+            '</Ntry>'
+            % (account_ccy, esc(e["amount"]), cd, date, "".join(refs), fx, rmt, parties)
+        )
+    xml = (
+        '<?xml version="1.0" encoding="UTF-8"?>'
+        '<Document><BkToCstmrStmt><Stmt>'
+        '<Acct><Id><IBAN>%s</IBAN></Id><Ccy>%s</Ccy></Acct>'
+        '%s'
+        '</Stmt></BkToCstmrStmt></Document>'
+        % (account_iban, account_ccy, "".join(ntries))
+    )
+    return xml.encode("utf-8")

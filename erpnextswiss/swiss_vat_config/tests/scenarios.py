@@ -671,3 +671,9 @@ def scenario_correction_tva_ecriture(ctx):
     ctx.make_journal_entry(box="415", tag_account="1174", amount=162)
     ctx.assert_vat(tax={"415": 162, "400": 0})   # le tag alimente 415, PAS 400
     ctx.assert_plausibilite_ok()
+
+
+# --- Scénarios PAIEMENTS & RAPPROCHEMENT (module frère) -----------------------
+# Importés ici pour que le runner (dir(scenarios)) les découvre automatiquement,
+# sans modifier runner.py. Voir scenarios_payments.py.
+from erpnextswiss.swiss_vat_config.tests.scenarios_payments import *  # noqa: F401,F403,E402

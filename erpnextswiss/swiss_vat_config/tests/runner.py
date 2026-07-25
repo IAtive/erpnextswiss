@@ -20,9 +20,9 @@ import frappe
 from erpnextswiss.swiss_vat_config.tests.helpers import Ctx, ensure_masters
 
 # pièces transactionnelles créées par les scénarios (ordre d'annulation : dépendances d'abord)
-_TXN_DOCTYPES = ["Period Closing Voucher", "Payment Entry", "Sales Invoice", "Purchase Invoice",
-                 "Exchange Rate Revaluation", "Journal Entry", "Delivery Note", "Purchase Receipt",
-                 "Stock Entry", "VAT Declaration"]
+_TXN_DOCTYPES = ["Period Closing Voucher", "Bank Transaction", "Payment Entry", "Sales Invoice",
+                 "Purchase Invoice", "Exchange Rate Revaluation", "Journal Entry", "Delivery Note",
+                 "Purchase Receipt", "Stock Entry", "VAT Declaration"]
 
 
 def reset_test_company(company):
