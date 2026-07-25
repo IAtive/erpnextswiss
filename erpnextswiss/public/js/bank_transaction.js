@@ -15,7 +15,7 @@ frappe.ui.form.on("Bank Transaction", {
 		if (!doc.bank_exchange_rate) return;
 
 		frm.add_custom_button(
-			__("Rapprocher au taux banque"),
+			__("Reconcile at bank rate"),
 			() => open_bank_rate_dialog(frm),
 			__("Actions")
 		);
@@ -27,22 +27,22 @@ function open_bank_rate_dialog(frm) {
 	const default_type = is_pay ? "Purchase Invoice" : "Sales Invoice";
 
 	const d = new frappe.ui.Dialog({
-		title: __("Rapprocher au taux banque"),
+		title: __("Reconcile at bank rate"),
 		fields: [
 			{
 				fieldname: "info",
 				fieldtype: "HTML",
-				options: `<div class="text-muted small">${__("Montant compte")}: <b>${
+				options: `<div class="text-muted small">${__("Account amount")}: <b>${
 					frm.doc.currency
-				} ${flt(frm.doc.withdrawal || frm.doc.deposit)}</b> · ${__("Origine")}: <b>${
+				} ${flt(frm.doc.withdrawal || frm.doc.deposit)}</b> · ${__("Original")}: <b>${
 					frm.doc.original_amount || ""
-				} ${frm.doc.original_currency || ""}</b> · ${__("Taux banque")}: <b>${
+				} ${frm.doc.original_currency || ""}</b> · ${__("Bank rate")}: <b>${
 					frm.doc.bank_exchange_rate
 				}</b></div>`,
 			},
 			{
 				fieldname: "voucher_type",
-				label: __("Type de pièce"),
+				label: __("Voucher type"),
 				fieldtype: "Select",
 				options: "Purchase Invoice\nSales Invoice",
 				default: default_type,
@@ -50,14 +50,14 @@ function open_bank_rate_dialog(frm) {
 			},
 			{
 				fieldname: "voucher",
-				label: __("Facture"),
+				label: __("Invoice"),
 				fieldtype: "Dynamic Link",
 				options: "voucher_type",
 				reqd: 1,
 				get_query: () => ({ filters: { docstatus: 1, outstanding_amount: [">", 0] } }),
 			},
 		],
-		primary_action_label: __("Rapprocher"),
+		primary_action_label: __("Reconcile"),
 		primary_action(values) {
 			frappe.call({
 				method: "erpnextswiss.treasury.fx_reconcile.reconcile_at_bank_rate",
@@ -67,11 +67,11 @@ function open_bank_rate_dialog(frm) {
 					voucher_name: values.voucher,
 				},
 				freeze: true,
-				freeze_message: __("Création du paiement au taux banque..."),
+				freeze_message: __("Creating payment at bank rate..."),
 				callback(r) {
 					if (r.message) {
 						frappe.show_alert({
-							message: __("Rapproché via {0}", [r.message.payment_entry]),
+							message: __("Reconciled via {0}", [r.message.payment_entry]),
 							indicator: "green",
 						});
 						d.hide();

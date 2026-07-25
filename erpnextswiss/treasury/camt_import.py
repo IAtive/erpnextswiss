@@ -208,7 +208,7 @@ def create_bank_transactions(statements, fallback_bank_account=None):
 	for stmt in statements:
 		bank_account = _get_bank_account(stmt.get("iban")) or fallback_bank_account
 		if not bank_account:
-			errors.append(_("Aucun Bank Account pour l'IBAN {0}").format(stmt.get("iban")))
+			errors.append(_("No Bank Account found for IBAN {0}.").format(stmt.get("iban")))
 			continue
 		company = frappe.db.get_value("Bank Account", bank_account, "company")
 		account_currency = frappe.db.get_value(
@@ -282,9 +282,9 @@ def upload_camt(fallback_bank_account=None):
 	"""Endpoint d'upload : ZIP ou XML, via le fichier joint à la requête."""
 	from erpnextswiss.treasury.utils import is_banking_installed
 	if not is_banking_installed():
-		frappe.throw(_("L'app banking (ALYF) n'est pas installée."))
+		frappe.throw(_("The ALYF Banking app is not installed."))
 	files = frappe.request.files
 	if not files or "file" not in files:
-		frappe.throw(_("Aucun fichier fourni."))
+		frappe.throw(_("No file provided."))
 	content = files["file"].read()
 	return import_zip_or_xml(content, fallback_bank_account=fallback_bank_account)

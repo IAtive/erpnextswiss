@@ -21,7 +21,7 @@ def reconcile_at_bank_rate(bank_transaction_name, voucher_type, voucher_name):
 
 	bt = frappe.get_doc("Bank Transaction", bank_transaction_name)
 	if bt.docstatus != 1:
-		frappe.throw(_("La transaction bancaire doit être soumise."))
+		frappe.throw(_("The bank transaction must be submitted."))
 
 	company_bank_account = frappe.db.get_value("Bank Account", bt.bank_account, "account")
 	bank_amount = flt(bt.withdrawal) or flt(bt.deposit)

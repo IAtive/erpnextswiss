@@ -22,19 +22,19 @@ function open_treasury_camt_import(on_done) {
 		[
 			{
 				fieldname: "bank_account",
-				label: __("Compte bancaire (fallback)"),
+				label: __("Fallback bank account"),
 				fieldtype: "Link",
 				options: "Bank Account",
 				reqd: 0,
 				description: __(
-					"Optionnel : utilisé seulement si l'IBAN du fichier ne correspond à aucun compte."
+					"Optional: used only if the file IBAN does not match any account."
 				),
 			},
 		],
 		(values) => {
 			const uploader = new frappe.ui.FileUploader({
-				dialog_title: __("Importer camt.053 (XML ou ZIP)"),
-				upload_notes: __("Import FX correct (montant en devise du compte + taux banque)."),
+				dialog_title: __("Import camt.053 (XML or ZIP)"),
+				upload_notes: __("FX-correct import (amount in account currency + bank rate)."),
 				// endpoint Treasury (lit frappe.local.uploaded_file + form_dict.docname)
 				method: "erpnextswiss.treasury.overrides.upload_camt_file",
 				doctype: "Bank Account",
@@ -56,6 +56,6 @@ function open_treasury_camt_import(on_done) {
 			}
 		},
 		__("Import camt / ZIP"),
-		__("Continuer")
+		__("Continue")
 	);
 }

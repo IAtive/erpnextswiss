@@ -8899,7 +8899,7 @@ msgstr ""
 #: erpnextswiss/erpnextswiss/report/account_sheets/account_sheets.py:21
 #: erpnextswiss/erpnextswiss/report/account_sheets_with_tax_codes/account_sheets_with_tax_codes.py:22
 msgid "Voucher type"
-msgstr ""
+msgstr "Belegart"
 
 #. Option for the 'Status' (Select) field in DocType 'Label Printer Job'
 #: erpnextswiss/erpnextswiss/doctype/label_printer_job/label_printer_job.json
@@ -9765,4 +9765,52 @@ msgstr ""
 "Bei der Ausstellung fixierte Empfänger-IBAN (QR-IBAN für die QRR-Methode,"
 " sonst normale IBAN). Gewährleistet einen identischen Nachdruck, auch "
 "wenn sich die Kontokonfiguration später ändert."
+
+msgid "The bank transaction must be submitted."
+msgstr "Die Bankbewegung muss gebucht sein."
+
+msgid "No Bank Account found for IBAN {0}."
+msgstr "Kein Bankkonto für die IBAN {0} gefunden."
+
+msgid "The ALYF Banking app is not installed."
+msgstr "Die App ALYF Banking ist nicht installiert."
+
+msgid "No file provided."
+msgstr "Keine Datei bereitgestellt."
+
+msgid "Imported: {0} · Duplicates skipped: {1} · Errors: {2}"
+msgstr "Importiert: {0} · Duplikate übersprungen: {1} · Fehler: {2}"
+
+msgid "Reconcile at bank rate"
+msgstr "Zum Bankkurs abgleichen"
+
+msgid "Account amount"
+msgstr "Kontobetrag"
+
+msgid "Bank rate"
+msgstr "Bankkurs"
+
+msgid "Creating payment at bank rate..."
+msgstr "Zahlung zum Bankkurs wird erstellt…"
+
+msgid "Reconciled via {0}"
+msgstr "Abgeglichen über {0}"
+
+msgid "Fallback bank account"
+msgstr "Ausweich-Bankkonto"
+
+msgid "Import camt.053 (XML or ZIP)"
+msgstr "camt.053 importieren (XML oder ZIP)"
+
+msgid "FX-correct import (amount in account currency + bank rate)."
+msgstr "Devisenkorrekter Import (Betrag in Kontowährung + Bankkurs)."
+
+msgid "Optional: used only if the file IBAN does not match any account."
+msgstr "Optional: nur verwendet, wenn die IBAN der Datei keinem Konto entspricht."
+
+msgid "Optional: used if the file IBAN does not match any account."
+msgstr "Optional: verwendet, wenn die IBAN der Datei keinem Konto entspricht."
+
+msgid "Please first select a transaction and a voucher to reconcile."
+msgstr "Bitte zuerst eine Bewegung und einen Beleg zum Abgleichen auswählen."
 

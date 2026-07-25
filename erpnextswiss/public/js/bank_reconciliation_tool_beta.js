@@ -18,7 +18,7 @@ frappe.ui.form.on("Bank Reconciliation Tool Beta", {
 				$btn.click();
 			} else {
 				frappe.show_alert({
-					message: __("Sélectionnez d'abord une transaction et une pièce à rapprocher."),
+					message: __("Please first select a transaction and a voucher to reconcile."),
 					indicator: "orange",
 				});
 			}
@@ -34,8 +34,8 @@ frappe.ui.form.on("Bank Reconciliation Tool Beta", {
 function treasury_open_camt_import(bank_account, on_done) {
 	const open = (ba) => {
 		const uploader = new frappe.ui.FileUploader({
-			dialog_title: __("Importer camt.053 (XML ou ZIP)"),
-			upload_notes: __("Import FX correct (montant en devise du compte + taux banque)."),
+			dialog_title: __("Import camt.053 (XML or ZIP)"),
+			upload_notes: __("FX-correct import (amount in account currency + bank rate)."),
 			method: "erpnextswiss.treasury.overrides.upload_camt_file",
 			doctype: "Bank Account",
 			docname: ba || "",
@@ -63,16 +63,16 @@ function treasury_open_camt_import(bank_account, on_done) {
 			[
 				{
 					fieldname: "bank_account",
-					label: __("Compte bancaire (fallback)"),
+					label: __("Fallback bank account"),
 					fieldtype: "Link",
 					options: "Bank Account",
 					reqd: 0,
-					description: __("Optionnel : utilisé si l'IBAN du fichier ne correspond à aucun compte."),
+					description: __("Optional: used if the file IBAN does not match any account."),
 				},
 			],
 			(v) => open(v.bank_account),
 			__("Import camt / ZIP"),
-			__("Continuer")
+			__("Continue")
 		);
 	}
 }

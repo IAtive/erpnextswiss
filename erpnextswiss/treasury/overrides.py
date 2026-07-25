@@ -46,11 +46,11 @@ def upload_camt_file():
 	result = import_zip_or_xml(file_bytes, fallback_bank_account=bank_account)
 
 	# récap visible pour l'utilisateur (sinon les "ignorés" sont silencieux)
-	msg = frappe._("Importées: {0} · Doublons ignorés: {1} · Erreurs: {2}").format(
+	msg = frappe._("Imported: {0} · Duplicates skipped: {1} · Errors: {2}").format(
 		len(result["created"]), len(result["skipped"]), len(result["errors"])
 	)
 	if result["errors"]:
-		msg += "<br><br><b>" + frappe._("Erreurs") + " :</b><br>" + "<br>".join(
+		msg += "<br><br><b>" + frappe._("Errors") + " :</b><br>" + "<br>".join(
 			frappe.utils.escape_html(e) for e in result["errors"][:15]
 		)
 	frappe.msgprint(msg, title=frappe._("Import camt / ZIP"), indicator="orange" if result["errors"] else "green")

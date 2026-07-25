@@ -8839,7 +8839,7 @@ msgstr ""
 #: erpnextswiss/erpnextswiss/report/account_sheets/account_sheets.py:21
 #: erpnextswiss/erpnextswiss/report/account_sheets_with_tax_codes/account_sheets_with_tax_codes.py:22
 msgid "Voucher type"
-msgstr ""
+msgstr "Tipo di documento"
 
 #. Option for the 'Status' (Select) field in DocType 'Label Printer Job'
 #: erpnextswiss/erpnextswiss/doctype/label_printer_job/label_printer_job.json
@@ -9330,4 +9330,56 @@ msgstr ""
 "IBAN di ricezione fissato al momento dell'emissione (QR-IBAN per il "
 "metodo QRR, IBAN normale altrimenti). Garantisce una ristampa identica "
 "anche in caso di successiva modifica della configurazione del conto."
+
+msgid "The bank transaction must be submitted."
+msgstr "La transazione bancaria deve essere confermata."
+
+msgid "No Bank Account found for IBAN {0}."
+msgstr "Nessun conto bancario trovato per l'IBAN {0}."
+
+msgid "The ALYF Banking app is not installed."
+msgstr "L'applicazione ALYF Banking non è installata."
+
+msgid "No file provided."
+msgstr "Nessun file fornito."
+
+msgid "Imported: {0} · Duplicates skipped: {1} · Errors: {2}"
+msgstr "Importate: {0} · Duplicati ignorati: {1} · Errori: {2}"
+
+msgid "Reconcile at bank rate"
+msgstr "Riconcilia al tasso della banca"
+
+msgid "Account amount"
+msgstr "Importo del conto"
+
+msgid "Bank rate"
+msgstr "Tasso della banca"
+
+msgid "Creating payment at bank rate..."
+msgstr "Creazione del pagamento al tasso della banca…"
+
+msgid "Reconciled via {0}"
+msgstr "Riconciliato tramite {0}"
+
+msgid "Fallback bank account"
+msgstr "Conto bancario di ripiego"
+
+msgid "Import camt.053 (XML or ZIP)"
+msgstr "Importa camt.053 (XML o ZIP)"
+
+msgid "FX-correct import (amount in account currency + bank rate)."
+msgstr ""
+"Importazione valutaria corretta (importo nella valuta del conto + tasso "
+"della banca)."
+
+msgid "Optional: used only if the file IBAN does not match any account."
+msgstr ""
+"Opzionale: utilizzato solo se l'IBAN del file non corrisponde ad alcun "
+"conto."
+
+msgid "Optional: used if the file IBAN does not match any account."
+msgstr "Opzionale: utilizzato se l'IBAN del file non corrisponde ad alcun conto."
+
+msgid "Please first select a transaction and a voucher to reconcile."
+msgstr "Selezionare prima una transazione e un documento da riconciliare."
 
