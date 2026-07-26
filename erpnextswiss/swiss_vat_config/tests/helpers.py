@@ -610,3 +610,36 @@ def build_camt053(entries, account_iban=TEST_IBAN_NORMAL, account_ccy="CHF"):
         % (account_iban, account_ccy, "".join(ntries))
     )
     return xml.encode("utf-8")
+
+
+def build_camt054_batch(payments, account_iban=TEST_IBAN_NORMAL, account_ccy="CHF", date=DATE):
+    """Construit un camt.054 (avis, conteneur <Ntfctn>) GROUPÉ : une écriture unique
+    dont le montant est la somme, avec N <TxDtls> (un par paiement) portant chacun sa
+    référence et son tiers. Reproduit un avis d'encaissements QR-bill regroupés.
+
+    payments : liste de dicts {amount, ref, party}.
+    """
+    import html as _html
+
+    def esc(v):
+        return _html.escape(str(v)) if v is not None else ""
+
+    total = sum(float(p["amount"]) for p in payments)
+    txdtls = []
+    for p in payments:
+        rmt = (("<RmtInf><Strd><CdtrRefInf><Ref>%s</Ref></CdtrRefInf></Strd></RmtInf>" % esc(p["ref"]))
+               if p.get("ref") else "")
+        party = (("<RltdPties><Dbtr><Nm>%s</Nm></Dbtr></RltdPties>" % esc(p["party"]))
+                 if p.get("party") else "")
+        txdtls.append('<TxDtls><Amt Ccy="%s">%s</Amt>%s%s</TxDtls>'
+                      % (account_ccy, esc(p["amount"]), rmt, party))
+    xml = (
+        '<?xml version="1.0" encoding="UTF-8"?>'
+        '<Document><BkToCstmrDbtCdtNtfctn><Ntfctn>'
+        '<Acct><Id><IBAN>%s</IBAN></Id><Ccy>%s</Ccy></Acct>'
+        '<Ntry><Amt Ccy="%s">%.2f</Amt><CdtDbtInd>CRDT</CdtDbtInd><Sts>BOOK</Sts>'
+        '<BookgDt><Dt>%s</Dt></BookgDt><NtryDtls>%s</NtryDtls></Ntry>'
+        '</Ntfctn></BkToCstmrDbtCdtNtfctn></Document>'
+        % (account_iban, account_ccy, account_ccy, total, date, "".join(txdtls))
+    )
+    return xml.encode("utf-8")

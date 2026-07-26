@@ -13,7 +13,7 @@ Lancement : bench execute erpnextswiss.swiss_vat_config.tests.runner.run_one
 """
 import frappe
 from erpnextswiss.swiss_vat_config.tests.helpers import (
-    ensure_payment_masters, build_camt053, TEST_IBAN_NORMAL, TEST_QR_IBAN,
+    ensure_payment_masters, build_camt053, build_camt054_batch, TEST_IBAN_NORMAL, TEST_QR_IBAN,
 )
 
 
@@ -104,6 +104,26 @@ def scenario_camt_reference_normalisee(ctx):
     bts = ctx.import_camt(xml)
     bt = ctx.bt_by_reference(bts, compact)
     ctx._rec("Norm", "réf compacte", compact, bt.reference_number if bt else None, bt is not None)
+
+
+def scenario_camt054_batch(ctx):
+    """SCÉNARIO : avis groupé camt.054 (1 écriture, 3 paiements) -> 3 Bank Transactions.
+    POURQUOI : les banques regroupent les encaissements QR-bill en une écriture ; le
+    détail par référence est dans le camt.054 (conteneur Ntfctn, plusieurs TxDtls).
+    Chaque paiement doit devenir une transaction DISTINCTE, rapprochable par sa réf.
+    ATTENDU : 3 BT créées, montants 100/300/500, 3 références préservées."""
+    ensure_payment_masters(ctx.company)
+    xml = build_camt054_batch([
+        {"amount": 100, "ref": "000000000000000000000000117", "party": "SCEN Client CH"},
+        {"amount": 300, "ref": "RF84202600035", "party": "SCEN Client CH"},
+        {"amount": 500, "ref": "000000000000000000000000349", "party": "SCEN Client CH"},
+    ])
+    bts = ctx.import_camt(xml)
+    ctx._rec("camt.054", "nb transactions", 3, len(bts), len(bts) == 3)
+    ctx._rec("camt.054", "réfs distinctes", 3, len(set(b.reference_number for b in bts)),
+             len(set(b.reference_number for b in bts)) == 3)
+    amounts = sorted(b.deposit for b in bts)
+    ctx._rec("camt.054", "montants", "[100.0, 300.0, 500.0]", amounts, amounts == [100.0, 300.0, 500.0])
 
 
 def scenario_camt_import_fx(ctx):

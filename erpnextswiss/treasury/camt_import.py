@@ -78,60 +78,152 @@ def _first(node, name):
 # ---------------------------------------------------------------------------
 # Parsing
 # ---------------------------------------------------------------------------
+# Conteneurs ISO 20022 partageant la même structure interne (Acct + Ntry/TxDtls) :
+#   Stmt   -> camt.053 (relevé de fin de journée)
+#   Ntfctn -> camt.054 (avis de débit/crédit, détail des paiements groupés)
+#   Rpt    -> camt.052 (rapport intraday, provisoire)
+_CAMT_CONTAINERS = ("Stmt", "Ntfctn", "Rpt")
+
+
 def parse_camt(xml_bytes):
-	"""Retourne une liste de statements : {iban, currency, transactions:[...]}."""
+	"""Retourne une liste de statements : {iban, currency, transactions:[...]}.
+
+	Gère camt.053 / camt.054 / camt.052 (même structure interne). Une écriture
+	groupée (camt.054 avec plusieurs <TxDtls>) est éclatée en une transaction par
+	paiement -> indispensable au rapprochement fin des encaissements QR-bill.
+	"""
 	root = ET.fromstring(xml_bytes)
 	statements = []
-	for stmt in _iter(root, "Stmt"):
-		acct = _first(stmt, "Acct")
-		iban = None
-		currency = None
-		if acct is not None:
-			iban = _text(acct, "Id", "IBAN") or _text(_first(acct, "Id"), "Othr", "Id")
-			currency = _text(acct, "Ccy")
-		txns = [_parse_entry(ntry, currency) for ntry in _iter(stmt, "Ntry")]
-		statements.append({"iban": iban, "currency": currency, "transactions": [t for t in txns if t]})
+	for container in _CAMT_CONTAINERS:
+		for stmt in _iter(root, container):
+			acct = _first(stmt, "Acct")
+			iban = currency = None
+			if acct is not None:
+				iban = _text(acct, "Id", "IBAN") or _text(_first(acct, "Id"), "Othr", "Id")
+				currency = _text(acct, "Ccy")
+			txns = []
+			for ntry in _iter(stmt, "Ntry"):
+				txns.extend(_parse_entry(ntry, currency))   # liste (batch -> N)
+			statements.append({"iban": iban, "currency": currency, "transactions": txns})
 	return statements
 
 
+def _rate_of(el):
+	"""Float d'un élément <XchgRate> (ou None)."""
+	if el is not None and el.text:
+		try:
+			return float(el.text.strip())
+		except ValueError:
+			return None
+	return None
+
+
+def _account_amount_of(txd, account_currency):
+	"""Montant d'un <TxDtls> exprimé dans la devise du compte (contre-valeur ou Amt direct).
+
+	Pour un avis groupé, chaque paiement porte son propre montant : on cherche la
+	contre-valeur (CntrValAmt, déjà dans la devise du compte) puis, à défaut, un
+	<Amt> déjà libellé dans la devise du compte.
+	"""
+	cv = _find(txd, "AmtDtls", "CntrValAmt", "Amt")
+	if cv is not None and cv.attrib.get("Ccy") == account_currency and cv.text:
+		try:
+			return float(cv.text.strip())
+		except ValueError:
+			pass
+	for amt_e in _iter(txd, "Amt"):
+		if amt_e.attrib.get("Ccy") == account_currency and amt_e.text:
+			try:
+				return float(amt_e.text.strip())
+			except ValueError:
+				continue
+	return None
+
+
+def _make_txn(date, booked_amount, booked_ccy, cdtdbt, reference, party_name, party_iban,
+              pmtinfid, orig_ccy, orig_amount, xchg_rate, dedup_basis):
+	"""Assemble un dict transaction (avec FX, normalisation de référence, dédup)."""
+	is_fx = bool(orig_ccy and booked_ccy and orig_ccy != booked_ccy)
+	# fallback FX : taux = montant compte / montant d'origine
+	if is_fx and xchg_rate is None and orig_amount and booked_amount:
+		xchg_rate = round(abs(booked_amount) / abs(orig_amount), 9)
+	# normalisation : QRR/SCOR sans espaces internes -> égalité EXACTE avec le champ
+	# de référence côté matching (qr_reference / esr_reference_number).
+	if reference and _is_structured_ref(reference):
+		reference = re.sub(r"\s", "", reference)
+	basis = dedup_basis or "{0}|{1}|{2}|{3}".format(date, booked_amount, cdtdbt, reference)
+	return {
+		"date": date,
+		"booked_amount": abs(booked_amount) if booked_amount is not None else 0,
+		"booked_currency": booked_ccy,
+		"credit_debit": cdtdbt,
+		"reference": reference,
+		"transaction_id": hashlib.md5(basis.encode("utf-8")).hexdigest(),
+		"party_name": party_name,
+		"party_iban": party_iban,
+		"pmtinfid": pmtinfid,
+		# FX : renseigné seulement si devise d'origine != devise du compte
+		"original_currency": orig_ccy if is_fx else None,
+		"original_amount": orig_amount if is_fx else None,
+		"bank_exchange_rate": xchg_rate if is_fx else None,
+	}
+
+
 def _parse_entry(ntry, account_currency):
-	# statut : ne garder que les écritures comptabilisées (BOOK)
-	sts = _text(ntry, "Sts") or _text(ntry, "Sts", "Cd")
-	if sts and sts.upper() not in ("BOOK", "BOOK "):
-		return None
+	"""Retourne une LISTE de transactions pour une écriture <Ntry>.
+
+	- 0 ou 1 <TxDtls> : une transaction (montant booké de l'écriture) — inchangé.
+	- N <TxDtls> (avis groupé camt.054) : une transaction PAR paiement, avec son
+	  propre montant / référence / tiers / FX.
+	"""
+	# statut : garder les écritures comptabilisées (BOOK) ET les avis en attente
+	# (PDNG) — un camt.054 notifie souvent le crédit AVANT son booking définitif.
+	# Le dedup par AcctSvcrRef empêche le double-import quand la version BOOK arrive.
+	# On écarte seulement l'informatif pur (INFO).
+	sts = (_text(ntry, "Sts") or _text(ntry, "Sts", "Cd") or "").strip().upper()
+	if sts and sts not in ("BOOK", "PDNG"):
+		return []
 
 	amt_el = _first(ntry, "Amt")
-	if amt_el is None:
-		return None
-	booked_amount = float(amt_el.text.strip())
-	booked_ccy = (amt_el.attrib.get("Ccy") or account_currency or "").strip()
-	cdtdbt = (_text(ntry, "CdtDbtInd") or "CRDT").upper()
+	entry_booked = None
+	if amt_el is not None and amt_el.text:
+		try:
+			entry_booked = float(amt_el.text.strip())
+		except ValueError:
+			entry_booked = None
+	entry_ccy = ((amt_el.attrib.get("Ccy") if amt_el is not None else None) or account_currency or "").strip()
+	entry_cdtdbt = (_text(ntry, "CdtDbtInd") or "CRDT").upper()
 
 	date = _text(ntry, "BookgDt", "Dt") or _text(ntry, "BookgDt", "DtTm") \
 		or _text(ntry, "ValDt", "Dt")
 	if date and len(date) > 10:
 		date = date[:10]
 
-	acct_svcr_ref = _text(ntry, "AcctSvcrRef")
+	entry_acct_svcr_ref = _text(ntry, "AcctSvcrRef")
+	# taux au niveau écriture (mono-crédit FX : XchgRate hors TxDtls)
+	entry_rate = _rate_of(_first(ntry, "XchgRate"))
 
-	# --- détails transaction (premier TxDtls) ---
-	txdtls = _first(ntry, "TxDtls")
-	reference = None
-	party_name = None
-	party_iban = None
-	pmtinfid = None
-	orig_ccy = None
-	orig_amount = None
-	xchg_rate = None
+	txdtls_list = list(_iter(ntry, "TxDtls"))
 
-	if txdtls is not None:
-		# référence : QRR structurée en priorité, sinon EndToEndId, sinon AcctSvcrRef
-		reference = _text(txdtls, "RmtInf", "Strd", "CdtrRefInf", "Ref") \
-			or _text(txdtls, "Refs", "EndToEndId") \
-			or _text(txdtls, "Refs", "AcctSvcrRef") \
-			or acct_svcr_ref
-		# tiers : pour un débit -> créancier (fournisseur) ; pour un crédit -> débiteur (client)
-		rlt = _first(txdtls, "RltdPties")
+	# aucun détail -> une transaction depuis l'écriture (montant global)
+	if not txdtls_list:
+		if entry_booked is None:
+			return []
+		return [_make_txn(date, entry_booked, entry_ccy, entry_cdtdbt, entry_acct_svcr_ref,
+		                  None, None, None, None, None, entry_rate, entry_acct_svcr_ref)]
+
+	batch = len(txdtls_list) > 1
+	out = []
+	for i, txd in enumerate(txdtls_list):
+		cdtdbt = (_text(txd, "CdtDbtInd") or entry_cdtdbt).upper()
+		# référence : QRR/SCOR structurée en priorité, sinon EndToEndId, sinon AcctSvcrRef
+		reference = _text(txd, "RmtInf", "Strd", "CdtrRefInf", "Ref") \
+			or _text(txd, "Refs", "EndToEndId") \
+			or _text(txd, "Refs", "AcctSvcrRef") \
+			or entry_acct_svcr_ref
+		# tiers : débit -> créancier ; crédit -> débiteur
+		party_name = party_iban = None
+		rlt = _first(txd, "RltdPties")
 		if rlt is not None:
 			if cdtdbt == "DBIT":
 				party_name = _text(rlt, "Cdtr", "Nm") or _text(rlt, "Cdtr", "Pty", "Nm")
@@ -139,12 +231,11 @@ def _parse_entry(ntry, account_currency):
 			else:
 				party_name = _text(rlt, "Dbtr", "Nm") or _text(rlt, "Dbtr", "Pty", "Nm")
 				party_iban = _text(rlt, "DbtrAcct", "Id", "IBAN")
-			# PmtInfId : identifiant du bloc de paiement de TON pain.001 (UBS le
-			# renvoie dans Refs/PmtInfId) -> bouclage des paiements sortants.
-			pmtinfid = _text(txdtls, "Refs", "PmtInfId")
-		# FX : on cherche, dans les détails, le premier montant dont la devise
-		# diffère de celle du compte (= le montant d'origine, ex. EUR).
-		for amt_e in _iter(txdtls, "Amt"):
+		pmtinfid = _text(txd, "Refs", "PmtInfId")
+
+		# FX : montant d'origine (devise != compte) DANS ce détail
+		orig_ccy = orig_amount = None
+		for amt_e in _iter(txd, "Amt"):
 			ccy = amt_e.attrib.get("Ccy")
 			if ccy and account_currency and ccy != account_currency and amt_e.text:
 				try:
@@ -153,44 +244,34 @@ def _parse_entry(ntry, account_currency):
 					break
 				except ValueError:
 					continue
-		# le taux peut être au niveau Ntry/AmtDtls (hors TxDtls) -> chercher dans toute l'écriture
-		rate_el = _first(ntry, "XchgRate")
-		if rate_el is not None and rate_el.text:
-			try:
-				xchg_rate = float(rate_el.text.strip())
-			except ValueError:
-				xchg_rate = None
+		xchg_rate = _rate_of(_first(txd, "XchgRate")) or entry_rate
 
-	# fallback : FX détecté sans taux explicite -> taux = montant compte / montant d'origine
-	if xchg_rate is None and orig_amount and orig_ccy and orig_ccy != booked_ccy and orig_amount != 0:
-		xchg_rate = round(abs(booked_amount) / abs(orig_amount), 9)
+		# montant booké de LA transaction :
+		#  - batch : montant propre du détail, dans la devise du compte
+		#  - mono  : montant booké de l'écriture (le détail porte souvent la devise d'origine)
+		if batch:
+			booked = _account_amount_of(txd, account_currency)
+			if booked is None:  # détail sans montant en devise compte -> dérive du FX
+				booked = round(abs(orig_amount) * xchg_rate, 2) if (orig_amount and xchg_rate) else orig_amount
+			booked_ccy = account_currency
+		else:
+			booked = entry_booked
+			booked_ccy = entry_ccy
 
-	reference = reference or acct_svcr_ref
-	# normalisation : QRR/SCOR sans espaces internes -> égalité EXACTE avec
-	# Sales Invoice.qr_reference (stocké sans espaces) côté matching ALYF.
-	# Certaines banques livrent la référence structurée espacée -> on nettoie.
-	if reference and _is_structured_ref(reference):
-		reference = re.sub(r"\s", "", reference)
+		# dédup : AcctSvcrRef du détail, sinon (batch) hash incluant l'index
+		txd_ref = _text(txd, "Refs", "AcctSvcrRef")
+		if txd_ref:
+			dedup = txd_ref
+		elif not batch:
+			dedup = entry_acct_svcr_ref
+		else:
+			dedup = "{0}|{1}|{2}|{3}|{4}".format(entry_acct_svcr_ref, i, date, booked, reference)
 
-	# transaction_id stable pour la déduplication
-	basis = acct_svcr_ref or "{0}|{1}|{2}|{3}".format(date, booked_amount, cdtdbt, reference)
-	transaction_id = hashlib.md5(basis.encode("utf-8")).hexdigest()
-
-	return {
-		"date": date,
-		"booked_amount": abs(booked_amount),
-		"booked_currency": booked_ccy,
-		"credit_debit": cdtdbt,
-		"reference": reference,
-		"transaction_id": transaction_id,
-		"party_name": party_name,
-		"party_iban": party_iban,
-		"pmtinfid": pmtinfid,
-		# FX : renseigné seulement si devise d'origine != devise du compte
-		"original_currency": orig_ccy if (orig_ccy and orig_ccy != booked_ccy) else None,
-		"original_amount": orig_amount if (orig_ccy and orig_ccy != booked_ccy) else None,
-		"bank_exchange_rate": xchg_rate if (orig_ccy and orig_ccy != booked_ccy) else None,
-	}
+		if booked is None:
+			continue
+		out.append(_make_txn(date, booked, booked_ccy, cdtdbt, reference, party_name,
+		                     party_iban, pmtinfid, orig_ccy, orig_amount, xchg_rate, dedup))
+	return out
 
 
 # ---------------------------------------------------------------------------
