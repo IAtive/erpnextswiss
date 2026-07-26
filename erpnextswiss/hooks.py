@@ -117,6 +117,7 @@ after_migrate = [
     "erpnextswiss.swiss_vat_config.vat_setup.after_migrate",
     "erpnextswiss.treasury.setup.after_migrate",
     "erpnextswiss.swiss_qr.setup.after_migrate",
+    "erpnextswiss.einvoice_compat.setup.after_migrate",
 ]
 
 # Desk Notifications
@@ -226,9 +227,14 @@ override_whitelisted_methods = {
     "banking.klarna_kosma_integration.doctype.bank_reconciliation_tool_beta.bank_reconciliation_tool_beta.get_reconcile_amount_context": "erpnextswiss.treasury.overrides.get_reconcile_amount_context",
 }
 
-# Treasury : monkeypatch de l'upload camt d'ALYF (les uploads court-circuitent
-# override_whitelisted_methods) -> l'écran ALYF utilise notre import FX/ZIP.
-boot_session = "erpnextswiss.treasury.overrides.apply_monkeypatches"
+# Monkeypatches appliqués au boot (gardés « app installée », idempotents) :
+# - Treasury : upload camt d'ALYF (court-circuite override_whitelisted_methods)
+#   -> l'écran ALYF utilise notre import FX/ZIP.
+# - eu_einvoice : identifiant TVA du vendeur suisse (BT-31 au lieu de BT-32).
+boot_session = [
+    "erpnextswiss.treasury.overrides.apply_monkeypatches",
+    "erpnextswiss.einvoice_compat.patches.apply_einvoice_patches",
+]
 
 # Fixtures (to import DocType customisations)
 # --------

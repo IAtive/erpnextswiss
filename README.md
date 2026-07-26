@@ -60,6 +60,7 @@ In case you update from the sources and observe an error, make sure to update de
     * camt.053 import (XML/ZIP) with FX handling, party resolution and QR-reference matching, with or without the ALYF Banking app — see [docs/bank_reconciliation.md](docs/bank_reconciliation.md)
     * ZUGFeRD: fully electronic invoices.
     * ZUGFeRD Wizard: read and interpret both ZUGFeRD and QR-invoices to purchase invoices
+    * EU e-invoicing (EN 16931 / Factur-X / XRechnung) via the optional ALYF eu_einvoice app, with Swiss adaptations (seller VAT → BT-31, default profile EN 16931) — see [docs/e_invoice.md](docs/e_invoice.md)
 * Taxes
     * Import monthly average exchange rates, daily exchange rates (ESTV) — scheduled, with config & logs (see [docs/swiss_exchange_rates.md](docs/swiss_exchange_rates.md))
     * VAT declaration (with ESTV data transfer easyTax/ePortal)

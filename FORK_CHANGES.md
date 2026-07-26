@@ -411,6 +411,49 @@ Extension du framework de scénarios existant (même `runner.py` / `reset_test_c
   `import_camt`. `runner.py` : `Bank Transaction` ajouté au reset transactionnel.
 - **Résultat** : **42/42** scénarios au vert (29 TVA existants + 13 paiement), aucune régression.
 
+## 18. Compatibilité e-invoice UE (`eu_einvoice` d'ALYF) — adaptations suisses (module `einvoice_compat`)
+
+`eu_einvoice` (ALYF, GPL-3, **app optionnelle**) émet/lit des e-factures EN 16931 / Factur-X /
+XRechnung avec validation **Schematron** (règles métier `BR-*`, plus strictes que le XSD du module
+ZUGFeRD interne §12). Deux ajustements sont nécessaires pour une **société suisse émettrice**. Ils sont
+**portés par ERPNextSwiss** (jamais d'édition d'`eu_einvoice`), **gardés** « eu_einvoice installé »,
+idempotents, et silencieux si l'app est absente ou change de structure.
+
+### 18.1 Identifiant TVA du vendeur suisse → BT-31 (monkeypatch, `boot_session`)
+- **Problème** : `_set_seller_tax_id` d'eu_einvoice ne connaît que le format UE (`validate_vat_id`) et
+  rebascule un UID suisse (`CHE-…MWST`) en schéma `FC` → **BT-32** (registration fiscale) au lieu de `VA`
+  → **BT-31** (identifiant TVA). La règle **BR-CO-26** (n'accepte que BT-29/30/31) échoue → une facture
+  émise par une société suisse n'est **pas conforme**. Le chemin ACHETEUR gère pourtant déjà le suisse
+  (`normalize_swiss_vat_id`, cf. commit upstream #233 « accept swiss VAT IDs from **customers** ») :
+  angle mort germano-centré, le chemin VENDEUR n'a jamais été mis à jour.
+- **Fix** : `einvoice_compat/patches.py` wrappe `validate_vat_id` (au `boot_session`, comme le monkeypatch
+  Treasury §14) pour reconnaître un UID suisse **checksum-valide** (`is_valid_swiss_vat_id`) et renvoyer
+  sa forme normalisée → le chemin vendeur passe dans sa branche `VA` (BT-31). Le chemin acheteur teste le
+  suisse AVANT `validate_vat_id` → aucun double effet.
+- **Testé** : facture EN 16931 + UID valide (`CHE-123.456.788 MWST`) + TVA 8.1 % → validation Schematron
+  **100 % verte** (BR-CO-26 levée). ⚠️ Un UID à clé de contrôle **invalide** reste rejeté (comportement
+  correct). Le monkeypatch (boot_session) exige un **redémarrage de `bench start`** pour s'activer.
+- **Transitoire** : un **PR upstream** est proposé à ALYF (recopier la branche suisse du chemin acheteur
+  vers `_set_seller_tax_id`) ; le monkeypatch pourra être retiré une fois mergé.
+
+### 18.2 Profil e-invoice par défaut = EN 16931 (Property Setters, `after_migrate`)
+- **Problème** : eu_einvoice fixe le profil par défaut à **EXTENDED** (sur-ensemble, rarement nécessaire)
+  sur **deux** champs : `Customer.einvoice_profile` **et** `Sales Invoice.einvoice_profile`. La facture
+  récupérant le profil du client (`fetch_from`, prioritaire), un client à EXTENDED impose EXTENDED à ses
+  factures.
+- **Fix** : `einvoice_compat/setup.py` pose **deux Property Setters** (Client + Facture) → défaut
+  **EN 16931** (le profil interopérable de référence B2B UE). Le Property Setter **survit** aux mises à
+  jour d'eu_einvoice (contrairement à une édition du custom field). Un profil spécifique (XRECHNUNG pour
+  le secteur public allemand…) reste réglable **par client**.
+- **Testé** : client neuf → `EN 16931` ; facture d'un client neuf → `EN 16931` (via fetch_from).
+- **Rappel** : ne rattrape pas les clients **existants** déjà à EXTENDED (choix : pas de reprise de données).
+
+### Rappel — QR-bill suisse vs e-invoice UE
+Le module ZUGFeRD interne (§12) reste **supérieur pour le suisse** : son Wizard lit aussi le **QR-bill**
+et le **QR UE** (eu_einvoice est EU-only). eu_einvoice apporte, lui, la **validation Schematron**, le
+profil **XRechnung** et le **PDF/A-3**. Les deux coexistent (deux hooks `validate` sur Sales Invoice,
+testés sans conflit avec §12).
+
 ## Récapitulatif des fichiers du fork modifiés
 
 ```
@@ -444,7 +487,7 @@ erpnextswiss/erpnextswiss/doctype/swiss_exchange_rate_currency/     # (§10) chi
 erpnextswiss/erpnextswiss/doctype/swiss_exchange_rate_import_row/   # (§10) child lignes (read-only)
 erpnextswiss/docs/                                             # (§9) doc rapatriée : ch_accounting_setup.md, swiss_exchange_rates.md
 pyproject.toml                                                 # (§12) + dépendance qrbill>=1.2
-erpnextswiss/hooks.py                                          # (§12/§13/§14) after_migrate swiss_qr/treasury ; doc_events Sales Invoice+Account ; jinja get_qr_bill_svg ; boot_session monkeypatch ; override get_reconcile_amount_context ; doctype_js/list_js Bank Transaction
+erpnextswiss/hooks.py                                          # (§12/§13/§14/§18) after_migrate swiss_qr/treasury/einvoice_compat ; doc_events Sales Invoice+Account ; jinja get_qr_bill_svg ; boot_session [treasury + einvoice_compat monkeypatches] ; override get_reconcile_amount_context ; doctype_js/list_js Bank Transaction
 erpnextswiss/swiss_qr/                                         # (§12) config QR par compte, génération réf serveur, rendu qrbill local, validation, migration
     setup.py · references.py · render.py · validation.py       #   champs · génération · SVG local · garde-fous
 erpnextswiss/erpnextswiss/print_format/swiss_qr_invoice/       # (§12) print format unique (Jinja + SVG local)
@@ -462,6 +505,9 @@ erpnextswiss/locale/                                           # (§16) fr.po / 
 erpnextswiss/swiss_vat_config/tests/scenarios_payments.py     # (§17) 13 scénarios paiement & rapprochement
 erpnextswiss/swiss_vat_config/tests/helpers.py                # (§17) build_camt053, ensure_payment_masters, asserters paiement
 erpnextswiss/swiss_vat_config/tests/{scenarios.py,runner.py}  # (§17) wiring module frère + Bank Transaction au reset
+erpnextswiss/einvoice_compat/                                  # (§18) compat eu_einvoice (app optionnelle), gardé « eu_einvoice installé »
+    patches.py                                                #   monkeypatch VAT vendeur suisse -> BT-31 (boot_session)
+    setup.py                                                  #   Property Setters profil défaut EN 16931 (after_migrate)
 erpnextswiss/modules.txt                                       # (§13) + module « Treasury »
 erpnextswiss/docs/swiss_qr_bill.md · docs/bank_reconciliation.md  # (§12/§13) guides utilisateur
 (supprimés) erpnextswiss/doctype/contract{,_period,_service}/  # collision Contract natif
