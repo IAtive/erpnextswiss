@@ -462,7 +462,10 @@ def set_accounting_settings():
     5. Currency CHF (globale) : fraction = "centime" (au lieu de "Rappen[K]" — nom allemand + artefact
        de note de bas de page hérité du seed Frappe) et symbol = "CHF" (au lieu de "Fr") — conforme à
        une facturation suisse francophone / bexio. Purement cosmétique (montant en toutes lettres +
-       affichage) ; n'affecte ni les montants ni la comptabilité. NB : Currency est un doctype GLOBAL."""
+       affichage) ; n'affecte ni les montants ni la comptabilité. NB : Currency est un doctype GLOBAL.
+    6. Address Template Switzerland (globale) : pays traduit (_(country)) et non capitalisé —
+       « Suisse » au lieu de « SWITZERLAND ». Cosmétique (affichage) ; n'affecte pas les adresses
+       structurées ISO 20022 (QR-facture / pain.001, qui lisent les champs + le code pays)."""
     frappe.db.set_single_value("Accounts Settings", "book_tax_discount_loss", 1)
     print("→ Accounts Settings : book_tax_discount_loss = 1 (ventilation TVA des escomptes)")
     frappe.db.set_single_value("System Settings", "rounding_method", "Commercial Rounding")
@@ -475,6 +478,16 @@ def set_accounting_settings():
     if frappe.db.exists("Currency", "CHF"):
         frappe.db.set_value("Currency", "CHF", {"fraction": "centime", "symbol": "CHF"})
         print("→ Currency CHF : fraction = centime, symbol = CHF (facturation suisse FR)")
+    # Address Template Switzerland (GLOBAL) : pays TRADUIT (_(country) → « Suisse »
+    # / « Schweiz » selon la langue) et NON forcé en majuscules. La ville reste en
+    # capitales (convention postale : « 1204 GENÈVE »). Purement cosmétique (affichage).
+    if frappe.db.exists("Address Template", "Switzerland"):
+        frappe.db.set_value("Address Template", "Switzerland", "template",
+            "{{ address_line1 }}<br>\n"
+            "{% if address_line2 %}{{ address_line2 }}<br>{% endif -%}\n"
+            "{{ pincode }} {{ city | upper }}<br>\n"
+            "{{ _(country) }}\n")
+        print("→ Address Template Switzerland : pays traduit, non capitalisé")
 
 
 def setup_vat_queries():
