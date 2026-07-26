@@ -5497,6 +5497,8 @@ msgid ""
 "Number of days the payment proposal will look ahead. Payments with a due "
 "date further ahead will not be proposed."
 msgstr ""
+"Nombre de jours d'anticipation de la proposition de paiement. Les paiements "
+"dont l'échéance dépasse ce délai ne sont pas proposés."
 
 #. Label of the numeric_only_debtor_matching (Check) field in DocType
 #. 'ERPNextSwiss Settings'

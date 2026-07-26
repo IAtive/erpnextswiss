@@ -5480,6 +5480,8 @@ msgid ""
 "Number of days the payment proposal will look ahead. Payments with a due "
 "date further ahead will not be proposed."
 msgstr ""
+"Numero di giorni di anticipo considerati dalla proposta di pagamento. I "
+"pagamenti con scadenza oltre tale intervallo non vengono proposti."
 
 #. Label of the numeric_only_debtor_matching (Check) field in DocType
 #. 'ERPNextSwiss Settings'
@@ -6105,7 +6107,7 @@ msgstr ""
 #. Label of the planning_days (Int) field in DocType 'ERPNextSwiss Settings'
 #: erpnextswiss/erpnextswiss/doctype/erpnextswiss_settings/erpnextswiss_settings.json
 msgid "Planning Period (Days)"
-msgstr ""
+msgstr "Periodo di pianificazione (giorni)"
 
 #. Name of a DocType
 #: erpnextswiss/erpnextswiss/doctype/planzer_log/planzer_log.json

@@ -5514,6 +5514,9 @@ msgid ""
 "Number of days the payment proposal will look ahead. Payments with a due "
 "date further ahead will not be proposed."
 msgstr ""
+"Anzahl der Tage, die der Zahlungsvorschlag vorausschauend berücksichtigt. "
+"Zahlungen mit einem weiter in der Zukunft liegenden Fälligkeitsdatum werden "
+"nicht vorgeschlagen."
 
 #. Label of the numeric_only_debtor_matching (Check) field in DocType
 #. 'ERPNextSwiss Settings'
@@ -9649,13 +9652,6 @@ msgstr "Das Bankkonto hat keine IBAN hinterlegt."
 
 msgid "Invalid ESR Code Line"
 msgstr "Ungültige ESR-Zeile"
-
-msgid ""
-"Number of days the payment rpoposal will look ahead. Payments with due "
-"date further ahead will not be proposed."
-msgstr ""
-"Anzahl Tage in der Zukunft, die für den Zahlugnsvorschlag einbezogen "
-"werden."
 
 msgid "Degree"
 msgstr "Anstellungsgrad"
