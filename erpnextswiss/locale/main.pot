@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ERPNextSwiss VERSION\n"
 "Report-Msgid-Bugs-To: info@libracore.com\n"
-"POT-Creation-Date: 2026-07-23 16:21+0000\n"
-"PO-Revision-Date: 2026-07-23 16:21+0000\n"
+"POT-Creation-Date: 2026-07-26 15:07+0000\n"
+"PO-Revision-Date: 2026-07-26 15:07+0000\n"
 "Last-Translator: info@libracore.com\n"
 "Language-Team: info@libracore.com\n"
 "MIME-Version: 1.0\n"
@@ -627,6 +627,10 @@ msgstr ""
 msgid "="
 msgstr ""
 
+#: erpnextswiss/erpnextswiss/config_readiness.py:235
+msgid "A non-conformant pain.001 will only be detected after the bank rejects it (enable « Validate XML »)."
+msgstr ""
+
 #. Description of the 'Printer group' (Link) field in DocType 'Label Printer'
 #: erpnextswiss/erpnextswiss/doctype/label_printer/label_printer.json
 msgid "A printer group consists of all printers that are reachable via the same on-site host (running a client script)."
@@ -777,6 +781,10 @@ msgstr ""
 #: erpnextswiss/erpnextswiss/doctype/ebics_connection/ebics_connection.json
 #: erpnextswiss/erpnextswiss/doctype/ebics_connection/ebics_connection_wizard.html:83
 msgid "Account activated"
+msgstr ""
+
+#: erpnextswiss/public/js/bank_transaction.js:35
+msgid "Account amount"
 msgstr ""
 
 #: erpnextswiss/erpnextswiss/doctype/payment_proposal/payment_proposal.py:404
@@ -1212,14 +1220,6 @@ msgstr ""
 msgid "Attribute"
 msgstr ""
 
-#: erpnextswiss/treasury/camt_import.py:186
-msgid "Aucun Bank Account pour l'IBAN {0}"
-msgstr ""
-
-#: erpnextswiss/treasury/camt_import.py:255
-msgid "Aucun fichier fourni."
-msgstr ""
-
 #: erpnextswiss/erpnextswiss/doctype/swiss_exchange_rate_import_log/swiss_exchange_rate_import_log.js:8
 msgid "Aucune date de valeur sur ce log."
 msgstr ""
@@ -1264,6 +1264,15 @@ msgstr ""
 #. 'ERPNextSwiss Settings'
 #: erpnextswiss/erpnextswiss/doctype/erpnextswiss_settings/erpnextswiss_settings.json
 msgid "Automated Payments"
+msgstr ""
+
+#: erpnextswiss/erpnextswiss/config_readiness.py:382
+#: erpnextswiss/erpnextswiss/config_readiness.py:386
+msgid "Automatic FTA rate import enabled"
+msgstr ""
+
+#: erpnextswiss/erpnextswiss/config_readiness.py:383
+msgid "Automatic FTA rate import is disabled → rates will not update on their own (risk of stale/missing rates)."
 msgstr ""
 
 #. Label of the auto_process_matches (Check) field in DocType 'ERPNextSwiss
@@ -1318,6 +1327,11 @@ msgstr ""
 msgid "BIC Field ID"
 msgstr ""
 
+#: erpnextswiss/erpnextswiss/config_readiness.py:190
+#: erpnextswiss/erpnextswiss/config_readiness.py:193
+msgid "BIC of the receiving account"
+msgstr ""
+
 #: erpnextswiss/config/erpnextswiss.py:405
 #: erpnextswiss/config/erpnextswiss.py:406
 msgid "BKP Importer"
@@ -1345,6 +1359,14 @@ msgstr ""
 #. Label of the account (Link) field in DocType 'ebics Statement'
 #: erpnextswiss/erpnextswiss/doctype/ebics_statement/ebics_statement.json
 msgid "Bank Account"
+msgstr ""
+
+#: erpnextswiss/erpnextswiss/config_readiness.py:220
+msgid "Bank Account (IBAN + GL account)"
+msgstr ""
+
+#: erpnextswiss/erpnextswiss/config_readiness.py:213
+msgid "Bank Account IBAN (camt routing)"
 msgstr ""
 
 #. Label of the bank_import_section (Section Break) field in DocType
@@ -1395,6 +1417,10 @@ msgstr ""
 #: erpnextswiss/config/erpnextswiss.py:38
 #: erpnextswiss/erpnextswiss/page/bankimport/bankimport.js:4
 msgid "Bank import"
+msgstr ""
+
+#: erpnextswiss/public/js/bank_transaction.js:39
+msgid "Bank rate"
 msgstr ""
 
 #. Name of a DocType
@@ -1525,6 +1551,11 @@ msgstr ""
 
 #: erpnextswiss/erpnextswiss/report/service_invoicing/service_invoicing.py:27
 msgid "Billing Hours"
+msgstr ""
+
+#: erpnextswiss/erpnextswiss/config_readiness.py:282
+#: erpnextswiss/erpnextswiss/config_readiness.py:319
+msgid "Billing address present"
 msgstr ""
 
 #. Option for the 'Status' (Select) field in DocType 'Inspection Equipment'
@@ -1940,6 +1971,7 @@ msgstr ""
 #: erpnextswiss/erpnextswiss/report/annual_salary_sheet/annual_salary_sheet.js:9
 #: erpnextswiss/erpnextswiss/report/betriebserfolg/betriebserfolg.js:9
 #: erpnextswiss/erpnextswiss/report/budget_control/budget_control.js:16
+#: erpnextswiss/erpnextswiss/report/controle_de_configuration/controle_de_configuration.js:8
 #: erpnextswiss/erpnextswiss/report/kontrolle_mwst/kontrolle_mwst.js:31
 #: erpnextswiss/erpnextswiss/report/kontrolle_mwst_de/kontrolle_mwst_de.js:29
 #: erpnextswiss/erpnextswiss/report/monthly_worktime/monthly_worktime.js:33
@@ -1956,8 +1988,23 @@ msgstr ""
 msgid "Company abbreviation"
 msgstr ""
 
+#: erpnextswiss/erpnextswiss/config_readiness.py:128
+#: erpnextswiss/erpnextswiss/config_readiness.py:132
+#: erpnextswiss/erpnextswiss/config_readiness.py:135
+msgid "Company address complete"
+msgstr ""
+
 #: erpnextswiss/erpnextswiss/doctype/payment_proposal/payment_proposal.py:45
 msgid "Company address missing or incomplete."
+msgstr ""
+
+#: erpnextswiss/erpnextswiss/config_readiness.py:207
+msgid "Company bank account (Bank Account)"
+msgstr ""
+
+#: erpnextswiss/erpnextswiss/config_readiness.py:138
+#: erpnextswiss/erpnextswiss/config_readiness.py:142
+msgid "Company currency = CHF"
 msgstr ""
 
 #: erpnextswiss/erpnextswiss/doctype/abacus_export_file/abacus_export_file.js:73
@@ -1999,11 +2046,6 @@ msgstr ""
 #. Label of the component (Link) field in DocType 'Salary Component Link'
 #: erpnextswiss/erpnextswiss/doctype/salary_component_link/salary_component_link.json
 msgid "Component"
-msgstr ""
-
-#: erpnextswiss/public/js/bank_reconciliation_tool_beta.js:66
-#: erpnextswiss/public/js/bank_transaction_list.js:25
-msgid "Compte bancaire (fallback)"
 msgstr ""
 
 #. Label of the computation (Select) field in DocType 'AFC VAT Box'
@@ -2078,7 +2120,7 @@ msgstr ""
 
 #: erpnextswiss/public/js/bank_reconciliation_tool_beta.js:75
 #: erpnextswiss/public/js/bank_transaction_list.js:59
-msgid "Continuer"
+msgid "Continue"
 msgstr ""
 
 #. Label of a Card Break in the ERPNextSwiss Workspace
@@ -2089,6 +2131,11 @@ msgstr ""
 
 #: erpnextswiss/swiss_vat_config/report/controle_plausibilite_tva/controle_plausibilite_tva.py:16
 msgid "Control"
+msgstr ""
+
+#. Name of a report
+#: erpnextswiss/erpnextswiss/report/controle_de_configuration/controle_de_configuration.json
+msgid "Controle de configuration"
 msgstr ""
 
 #. Label of a Link in the ERPNextSwiss Workspace
@@ -2224,8 +2271,16 @@ msgstr ""
 msgid "Created"
 msgstr ""
 
+#: erpnextswiss/erpnextswiss/config_readiness.py:241
+msgid "Creating a payment proposal will fail (« Please configure the planning period in ERPNextSwiss Settings »)."
+msgstr ""
+
 #: erpnextswiss/erpnextswiss/doctype/zugferd_wizard/zugferd_wizard.js:36
 msgid "Creating invoice..."
+msgstr ""
+
+#: erpnextswiss/public/js/bank_transaction.js:70
+msgid "Creating payment at bank rate..."
 msgstr ""
 
 #: erpnextswiss/erpnextswiss/report/advanced_sales_partners_commission_detail/advanced_sales_partners_commission_detail.py:14
@@ -2256,10 +2311,6 @@ msgstr ""
 
 #: erpnextswiss/erpnextswiss/doctype/abaninja_settings/abaninja_settings.js:40
 msgid "Critical Error"
-msgstr ""
-
-#: erpnextswiss/public/js/bank_transaction.js:70
-msgid "Création du paiement au taux banque..."
 msgstr ""
 
 #. Description of the 'Create Inverted Rates (CHF → currency)' (Check) field in
@@ -2371,6 +2422,10 @@ msgstr ""
 #. Label of the customer_no (Data) field in DocType 'Planzer Settings'
 #: erpnextswiss/erpnextswiss/doctype/planzer_settings/planzer_settings.json
 msgid "Customer No"
+msgstr ""
+
+#: erpnextswiss/erpnextswiss/config_readiness.py:289
+msgid "Customer invoice in this currency BLOCKED: no receivable account in the currency (customer Accounting tab) and « multi-currency on a single account » disabled."
 msgstr ""
 
 #. Label of the customer_name (Data) field in DocType 'EDI Connection'
@@ -2792,6 +2847,20 @@ msgstr ""
 msgid "Default Values"
 msgstr ""
 
+#: erpnextswiss/erpnextswiss/config_readiness.py:346
+msgid "Default account of the payment mode"
+msgstr ""
+
+#: erpnextswiss/erpnextswiss/config_readiness.py:119
+#: erpnextswiss/erpnextswiss/config_readiness.py:123
+msgid "Default bank account"
+msgstr ""
+
+#: erpnextswiss/erpnextswiss/config_readiness.py:145
+#: erpnextswiss/erpnextswiss/config_readiness.py:148
+msgid "Default receivable/payable accounts"
+msgstr ""
+
 #. Description of the 'D6 Define and Implement Corrective Actions' (Section
 #. Break) field in DocType 'Non Conformity Report 8D'
 #: erpnextswiss/erpnextswiss/doctype/non_conformity_report_8d/non_conformity_report_8d.json
@@ -2954,6 +3023,10 @@ msgstr ""
 msgid "Disabled"
 msgstr ""
 
+#: erpnextswiss/erpnextswiss/config_readiness.py:437
+msgid "Disabled: each foreign-currency party MUST have a receivable/payable account in its currency, otherwise its invoices will be blocked."
+msgstr ""
+
 #. Label of the discount (Currency) field in DocType 'HLK Discounts'
 #: erpnextswiss/erpnextswiss/doctype/hlk_discounts/hlk_discounts.json
 msgid "Discount"
@@ -2998,6 +3071,10 @@ msgstr ""
 #: erpnextswiss/erpnextswiss/report/account_sheets_with_tax_codes/account_sheets_with_tax_codes.html:21
 #: erpnextswiss/erpnextswiss/report/kontrolle_mwst_de/kontrolle_mwst_de.py:20
 msgid "Document"
+msgstr ""
+
+#: erpnextswiss/erpnextswiss/report/controle_de_configuration/controle_de_configuration.py:63
+msgid "Domain / Check"
 msgstr ""
 
 #. Option for the 'Status' (Select) field in DocType 'D3 Interim Containment
@@ -3510,6 +3587,10 @@ msgstr ""
 msgid "Enabled"
 msgstr ""
 
+#: erpnextswiss/erpnextswiss/config_readiness.py:433
+msgid "Enabled: a single CHF account can carry foreign-currency invoices (per-currency party accounts not required)."
+msgstr ""
+
 #. Label of the file_encoding (Select) field in DocType 'BankImport Template'
 #: erpnextswiss/erpnextswiss/doctype/bankimport_template/bankimport_template.json
 msgid "Encoding"
@@ -3562,10 +3643,6 @@ msgstr ""
 msgid "Erfolg nach Zinsen"
 msgstr ""
 
-#: erpnextswiss/treasury/overrides.py:53
-msgid "Erreurs"
-msgstr ""
-
 #. Option for the 'Status' (Select) field in DocType 'ebics Statement'
 #. Option for the 'Status' (Select) field in DocType 'Swiss Exchange Rate
 #. Import Log'
@@ -3613,6 +3690,10 @@ msgstr ""
 msgid "Error while generating xml. Make sure that you made required customisations to the DocTypes."
 msgstr ""
 
+#: erpnextswiss/treasury/overrides.py:53
+msgid "Errors"
+msgstr ""
+
 #. Description of the 'D1 Use a Team' (Section Break) field in DocType 'Non
 #. Conformity Report 8D'
 #: erpnextswiss/erpnextswiss/doctype/non_conformity_report_8d/non_conformity_report_8d.json
@@ -3636,6 +3717,16 @@ msgstr ""
 #. Import Row'
 #: erpnextswiss/erpnextswiss/doctype/swiss_exchange_rate_import_row/swiss_exchange_rate_import_row.json
 msgid "Exchange Rate"
+msgstr ""
+
+#: erpnextswiss/erpnextswiss/config_readiness.py:152
+#: erpnextswiss/erpnextswiss/config_readiness.py:156
+msgid "Exchange gain/loss account"
+msgstr ""
+
+#: erpnextswiss/erpnextswiss/config_readiness.py:370
+#: erpnextswiss/erpnextswiss/config_readiness.py:374
+msgid "Exchange rate available"
 msgstr ""
 
 #. Label of the exclude_from_payment_reminder_until (Date) field in DocType
@@ -3728,8 +3819,9 @@ msgstr ""
 msgid "FR"
 msgstr ""
 
-#: erpnextswiss/public/js/bank_transaction.js:53
-msgid "Facture"
+#: erpnextswiss/public/js/bank_reconciliation_tool_beta.js:38
+#: erpnextswiss/public/js/bank_transaction_list.js:37
+msgid "FX-correct import (amount in account currency + bank rate)."
 msgstr ""
 
 #. Option for the 'Status' (Select) field in DocType 'Label Printer Job'
@@ -3739,6 +3831,11 @@ msgstr ""
 
 #: erpnextswiss/erpnextswiss/page/bankimport/bankimport.py:914
 msgid "Failed to parse lines with error: {0}"
+msgstr ""
+
+#: erpnextswiss/public/js/bank_reconciliation_tool_beta.js:66
+#: erpnextswiss/public/js/bank_transaction_list.js:25
+msgid "Fallback bank account"
 msgstr ""
 
 #: erpnextswiss/erpnextswiss/doctype/brevo_settings/brevo_settings.js:13
@@ -3812,6 +3909,26 @@ msgstr ""
 #. Label of the footer_skip (Int) field in DocType 'BankImport Template'
 #: erpnextswiss/erpnextswiss/doctype/bankimport_template/bankimport_template.json
 msgid "Footer Skip"
+msgstr ""
+
+#: erpnextswiss/erpnextswiss/config_readiness.py:285
+msgid "Foreign customer with missing/CHF currency"
+msgstr ""
+
+#: erpnextswiss/erpnextswiss/config_readiness.py:286
+msgid "Foreign customer without a foreign billing currency: foreign-currency invoices and e-invoicing may be mislabeled (check the customer currency)."
+msgstr ""
+
+#: erpnextswiss/erpnextswiss/config_readiness.py:322
+msgid "Foreign supplier with missing/CHF currency"
+msgstr ""
+
+#: erpnextswiss/erpnextswiss/config_readiness.py:323
+msgid "Foreign supplier without a foreign currency: foreign-currency invoices/payments may be mislabeled (check the supplier currency)."
+msgstr ""
+
+#: erpnextswiss/erpnextswiss/config_readiness.py:153
+msgid "Foreign-currency payments cannot book the exchange difference (Payment Entry submission blocked)."
 msgstr ""
 
 #. Label of the file_format (Select) field in DocType 'BankImport Bank'
@@ -3901,6 +4018,10 @@ msgstr ""
 
 #: erpnextswiss/swiss_vat_config/report/controle_plausibilite_tva/controle_plausibilite_tva.py:19
 msgid "GL / value"
+msgstr ""
+
+#: erpnextswiss/erpnextswiss/config_readiness.py:217
+msgid "GL account linked to the Bank Account"
 msgstr ""
 
 #. Label of the gln (Data) field in DocType 'EDI Sales Report Item'
@@ -4260,6 +4381,10 @@ msgstr ""
 msgid "Ignore special characters"
 msgstr ""
 
+#: erpnextswiss/erpnextswiss/report/controle_de_configuration/controle_de_configuration.py:66
+msgid "Impact if misconfigured"
+msgstr ""
+
 #: erpnextswiss/erpnextswiss/doctype/municipality/municipality_list.js:21
 #: erpnextswiss/erpnextswiss/doctype/pincode/pincode_list.js:21
 #: erpnextswiss/public/js/holiday_list.js:4
@@ -4269,11 +4394,6 @@ msgstr ""
 
 #: erpnextswiss/erpnextswiss/page/bkp_importer/bkp_importer.js:34
 msgid "Import / Update BKP Items from uploaded Files"
-msgstr ""
-
-#: erpnextswiss/public/js/bank_reconciliation_tool_beta.js:38
-#: erpnextswiss/public/js/bank_transaction_list.js:37
-msgid "Import FX correct (montant en devise du compte + taux banque)."
 msgstr ""
 
 #: erpnextswiss/erpnextswiss/doctype/municipality/municipality_list.js:6
@@ -4298,6 +4418,11 @@ msgstr ""
 msgid "Import camt / ZIP"
 msgstr ""
 
+#: erpnextswiss/public/js/bank_reconciliation_tool_beta.js:37
+#: erpnextswiss/public/js/bank_transaction_list.js:36
+msgid "Import camt.053 (XML or ZIP)"
+msgstr ""
+
 #: erpnextswiss/erpnextswiss/doctype/swiss_exchange_rate_settings/swiss_exchange_rate_settings.js:13
 msgid "Import des cours AFC"
 msgstr ""
@@ -4311,13 +4436,12 @@ msgstr ""
 msgid "Import started..."
 msgstr ""
 
-#: erpnextswiss/public/js/bank_reconciliation_tool_beta.js:37
-#: erpnextswiss/public/js/bank_transaction_list.js:36
-msgid "Importer camt.053 (XML ou ZIP)"
+#: erpnextswiss/erpnextswiss/config_readiness.py:218
+msgid "Imported transactions will have no currency (GL account not linked)."
 msgstr ""
 
 #: erpnextswiss/treasury/overrides.py:49
-msgid "Importées: {0} · Doublons ignorés: {1} · Erreurs: {2}"
+msgid "Imported: {0} · Duplicates skipped: {1} · Errors: {2}"
 msgstr ""
 
 #. Label of the tax_1 (Float) field in DocType 'VAT Declaration'
@@ -4372,6 +4496,10 @@ msgstr ""
 #. Label of the section_incoming (Section Break) field in DocType 'EDI File'
 #: erpnextswiss/erpnextswiss/doctype/edi_file/edi_file.json
 msgid "Incoming"
+msgstr ""
+
+#: erpnextswiss/erpnextswiss/config_readiness.py:261
+msgid "Incoming/outgoing payments will not auto-match by QR reference (mapping SI→qr_reference / PI→esr_reference_number missing)."
 msgstr ""
 
 #: erpnextswiss/swiss_qr/render.py:40
@@ -4531,6 +4659,10 @@ msgstr ""
 msgid "Inventory Number"
 msgstr ""
 
+#: erpnextswiss/public/js/bank_transaction.js:53
+msgid "Invoice"
+msgstr ""
+
 #. Label of the amount (Currency) field in DocType 'Payment Proposal Purchase
 #. Invoice'
 #: erpnextswiss/erpnextswiss/doctype/payment_proposal_purchase_invoice/payment_proposal_purchase_invoice.json
@@ -4552,6 +4684,10 @@ msgstr ""
 #. Transaction'
 #: erpnextswiss/erpnextswiss/doctype/ebics_statement_transaction/ebics_statement_transaction.json
 msgid "Invoice Matches"
+msgstr ""
+
+#: erpnextswiss/erpnextswiss/config_readiness.py:146
+msgid "Invoice creation will be blocked (default receivable/payable account missing)."
 msgstr ""
 
 #: erpnextswiss/docs/custom_scripts/payment_entry.js:41
@@ -4747,10 +4883,6 @@ msgstr ""
 msgid "Kontrolle MwSt DE"
 msgstr ""
 
-#: erpnextswiss/treasury/camt_import.py:252
-msgid "L'app banking (ALYF) n'est pas installée."
-msgstr ""
-
 #. Option for the 'Tax Class' (Select) field in DocType 'Sales Taxes and
 #. Charges Template'
 #: erpnextswiss/erpnextswiss/custom/sales_taxes_and_charges_template.json
@@ -4775,10 +4907,6 @@ msgstr ""
 #. Option for the 'Scope' (Select) field in DocType 'ebics Connection'
 #: erpnextswiss/erpnextswiss/doctype/ebics_connection/ebics_connection.json
 msgid "LU"
-msgstr ""
-
-#: erpnextswiss/treasury/fx_reconcile.py:24
-msgid "La transaction bancaire doit être soumise."
 msgstr ""
 
 #. Label of the box_label (Data) field in DocType 'AFC VAT Box'
@@ -4860,6 +4988,18 @@ msgstr ""
 #. Label of the last_sync (Datetime) field in DocType 'Brevo Settings'
 #: erpnextswiss/erpnextswiss/doctype/brevo_settings/brevo_settings.json
 msgid "Last Sync"
+msgstr ""
+
+#: erpnextswiss/erpnextswiss/config_readiness.py:410
+msgid "Last import executed"
+msgstr ""
+
+#: erpnextswiss/erpnextswiss/config_readiness.py:424
+msgid "Last import status"
+msgstr ""
+
+#: erpnextswiss/erpnextswiss/config_readiness.py:418
+msgid "Last import {0} h ago (expected ≤ {1} h for {2} frequency) → the scheduler may no longer be running."
 msgstr ""
 
 #: erpnextswiss/erpnextswiss/page/bankimport/bankimport.py:800
@@ -5115,10 +5255,6 @@ msgstr ""
 msgid "Monday"
 msgstr ""
 
-#: erpnextswiss/public/js/bank_transaction.js:35
-msgid "Montant compte"
-msgstr ""
-
 #: erpnextswiss/erpnextswiss/report/monthly_worktime/monthly_worktime.js:19
 msgid "Month"
 msgstr ""
@@ -5157,6 +5293,11 @@ msgstr ""
 
 #: erpnextswiss/erpnextswiss/report/monthly_worktime/monthly_worktime.py:129
 msgid "Monthly: {0} h"
+msgstr ""
+
+#: erpnextswiss/erpnextswiss/config_readiness.py:432
+#: erpnextswiss/erpnextswiss/config_readiness.py:436
+msgid "Multi-currency on a single party account"
 msgstr ""
 
 #: erpnextswiss/public/js/purchase_invoice.js:262
@@ -5284,6 +5425,10 @@ msgstr ""
 msgid "NextCloud Settings"
 msgstr ""
 
+#: erpnextswiss/treasury/camt_import.py:292
+msgid "No Bank Account found for IBAN {0}."
+msgstr ""
+
 #: erpnextswiss/erpnextswiss/report/worktime_overview/worktime_overview.py:31
 msgid "No Employee found."
 msgstr ""
@@ -5306,12 +5451,20 @@ msgstr ""
 msgid "No address for employee {0} found."
 msgstr ""
 
+#: erpnextswiss/erpnextswiss/config_readiness.py:133
+msgid "No address linked to the company → pain.001 and QR-bill rejected."
+msgstr ""
+
 #: erpnextswiss/erpnextswiss/doctype/direct_debit_proposal/direct_debit_proposal_list.js:18
 msgid "No available sales invoices found."
 msgstr ""
 
 #: erpnextswiss/erpnextswiss/page/payment_export/payment_export.js:55
 msgid "No errors"
+msgstr ""
+
+#: erpnextswiss/treasury/camt_import.py:369
+msgid "No file provided."
 msgstr ""
 
 #: erpnextswiss/erpnextswiss/page/abacus_export/abacus_export.js:92
@@ -5356,6 +5509,10 @@ msgstr ""
 
 #: erpnextswiss/erpnextswiss/page/match_payments/match_payments.js:54
 msgid "No unpaid sales invoices found."
+msgstr ""
+
+#: erpnextswiss/erpnextswiss/config_readiness.py:371
+msgid "No {0}↔CHF rate: any invoice in {0} will be BLOCKED (rate 0.00, online fallback disabled). Import the FTA rates."
 msgstr ""
 
 #. Label of the nominal_value (Data) field in DocType 'Calibration Test Item'
@@ -5477,6 +5634,8 @@ msgstr ""
 
 #. Option for the 'Status' (Select) field in DocType 'EDI File'
 #: erpnextswiss/erpnextswiss/doctype/edi_file/edi_file.json
+#: erpnextswiss/erpnextswiss/report/controle_de_configuration/controle_de_configuration.js:25
+#: erpnextswiss/erpnextswiss/report/controle_de_configuration/controle_de_configuration.py:65
 msgid "Open"
 msgstr ""
 
@@ -5523,12 +5682,12 @@ msgstr ""
 msgid "Optional Fields"
 msgstr ""
 
-#: erpnextswiss/public/js/bank_transaction_list.js:29
-msgid "Optionnel : utilisé seulement si l'IBAN du fichier ne correspond à aucun compte."
+#: erpnextswiss/public/js/bank_reconciliation_tool_beta.js:70
+msgid "Optional: used if the file IBAN does not match any account."
 msgstr ""
 
-#: erpnextswiss/public/js/bank_reconciliation_tool_beta.js:70
-msgid "Optionnel : utilisé si l'IBAN du fichier ne correspond à aucun compte."
+#: erpnextswiss/public/js/bank_transaction_list.js:29
+msgid "Optional: used only if the file IBAN does not match any account."
 msgstr ""
 
 #. Label of the section_options (Section Break) field in DocType 'Payment
@@ -5549,7 +5708,7 @@ msgid "Order of unknown item: {0}: {1}"
 msgstr ""
 
 #: erpnextswiss/public/js/bank_transaction.js:37
-msgid "Origine"
+msgid "Original"
 msgstr ""
 
 #. Option for the 'EBIT Classification' (Select) field in DocType 'Account'
@@ -5744,6 +5903,11 @@ msgstr ""
 msgid "Party Name"
 msgstr ""
 
+#: erpnextswiss/erpnextswiss/config_readiness.py:397
+#: erpnextswiss/erpnextswiss/config_readiness.py:401
+msgid "Party currencies covered by the import"
+msgstr ""
+
 #. Label of the password (Password) field in DocType 'Datatrans Settings'
 #. Label of the password (Password) field in DocType 'DPD Settings'
 #. Label of the zefix_pw (Password) field in DocType 'ERPNextSwiss Settings'
@@ -5788,6 +5952,10 @@ msgstr ""
 #: erpnextswiss/erpnextswiss/doctype/payment_proposal_expense/payment_proposal_expense.json
 #: erpnextswiss/erpnextswiss/doctype/payment_proposal_salary_slip/payment_proposal_salary_slip.json
 msgid "Payable Account"
+msgstr ""
+
+#: erpnextswiss/erpnextswiss/config_readiness.py:325
+msgid "Payable account in the currency"
 msgstr ""
 
 #: erpnextswiss/erpnextswiss/page/bank_wizard/transaction_table.html:93
@@ -6025,6 +6193,11 @@ msgstr ""
 msgid "Planning Period (Days)"
 msgstr ""
 
+#: erpnextswiss/erpnextswiss/config_readiness.py:240
+#: erpnextswiss/erpnextswiss/config_readiness.py:244
+msgid "Planning period (Payment Proposal)"
+msgstr ""
+
 #. Name of a DocType
 #: erpnextswiss/erpnextswiss/doctype/planzer_log/planzer_log.json
 msgid "Planzer Log"
@@ -6059,6 +6232,10 @@ msgstr ""
 
 #: erpnextswiss/erpnextswiss/doctype/ebics_connection/ebics_connection_wizard.html:3
 msgid "Please fill in the configuration fields of the connection."
+msgstr ""
+
+#: erpnextswiss/public/js/bank_reconciliation_tool_beta.js:21
+msgid "Please first select a transaction and a voucher to reconcile."
 msgstr ""
 
 #. Content of the 'Preview' (HTML) field in DocType 'ZUGFeRD Wizard'
@@ -6542,19 +6719,6 @@ msgstr ""
 msgid "REGEX 2"
 msgstr ""
 
-#: erpnextswiss/public/js/bank_transaction.js:60
-msgid "Rapprocher"
-msgstr ""
-
-#: erpnextswiss/public/js/bank_transaction.js:18
-#: erpnextswiss/public/js/bank_transaction.js:30
-msgid "Rapprocher au taux banque"
-msgstr ""
-
-#: erpnextswiss/public/js/bank_transaction.js:74
-msgid "Rapproché via {0}"
-msgstr ""
-
 #. Label of the rate (Float) field in DocType 'EDI File Pricat Item'
 #. Label of the rate (Currency) field in DocType 'EDI Sales Report Item'
 #: erpnextswiss/erpnextswiss/doctype/edi_file_pricat_item/edi_file_pricat_item.json
@@ -6607,6 +6771,10 @@ msgstr ""
 #: erpnextswiss/erpnextswiss/doctype/vat_declaration/vat_declaration.js:11
 #: erpnextswiss/erpnextswiss/doctype/vat_declaration_de/vat_declaration_de.js:10
 msgid "Recalculate"
+msgstr ""
+
+#: erpnextswiss/erpnextswiss/config_readiness.py:288
+msgid "Receivable account in the currency"
 msgstr ""
 
 #: erpnextswiss/erpnextswiss/page/bank_wizard/transaction_table.html:106
@@ -6663,6 +6831,11 @@ msgstr ""
 msgid "Receiving IBAN missing for method {0}."
 msgstr ""
 
+#: erpnextswiss/erpnextswiss/config_readiness.py:417
+#: erpnextswiss/erpnextswiss/config_readiness.py:421
+msgid "Recent import"
+msgstr ""
+
 #. Description of the 'D8 Congratulate the Main Contributors to your Team'
 #. (Section Break) field in DocType 'Non Conformity Report 8D'
 #: erpnextswiss/erpnextswiss/doctype/non_conformity_report_8d/non_conformity_report_8d.json
@@ -6670,7 +6843,17 @@ msgid "Recognize the collective efforts of the team. The team needs to be formal
 msgstr ""
 
 #: erpnextswiss/public/js/bank_reconciliation_tool_beta.js:13
+#: erpnextswiss/public/js/bank_transaction.js:60
 msgid "Reconcile"
+msgstr ""
+
+#: erpnextswiss/public/js/bank_transaction.js:18
+#: erpnextswiss/public/js/bank_transaction.js:30
+msgid "Reconcile at bank rate"
+msgstr ""
+
+#: erpnextswiss/public/js/bank_transaction.js:74
+msgid "Reconciled via {0}"
 msgstr ""
 
 #: erpnextswiss/erpnextswiss/page/abacus_export/abacus_export.html:12
@@ -6720,6 +6903,11 @@ msgstr ""
 msgid "Reference Number"
 msgstr ""
 
+#: erpnextswiss/erpnextswiss/config_readiness.py:260
+#: erpnextswiss/erpnextswiss/config_readiness.py:264
+msgid "Reference mapping (auto-matching)"
+msgstr ""
+
 #. Label of the references (Table) field in DocType 'Abacus Export File'
 #. Label of the sec_references (Section Break) field in DocType 'ebics
 #. Statement Transaction'
@@ -6751,6 +6939,12 @@ msgstr ""
 
 #: erpnextswiss/public/js/holiday_list.js:12
 msgid "Region"
+msgstr ""
+
+#: erpnextswiss/erpnextswiss/config_readiness.py:179
+#: erpnextswiss/erpnextswiss/config_readiness.py:183
+#: erpnextswiss/erpnextswiss/config_readiness.py:187
+msgid "Regular IBAN of the receiving account"
 msgstr ""
 
 #. Label of the remarks (Text Editor) field in DocType 'Sales Invoice Item'
@@ -7431,6 +7625,11 @@ msgstr ""
 msgid "Specify the problem by identifying in quantifiable terms the who, what, where, when, why, how, and how many (5W2H) for the problem."
 msgstr ""
 
+#: erpnextswiss/erpnextswiss/config_readiness.py:249
+#: erpnextswiss/erpnextswiss/config_readiness.py:253
+msgid "Stale exchange rates allowed"
+msgstr ""
+
 #. Label of the start_date (Date) field in DocType 'VAT Declaration'
 #. Label of the start_date (Date) field in DocType 'VAT Declaration DE'
 #: erpnextswiss/erpnextswiss/doctype/vat_declaration/vat_declaration.json
@@ -7481,6 +7680,7 @@ msgstr ""
 #: erpnextswiss/erpnextswiss/doctype/label_printer_job/label_printer_job.json
 #: erpnextswiss/erpnextswiss/doctype/non_conformity_report_8d/non_conformity_report_8d.json
 #: erpnextswiss/erpnextswiss/doctype/swiss_exchange_rate_import_log/swiss_exchange_rate_import_log.json
+#: erpnextswiss/erpnextswiss/report/controle_de_configuration/controle_de_configuration.py:64
 #: erpnextswiss/swiss_vat_config/report/controle_plausibilite_tva/controle_plausibilite_tva.py:20
 msgid "Status"
 msgstr ""
@@ -7543,6 +7743,10 @@ msgstr ""
 msgid "Supplier Address"
 msgstr ""
 
+#: erpnextswiss/erpnextswiss/config_readiness.py:329
+msgid "Supplier IBAN (pain.001 payment)"
+msgstr ""
+
 #. Label of the supplier_name (Data) field in DocType 'Payment Proposal
 #. Purchase Invoice'
 #: erpnextswiss/erpnextswiss/doctype/payment_proposal_purchase_invoice/payment_proposal_purchase_invoice.json
@@ -7563,6 +7767,10 @@ msgstr ""
 
 #: erpnextswiss/public/js/purchase_invoice.js:69
 msgid "Supplier has no valid QR-IBAN."
+msgstr ""
+
+#: erpnextswiss/erpnextswiss/config_readiness.py:326
+msgid "Supplier invoice in this currency BLOCKED: no payable account in the currency (supplier Accounting tab)."
 msgstr ""
 
 #: erpnextswiss/public/js/purchase_invoice.js:251
@@ -7690,10 +7898,6 @@ msgstr ""
 msgid "System unit"
 msgstr ""
 
-#: erpnextswiss/public/js/bank_reconciliation_tool_beta.js:21
-msgid "Sélectionnez d'abord une transaction et une pièce à rapprocher."
-msgstr ""
-
 #. Label of the ts_detail (Data) field in DocType 'Sales Invoice Item'
 #: erpnextswiss/erpnextswiss/custom/sales_invoice_item.json
 msgid "TS Detail"
@@ -7751,6 +7955,11 @@ msgstr ""
 msgid "Target Field"
 msgstr ""
 
+#: erpnextswiss/erpnextswiss/config_readiness.py:389
+#: erpnextswiss/erpnextswiss/config_readiness.py:392
+msgid "Target currency = CHF"
+msgstr ""
+
 #. Label of the target_date (Date) field in DocType 'Payment Proposal Salary
 #. Slip'
 #: erpnextswiss/erpnextswiss/doctype/payment_proposal_salary_slip/payment_proposal_salary_slip.json
@@ -7769,10 +7978,6 @@ msgstr ""
 
 #: erpnextswiss/erpnextswiss/report/monthly_worktime/monthly_worktime.py:123
 msgid "Target: {0} h"
-msgstr ""
-
-#: erpnextswiss/public/js/bank_transaction.js:39
-msgid "Taux banque"
 msgstr ""
 
 #. Label of the lodging_rate_2024 (Percent) field in DocType 'VAT Declaration'
@@ -8010,8 +8215,20 @@ msgstr ""
 msgid "Testing"
 msgstr ""
 
+#: erpnextswiss/erpnextswiss/config_readiness.py:250
+msgid "The 1st-of-month FTA rate will be rejected mid-month → ERPNext will fetch a non-compliant online rate (enable « allow stale »)."
+msgstr ""
+
+#: erpnextswiss/treasury/camt_import.py:366
+msgid "The ALYF Banking app is not installed."
+msgstr ""
+
 #: erpnextswiss/swiss_qr/validation.py:34
 msgid "The IBAN field contains a QR-IBAN. Put the QR-IBAN in the 'QR-IBAN' field (QRR method) and enter the regular IBAN here, which is used for payments (pain.001)."
+msgstr ""
+
+#: erpnextswiss/erpnextswiss/config_readiness.py:184
+msgid "The IBAN field contains a QR-IBAN: the pain.001 debtor will be invalid. Put the QR-IBAN in the QR-IBAN field."
 msgstr ""
 
 #: erpnextswiss/swiss_qr/validation.py:42
@@ -8022,18 +8239,58 @@ msgstr ""
 msgid "The QR-bill only supports CHF or EUR (invoice in {0})."
 msgstr ""
 
+#: erpnextswiss/erpnextswiss/config_readiness.py:120
+msgid "The QR-bill, the pain.001 file and the e-invoice cannot be generated (receiving account missing)."
+msgstr ""
+
+#: erpnextswiss/erpnextswiss/config_readiness.py:198
+msgid "The QRR QR-bill cannot be issued: QR-IBAN missing or outside the institution range 30000-31999."
+msgstr ""
+
 #: erpnextswiss/erpnextswiss/doctype/zugferd_wizard/nextcloud_integration.py:30
 msgid "The ZUGFeRD <> NextCloud interface is disabled."
+msgstr ""
+
+#: erpnextswiss/treasury/fx_reconcile.py:24
+msgid "The bank transaction must be submitted."
+msgstr ""
+
+#: erpnextswiss/erpnextswiss/config_readiness.py:139
+msgid "The company currency is not CHF: this distorts the scope of the multi-currency checks and the base accounting."
+msgstr ""
+
+#: erpnextswiss/erpnextswiss/config_readiness.py:167
+msgid "The e-invoice will be REJECTED: seller VAT identifier missing/invalid (EN 16931 rule BR-CO-26). Expected format: CHE-123.456.789 MWST (valid check digit)."
+msgstr ""
+
+#: erpnextswiss/erpnextswiss/config_readiness.py:159
+msgid "The exchange rate revaluation tool will refuse to run (unrealized exchange gain/loss account / 6998 missing)."
 msgstr ""
 
 #: erpnextswiss/erpnextswiss/doctype/zugferd_wizard/nextcloud_integration.py:172
 msgid "The following invoices were found in Nextcloud.<br>Click on them to process them.<br><br>"
 msgstr ""
 
+#: erpnextswiss/erpnextswiss/config_readiness.py:390
+msgid "The import target currency is not CHF (config to review)."
+msgstr ""
+
+#: erpnextswiss/erpnextswiss/config_readiness.py:425
+msgid "The last import is not OK: {0}"
+msgstr ""
+
 #. Description of the 'Minimum Fields' (Data) field in DocType 'BankImport
 #. Template'
 #: erpnextswiss/erpnextswiss/doctype/bankimport_template/bankimport_template.json
 msgid "The minimum field count per line."
+msgstr ""
+
+#: erpnextswiss/erpnextswiss/config_readiness.py:129
+msgid "The pain.001 debtor and the QR-bill creditor will be incomplete → payment files / QR-bills rejected."
+msgstr ""
+
+#: erpnextswiss/erpnextswiss/config_readiness.py:411
+msgid "The rate import has NEVER run (no « last run »)."
 msgstr ""
 
 #: erpnextswiss/public/js/purchase_invoice.js:78
@@ -8052,6 +8309,14 @@ msgstr ""
 #. Settings'
 #: erpnextswiss/erpnextswiss/doctype/datatrans_settings/datatrans_settings.json
 msgid "These are system-generated credentials from UPP Management &gt; Security"
+msgstr ""
+
+#: erpnextswiss/erpnextswiss/config_readiness.py:398
+msgid "These currencies used by your parties are NOT fetched automatically: {0}. Add them to the import currency list."
+msgstr ""
+
+#: erpnextswiss/erpnextswiss/config_readiness.py:347
+msgid "This (enabled) payment mode has no default account for this company → creating a payment via this mode will require choosing the account manually."
 msgstr ""
 
 #: erpnextswiss/erpnextswiss/doctype/inspection_equipment/inspection_equipment.py:38
@@ -8082,6 +8347,10 @@ msgstr ""
 
 #: erpnextswiss/docs/custom_scripts/purchase_invoice.js:25
 msgid "This invoice is already recorded in "
+msgstr ""
+
+#: erpnextswiss/erpnextswiss/config_readiness.py:330
+msgid "This supplier cannot be paid by pain.001 file (no IBAN set)."
 msgstr ""
 
 #. Label of the k_separator (Select) field in DocType 'BankImport Template'
@@ -8381,10 +8650,6 @@ msgstr ""
 msgid "Type"
 msgstr ""
 
-#: erpnextswiss/public/js/bank_transaction.js:45
-msgid "Type de pièce"
-msgstr ""
-
 #. Description of the 'Host' (Data) field in DocType 'Planzer Settings'
 #: erpnextswiss/erpnextswiss/doctype/planzer_settings/planzer_settings.json
 msgid "Typically lobplalb02.planzer.ch for PROD and lobplatestlb02.planzer.ch for TEST"
@@ -8480,6 +8745,11 @@ msgstr ""
 
 #: erpnextswiss/public/js/purchase_invoice_list.js:18
 msgid "Unpaid"
+msgstr ""
+
+#: erpnextswiss/erpnextswiss/config_readiness.py:158
+#: erpnextswiss/erpnextswiss/config_readiness.py:162
+msgid "Unrealized exchange account (revaluation)"
 msgstr ""
 
 #: erpnextswiss/erpnextswiss/page/bank_wizard/bank_wizard.js:87
@@ -8598,6 +8868,16 @@ msgstr ""
 #: erpnextswiss/erpnextswiss/doctype/vat_query/vat_query.json
 #: erpnextswiss/erpnextswiss/workspace/erpnextswiss/erpnextswiss.json
 msgid "VAT query"
+msgstr ""
+
+#: erpnextswiss/erpnextswiss/config_readiness.py:197
+#: erpnextswiss/erpnextswiss/config_readiness.py:201
+msgid "Valid QR-IBAN (QRR method)"
+msgstr ""
+
+#: erpnextswiss/erpnextswiss/config_readiness.py:166
+#: erpnextswiss/erpnextswiss/config_readiness.py:170
+msgid "Valid VAT number (UID)"
 msgstr ""
 
 #. Label of the validate_hlk_element_allocation (Check) field in DocType 'HLK
@@ -8721,6 +9001,7 @@ msgstr ""
 
 #: erpnextswiss/erpnextswiss/report/account_sheets/account_sheets.py:21
 #: erpnextswiss/erpnextswiss/report/account_sheets_with_tax_codes/account_sheets_with_tax_codes.py:22
+#: erpnextswiss/public/js/bank_transaction.js:45
 msgid "Voucher type"
 msgstr ""
 
@@ -8755,6 +9036,14 @@ msgstr ""
 #. Option for the 'Status' (Select) field in DocType 'Inspection Equipment'
 #: erpnextswiss/erpnextswiss/doctype/inspection_equipment/inspection_equipment.json
 msgid "Without Calibration"
+msgstr ""
+
+#: erpnextswiss/erpnextswiss/config_readiness.py:283
+msgid "Without an address, the e-invoice will be REJECTED (buyer address mandatory, EN 16931 BR-10/11) and the QR-bill « payable by » block will stay empty."
+msgstr ""
+
+#: erpnextswiss/erpnextswiss/config_readiness.py:320
+msgid "Without an address, this supplier cannot be paid by pain.001 (creditor without address → file rejected by the bank) and the purchase e-invoice will be incomplete."
 msgstr ""
 
 #: erpnextswiss/erpnextswiss/report/monthly_worktime/monthly_worktime.html:12
@@ -8850,6 +9139,10 @@ msgstr ""
 msgid "You are not allowed to send emails related to this document"
 msgstr ""
 
+#: erpnextswiss/erpnextswiss/config_readiness.py:229
+msgid "Your payment files use combined addresses (type K), REMOVED by SIX (Nov. 2025) → rejected by the bank. Switch to version 09."
+msgstr ""
+
 #. Option for the 'Tax Class' (Select) field in DocType 'Sales Taxes and
 #. Charges Template'
 #: erpnextswiss/erpnextswiss/custom/sales_taxes_and_charges_template.json
@@ -8928,6 +9221,14 @@ msgstr ""
 #. Option for the 'Method' (Select) field in DocType 'ERPNextSwiss Settings'
 #: erpnextswiss/erpnextswiss/doctype/erpnextswiss_settings/erpnextswiss_settings.json
 msgid "billing_hours"
+msgstr ""
+
+#: erpnextswiss/erpnextswiss/config_readiness.py:208
+msgid "camt statement import cannot route any transaction (no company Bank Account)."
+msgstr ""
+
+#: erpnextswiss/erpnextswiss/config_readiness.py:214
+msgid "camt statements for this account will be ignored (« No Bank Account found for IBAN »)."
 msgstr ""
 
 #. Label of the delis_id (Data) field in DocType 'DPD Settings'
@@ -9060,6 +9361,28 @@ msgstr ""
 msgid "not"
 msgstr ""
 
+#: erpnextswiss/erpnextswiss/config_readiness.py:180
+msgid "pain.001 (« IBAN missing in pay from account »), e-invoice and QR SCOR/NON cannot show your IBAN."
+msgstr ""
+
+#: erpnextswiss/erpnextswiss/config_readiness.py:234
+#: erpnextswiss/erpnextswiss/config_readiness.py:238
+msgid "pain.001 XML validation"
+msgstr ""
+
+#: erpnextswiss/erpnextswiss/config_readiness.py:191
+msgid "pain.001 generation will fail (« missing IBAN and/or BIC »)."
+msgstr ""
+
+#: erpnextswiss/erpnextswiss/config_readiness.py:228
+#: erpnextswiss/erpnextswiss/config_readiness.py:232
+msgid "pain.001 version = 09"
+msgstr ""
+
+#: erpnextswiss/erpnextswiss/report/controle_de_configuration/controle_de_configuration.py:55
+msgid "status"
+msgstr ""
+
 #: erpnextswiss/erpnextswiss/page/abacus_export/abacus_export.html:8
 msgid "to"
 msgstr ""
@@ -9109,5 +9432,17 @@ msgstr ""
 
 #: erpnextswiss/swiss_vat_config/doctype/afc_vat_box/afc_vat_box.py:18
 msgid "« Taguable en écriture » n'est possible que sur une case d'IMPÔT côté ACHAT (le moteur ne gère pas encore la voie écriture pour les cases de CA/base). Case {0} : {1} / {2} / {3}."
+msgstr ""
+
+#: erpnextswiss/erpnextswiss/config_readiness.py:458
+msgid "… +{0} more"
+msgstr ""
+
+#: erpnextswiss/erpnextswiss/report/controle_de_configuration/controle_de_configuration.py:39
+msgid "⚠️ {0} to check"
+msgstr ""
+
+#: erpnextswiss/erpnextswiss/report/controle_de_configuration/controle_de_configuration.py:37
+msgid "❌ {0} issue(s)"
 msgstr ""
 

@@ -27,11 +27,12 @@ frappe.query_reports["Controle de configuration"] = {
         }
         value = default_formatter(value, row, column, data);
         if (column.fieldname === "status" && data && data.status) {
-            if (data.status.indexOf("Anomalie") !== -1) {
+            // couleur pilotée par l'EMOJI (indépendant de la langue)
+            if (data.status.indexOf("❌") !== -1) {
                 value = `<span style="color:#c0392b;font-weight:600">${value}</span>`;
-            } else if (data.status.indexOf("vérifier") !== -1) {
+            } else if (data.status.indexOf("⚠") !== -1) {
                 value = `<span style="color:#b8860b;font-weight:600">${value}</span>`;
-            } else if (data.status.indexOf("OK") !== -1) {
+            } else if (data.status.indexOf("✅") !== -1) {
                 value = `<span style="color:#1e8449">${value}</span>`;
             }
         }

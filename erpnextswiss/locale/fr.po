@@ -5572,7 +5572,7 @@ msgstr ""
 #. Option for the 'Status' (Select) field in DocType 'EDI File'
 #: erpnextswiss/erpnextswiss/doctype/edi_file/edi_file.json
 msgid "Open"
-msgstr ""
+msgstr "Ouvrir"
 
 #: erpnextswiss/erpnextswiss/doctype/pincode/pincode.js:6
 msgid "Open Map"
@@ -7600,7 +7600,7 @@ msgstr "Statistiques"
 #: erpnextswiss/erpnextswiss/doctype/swiss_exchange_rate_import_log/swiss_exchange_rate_import_log.json
 #: erpnextswiss/swiss_vat_config/report/controle_plausibilite_tva/controle_plausibilite_tva.py:20
 msgid "Status"
-msgstr ""
+msgstr "Statut"
 
 #. Label of the status_message (Small Text) field in DocType 'Label Printer
 #. Job'
@@ -9695,4 +9695,391 @@ msgstr "Optionnel : utilisé si l'IBAN du fichier ne correspond à aucun compte.
 
 msgid "Please first select a transaction and a voucher to reconcile."
 msgstr "Sélectionnez d'abord une transaction et une pièce à rapprocher."
+
+msgid "✅ OK"
+msgstr "✅ OK"
+
+msgid "❌ Issue"
+msgstr "❌ Anomalie"
+
+msgid "⚠️ Check"
+msgstr "⚠️ À vérifier"
+
+msgid "1 · Company"
+msgstr "1 · Société"
+
+msgid "2 · Bank accounts"
+msgstr "2 · Comptes bancaires"
+
+msgid "3 · Party accounts (currencies)"
+msgstr "3 · Comptes de tiers (devises)"
+
+msgid "4 · Customers"
+msgstr "4 · Clients"
+
+msgid "5 · Suppliers"
+msgstr "5 · Fournisseurs"
+
+msgid "6 · Exchange rates (FTA)"
+msgstr "6 · Change (cours AFC)"
+
+msgid "7 · Settings"
+msgstr "7 · Paramètres"
+
+msgid "❌ {0} issue(s)"
+msgstr "❌ {0} anomalie(s)"
+
+msgid "⚠️ {0} to check"
+msgstr "⚠️ {0} à vérifier"
+
+msgid "… +{0} more"
+msgstr "… +{0} autres"
+
+msgid "Domain / Check"
+msgstr "Domaine / Contrôle"
+
+msgid "Impact if misconfigured"
+msgstr "Impact si mal configuré"
+
+msgid "Controle de configuration"
+msgstr "Contrôle de configuration"
+
+msgid "Default bank account"
+msgstr "Compte bancaire par défaut"
+
+msgid ""
+"The QR-bill, the pain.001 file and the e-invoice cannot be generated "
+"(receiving account missing)."
+msgstr ""
+"La QR-facture, le fichier pain.001 et la e-facture ne peuvent pas être "
+"générés (compte de réception manquant)."
+
+msgid "Company address complete"
+msgstr "Adresse société complète"
+
+msgid ""
+"The pain.001 debtor and the QR-bill creditor will be incomplete → payment"
+" files / QR-bills rejected."
+msgstr ""
+"Le débiteur du pain.001 et le créancier de la QR-facture seront "
+"incomplets → fichiers de paiement / bulletins QR rejetés."
+
+msgid "No address linked to the company → pain.001 and QR-bill rejected."
+msgstr "Aucune adresse liée à la société → pain.001 et QR-facture rejetés."
+
+msgid "Company currency = CHF"
+msgstr "Devise de la société = CHF"
+
+msgid ""
+"The company currency is not CHF: this distorts the scope of the multi-"
+"currency checks and the base accounting."
+msgstr ""
+"La devise de la société n'est pas CHF : cela fausse le périmètre des "
+"contrôles multidevises et la comptabilité de référence."
+
+msgid "Default receivable/payable accounts"
+msgstr "Comptes clients/fournisseurs par défaut"
+
+msgid ""
+"Invoice creation will be blocked (default receivable/payable account "
+"missing)."
+msgstr ""
+"La création de factures sera bloquée (compte de créance/dette par défaut "
+"manquant)."
+
+msgid "Exchange gain/loss account"
+msgstr "Compte de gain/perte de change"
+
+msgid ""
+"Foreign-currency payments cannot book the exchange difference (Payment "
+"Entry submission blocked)."
+msgstr ""
+"Les paiements en devise ne pourront pas comptabiliser l'écart de change "
+"(soumission du Payment Entry bloquée)."
+
+msgid "Unrealized exchange account (revaluation)"
+msgstr "Compte de change latent (réévaluation)"
+
+msgid ""
+"The exchange rate revaluation tool will refuse to run (unrealized "
+"exchange gain/loss account / 6998 missing)."
+msgstr ""
+"L'outil de réévaluation de change (change latent) refusera de tourner "
+"(compte de change non réalisé / 6998 manquant)."
+
+msgid "Valid VAT number (UID)"
+msgstr "N° TVA (IDE) valide"
+
+msgid ""
+"The e-invoice will be REJECTED: seller VAT identifier missing/invalid (EN"
+" 16931 rule BR-CO-26). Expected format: CHE-123.456.789 MWST (valid check"
+" digit)."
+msgstr ""
+"L'e-facture sera REJETÉE : identifiant TVA du vendeur manquant/invalide "
+"(règle EN 16931 BR-CO-26). Format attendu : CHE-123.456.789 MWST (clé "
+"valide)."
+
+msgid "Regular IBAN of the receiving account"
+msgstr "IBAN classique du compte de réception"
+
+msgid ""
+"pain.001 (« IBAN missing in pay from account »), e-invoice and QR "
+"SCOR/NON cannot show your IBAN."
+msgstr ""
+"pain.001 (« IBAN missing in pay from account »), e-facture et QR SCOR/NON"
+" ne pourront pas indiquer votre IBAN."
+
+msgid ""
+"The IBAN field contains a QR-IBAN: the pain.001 debtor will be invalid. "
+"Put the QR-IBAN in the QR-IBAN field."
+msgstr ""
+"Le champ IBAN contient une QR-IBAN : le débiteur du pain.001 sera "
+"invalide. Mettez la QR-IBAN dans le champ QR-IBAN."
+
+msgid "BIC of the receiving account"
+msgstr "BIC du compte de réception"
+
+msgid "pain.001 generation will fail (« missing IBAN and/or BIC »)."
+msgstr "La génération du pain.001 échouera (« missing IBAN and/or BIC »)."
+
+msgid "Valid QR-IBAN (QRR method)"
+msgstr "QR-IBAN valide (méthode QRR)"
+
+msgid ""
+"The QRR QR-bill cannot be issued: QR-IBAN missing or outside the "
+"institution range 30000-31999."
+msgstr ""
+"La QR-facture QRR ne peut pas être émise : QR-IBAN manquante ou hors "
+"plage institution 30000-31999."
+
+msgid "Company bank account (Bank Account)"
+msgstr "Compte bancaire de société (Bank Account)"
+
+msgid ""
+"camt statement import cannot route any transaction (no company Bank "
+"Account)."
+msgstr ""
+"L'import de relevés camt ne pourra router aucun mouvement (aucun Bank "
+"Account « compte de société »)."
+
+msgid "Bank Account IBAN (camt routing)"
+msgstr "IBAN du Bank Account (routage camt)"
+
+msgid ""
+"camt statements for this account will be ignored (« No Bank Account found"
+" for IBAN »)."
+msgstr ""
+"Les relevés camt de ce compte seront ignorés (« No Bank Account found for"
+" IBAN »)."
+
+msgid "GL account linked to the Bank Account"
+msgstr "Compte GL lié au Bank Account"
+
+msgid "Imported transactions will have no currency (GL account not linked)."
+msgstr "Les transactions importées n'auront pas de devise (compte GL non lié)."
+
+msgid "Bank Account (IBAN + GL account)"
+msgstr "Bank Account (IBAN + compte GL)"
+
+msgid "pain.001 version = 09"
+msgstr "Version pain.001 = 09"
+
+msgid ""
+"Your payment files use combined addresses (type K), REMOVED by SIX (Nov. "
+"2025) → rejected by the bank. Switch to version 09."
+msgstr ""
+"Vos fichiers de paiement utilisent des adresses combinées (type K), "
+"RETIRÉES par SIX (nov. 2025) → rejetés par la banque. Passez en version "
+"09."
+
+msgid "pain.001 XML validation"
+msgstr "Validation XML pain.001"
+
+msgid ""
+"A non-conformant pain.001 will only be detected after the bank rejects it"
+" (enable « Validate XML »)."
+msgstr ""
+"Un pain.001 non conforme ne sera détecté qu'après rejet par la banque "
+"(activez « Validate XML »)."
+
+msgid "Planning period (Payment Proposal)"
+msgstr "Période de planification (Payment Proposal)"
+
+msgid ""
+"Creating a payment proposal will fail (« Please configure the planning "
+"period in ERPNextSwiss Settings »)."
+msgstr ""
+"La création d'une proposition de paiement échouera (« Please configure "
+"the planning period in ERPNextSwiss Settings »)."
+
+msgid "Stale exchange rates allowed"
+msgstr "Cours de change périmés autorisés"
+
+msgid ""
+"The 1st-of-month FTA rate will be rejected mid-month → ERPNext will fetch"
+" a non-compliant online rate (enable « allow stale »)."
+msgstr ""
+"Le cours mensuel AFC du 1er sera rejeté en cours de mois → ERPNext ira "
+"chercher un cours en ligne NON conforme AFC (activez « allow stale »)."
+
+msgid "Reference mapping (auto-matching)"
+msgstr "Mapping de référence (matching auto)"
+
+msgid ""
+"Incoming/outgoing payments will not auto-match by QR reference (mapping "
+"SI→qr_reference / PI→esr_reference_number missing)."
+msgstr ""
+"Les encaissements/décaissements ne se rapprocheront pas automatiquement "
+"par la référence QR (mapping SI→qr_reference / PI→esr_reference_number "
+"manquant)."
+
+msgid "Default account of the payment mode"
+msgstr "Compte par défaut du mode de paiement"
+
+msgid ""
+"This (enabled) payment mode has no default account for this company → "
+"creating a payment via this mode will require choosing the account "
+"manually."
+msgstr ""
+"Ce mode de paiement (activé) n'a pas de compte par défaut pour cette "
+"société → la création d'un paiement via ce mode exigera de choisir le "
+"compte à la main."
+
+msgid "Billing address present"
+msgstr "Adresse de facturation présente"
+
+msgid ""
+"Without an address, the e-invoice will be REJECTED (buyer address "
+"mandatory, EN 16931 BR-10/11) and the QR-bill « payable by » block will "
+"stay empty."
+msgstr ""
+"Sans adresse, l'e-facture sera REJETÉE (adresse acheteur obligatoire, EN "
+"16931 BR-10/11) et le bloc « payable par » de la QR-facture restera vide."
+
+msgid "Foreign customer with missing/CHF currency"
+msgstr "Client étranger avec devise manquante/CHF"
+
+msgid ""
+"Foreign customer without a foreign billing currency: foreign-currency "
+"invoices and e-invoicing may be mislabeled (check the customer currency)."
+msgstr ""
+"Client à l'étranger sans devise de facturation étrangère : les factures "
+"en devise et l'e-facturation risquent d'être mal libellées (vérifiez la "
+"devise du client)."
+
+msgid "Receivable account in the currency"
+msgstr "Compte de créance dans la devise"
+
+msgid ""
+"Customer invoice in this currency BLOCKED: no receivable account in the "
+"currency (customer Accounting tab) and « multi-currency on a single "
+"account » disabled."
+msgstr ""
+"Facture client dans cette devise BLOQUÉE : aucun compte de créance dans "
+"la devise (onglet Comptabilité du client) et « multidevises sur compte "
+"unique » désactivé."
+
+msgid "Foreign supplier with missing/CHF currency"
+msgstr "Fournisseur étranger avec devise manquante/CHF"
+
+msgid ""
+"Foreign supplier without a foreign currency: foreign-currency "
+"invoices/payments may be mislabeled (check the supplier currency)."
+msgstr ""
+"Fournisseur à l'étranger sans devise étrangère : les factures/paiements "
+"en devise risquent d'être mal libellés (vérifiez la devise du "
+"fournisseur)."
+
+msgid "Payable account in the currency"
+msgstr "Compte de dette dans la devise"
+
+msgid ""
+"Supplier invoice in this currency BLOCKED: no payable account in the "
+"currency (supplier Accounting tab)."
+msgstr ""
+"Facture fournisseur dans cette devise BLOQUÉE : aucun compte de dette "
+"dans la devise (onglet Comptabilité du fournisseur)."
+
+msgid "Supplier IBAN (pain.001 payment)"
+msgstr "IBAN fournisseur (paiement pain.001)"
+
+msgid "This supplier cannot be paid by pain.001 file (no IBAN set)."
+msgstr ""
+"Ce fournisseur ne pourra pas être payé par fichier pain.001 (aucun IBAN "
+"renseigné)."
+
+msgid "Exchange rate available"
+msgstr "Cours de change disponible"
+
+msgid ""
+"No {0}↔CHF rate: any invoice in {0} will be BLOCKED (rate 0.00, online "
+"fallback disabled). Import the FTA rates."
+msgstr ""
+"Aucun cours {0}↔CHF : toute facture en {0} sera BLOQUÉE (cours 0.00, "
+"fallback en ligne coupé). Importez les cours AFC."
+
+msgid "Automatic FTA rate import enabled"
+msgstr "Import automatique des cours AFC activé"
+
+msgid ""
+"Automatic FTA rate import is disabled → rates will not update on their "
+"own (risk of stale/missing rates)."
+msgstr ""
+"L'import automatique des cours AFC est désactivé → les cours ne se "
+"mettent pas à jour tout seuls (risque de cours périmés/manquants)."
+
+msgid "Target currency = CHF"
+msgstr "Devise cible = CHF"
+
+msgid "The import target currency is not CHF (config to review)."
+msgstr "La devise cible de l'import n'est pas CHF (config à revoir)."
+
+msgid "Party currencies covered by the import"
+msgstr "Devises des tiers couvertes par l'import"
+
+msgid ""
+"These currencies used by your parties are NOT fetched automatically: {0}."
+" Add them to the import currency list."
+msgstr ""
+"Ces devises utilisées par vos tiers ne sont PAS récupérées "
+"automatiquement : {0}. Ajoutez-les à la liste des devises de l'import."
+
+msgid "Last import executed"
+msgstr "Dernier import exécuté"
+
+msgid "The rate import has NEVER run (no « last run »)."
+msgstr "L'import des cours n'a JAMAIS été exécuté (aucun « last run »)."
+
+msgid "Recent import"
+msgstr "Dernier import récent"
+
+msgid ""
+"Last import {0} h ago (expected ≤ {1} h for {2} frequency) → the "
+"scheduler may no longer be running."
+msgstr ""
+"Dernier import il y a {0} h (attendu ≤ {1} h pour une fréquence {2}) → le"
+" planificateur ne tourne peut-être plus."
+
+msgid "Last import status"
+msgstr "Statut du dernier import"
+
+msgid "The last import is not OK: {0}"
+msgstr "Le dernier import n'est pas OK : {0}"
+
+msgid "Multi-currency on a single party account"
+msgstr "Multidevises sur compte de tiers unique"
+
+msgid ""
+"Enabled: a single CHF account can carry foreign-currency invoices (per-"
+"currency party accounts not required)."
+msgstr ""
+"Activé : un compte CHF unique peut porter des factures en devise (comptes"
+" de tiers par devise non obligatoires)."
+
+msgid ""
+"Disabled: each foreign-currency party MUST have a receivable/payable "
+"account in its currency, otherwise its invoices will be blocked."
+msgstr ""
+"Désactivé : chaque tiers en devise DOIT avoir un compte de créance/dette "
+"dans sa devise, sinon ses factures seront bloquées."
 

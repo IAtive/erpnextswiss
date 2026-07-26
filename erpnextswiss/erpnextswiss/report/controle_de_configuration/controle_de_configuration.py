@@ -29,18 +29,20 @@ def _build_tree(rows):
         grp = by_group.get(g)
         if not grp:
             continue
+        # libellé de groupe TRADUIT (= id de l'arbre : name_field & parent_field cohérents)
+        glabel = _(g)
         n_ko = sum(1 for r in grp if r["status"].startswith("❌"))
         n_warn = sum(1 for r in grp if r["status"].startswith("⚠"))
         if n_ko:
-            summary = "❌ %d Anomalie(s)" % n_ko
+            summary = _("❌ {0} issue(s)").format(n_ko)
         elif n_warn:
-            summary = "⚠️ %d à vérifier" % n_warn
+            summary = _("⚠️ {0} to check").format(n_warn)
         else:
-            summary = OK
+            summary = _(OK)
         # ligne-groupe (repliable)
-        tree.append({"label": g, "status": summary, "impact": "", "link_url": "",
+        tree.append({"label": glabel, "status": summary, "impact": "", "link_url": "",
                      "indent": 0, "parent_id": ""})
-        # lignes de détail
+        # lignes de détail (statut traduit ; check déjà traduit par collect())
         for r in grp:
             lbl = r["check"]
             if r["entity"] and r["entity"] != "—":
@@ -50,8 +52,8 @@ def _build_tree(rows):
                 lbl = "%s (%d)" % (base, k)
                 k += 1
             seen.add(lbl)
-            tree.append({"label": lbl, "status": r["status"], "impact": r["impact"],
-                         "link_url": r.get("link_url", ""), "indent": 1, "parent_id": g})
+            tree.append({"label": lbl, "status": _(r["status"]), "impact": r["impact"],
+                         "link_url": r.get("link_url", ""), "indent": 1, "parent_id": glabel})
     return tree
 
 
