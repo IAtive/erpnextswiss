@@ -183,11 +183,45 @@ def configure_alyf_voucher_defaults():
 	settings.save(ignore_permissions=True)
 
 
+# Défauts de génération des fichiers de paiement (pain.001) sur ERPNextSwiss
+# Settings. Cœur ERPNextSwiss (indépendant d'ALYF) :
+#   - validate_xml = 1 : valide le pain.001 contre le XSD à la génération du
+#     Payment Proposal (attrape les fichiers non conformes avant envoi banque) ;
+#   - xml_version = "09" : pain.001.001.09.ch.03 = ADRESSES STRUCTURÉES (type S),
+#     conformité SIX (obligatoire depuis nov. 2025). Les versions 03/05 utilisent
+#     l'adresse combinée (type K), retirée.
+PAIN001_DEFAULT_VERSION = "09"
+
+
+def ensure_pain001_defaults():
+	"""Active la validation XML et force la version pain.001 « 09 » (conformité).
+
+	Idempotent. Applique nos défauts de fork (validation ON + adresses structurées).
+	"""
+	if not frappe.db.exists("DocType", "ERPNextSwiss Settings"):
+		return
+	settings = frappe.get_single("ERPNextSwiss Settings")
+	changed = False
+	if not settings.get("validate_xml"):
+		settings.validate_xml = 1
+		changed = True
+	if settings.get("xml_version") != PAIN001_DEFAULT_VERSION:
+		settings.xml_version = PAIN001_DEFAULT_VERSION
+		changed = True
+	if changed:
+		settings.flags.ignore_permissions = True
+		settings.save(ignore_permissions=True)
+
+
 def after_migrate():
-	"""Hook after_migrate : (si banking) champs FX, menu ALYF & mapping de référence."""
+	"""Hook after_migrate : défauts pain.001 (core) + (si banking) FX, menu & mappings ALYF."""
 	from erpnextswiss.treasury.utils import is_banking_installed
 
+	# core ERPNextSwiss (indépendant d'ALYF) : conformité pain.001
+	ensure_pain001_defaults()
+
 	if not is_banking_installed():
+		frappe.db.commit()
 		return
 	create_custom_fields(FX_CUSTOM_FIELDS, ignore_validate=True)
 	add_payment_proposal_to_alyf_sidebar()
